@@ -1,0 +1,1716 @@
+    <div id="displayBox" style="display: none;"><img src="<?= base_url(); ?>/assets/process.gif" style="width: 80px;"></div>
+        <div class="container-fluid form-top login">
+            <div class="row">
+                <div class="col-lg-12 ">
+
+                    <?php if($this->session->flashdata('message')):?>
+                    <div class="col-lg-12 ">
+                        <div class="alert alert-warning alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <strong class="rasid" style="color:red !important"><?php echo $this->session->flashdata('message');?></strong>
+                        </div>
+                    </div>
+                    <?php endif;?>
+                    <div class="col-lg-12">
+                        <div class="well well-sm">
+                            <?php 
+                                $case_no = $field_mut_basic->case_no;
+                                $arr = explode('/', $case_no);
+                                $service = $arr['4'];
+                                if($rtps=='RTPS'){
+                                    $hide='hide';
+                                    $readonly='readonly';
+                                }else{
+                                    $hide=null;
+                                    $readonly=null;
+                                }
+                            ?>
+
+
+                            <h2 style="text-align: center; color: red">Field <?=(($service=='FMUT')?'Mutation':'Partition')?> Revert Report</h2>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="panel panel-info">
+                            <div class="panel-body">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <span style="color:#3c8198; font-size: 18px" class="bold"><?php echo $this->lang->line('general_information'); ?>
+                                </span>
+                                <input type='hidden' id='case_no' value='<?=$field_mut_basic->case_no ?>'>
+                                <table class='table table-bordered unicode'>
+                                    <tr>
+                                        <td width="35%"><label
+                                            class="text-danger">Case No.
+                                            : &nbsp;&nbsp;&nbsp;<?= $field_mut_basic->case_no ?></label>
+                                        </td>
+                                        <td width="30%"><label
+                                            class="text-danger">Transfer Type
+                                            : &nbsp;&nbsp;&nbsp;<?= $this->utilityclass->getTransferType($field_mut_basic->trans_code) ?></label>
+                                        </td>
+                                        <td width="35%"><label
+                                            class="text-danger">জিলা (District)
+                                            : &nbsp;&nbsp;&nbsp;<?= $this->utilityclass->getDistrictName($field_mut_basic->dist_code) ?></label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><label
+                                            class="text-danger">মহকুমা (Sub Division)
+                                            :
+                                            &nbsp;&nbsp;&nbsp;<?= $this->utilityclass->getSubDivName($field_mut_basic->dist_code, $field_mut_basic->subdiv_code) ?></label>
+                                        </td>
+                                        <td><label
+                                            class="text-danger">চক্র (Circle)
+                                            :
+                                            &nbsp;&nbsp;&nbsp; <?= $this->utilityclass->getCircleName($field_mut_basic->dist_code, $field_mut_basic->subdiv_code, $field_mut_basic->cir_code) ?></label>
+                                        </td>
+                                        <td><label
+                                            class="text-danger">মৌজা (Mouza)
+                                            : &nbsp;&nbsp;&nbsp;<?= $this->utilityclass->getMouzaName($field_mut_basic->dist_code, $field_mut_basic->subdiv_code, $field_mut_basic->cir_code, $field_mut_basic->mouza_pargona_code) ?></label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1"><label
+                                            class="text-danger">লাট (Lot)
+                                            : &nbsp;&nbsp;&nbsp;<?= $this->utilityclass->getLotName($field_mut_basic->dist_code, $field_mut_basic->subdiv_code, $field_mut_basic->cir_code, $field_mut_basic->mouza_pargona_code, $field_mut_basic->lot_no) ?></label>
+                                        </td>
+                                        <td>
+                                                <label
+                                                class="text-danger">গাওঁ / চহৰ (Village) :
+                                                <?= $this->utilityclass->getVillageName($field_mut_basic->dist_code, $field_mut_basic->subdiv_code, $field_mut_basic->cir_code, $field_mut_basic->mouza_pargona_code, $field_mut_basic->lot_no, $field_mut_basic->vill_townprt_code) ?></span>
+                                            </label>
+                                        </td>
+                                        
+                                    </tr>
+                                    <?php foreach ($dag_details as $key => $value) { ?>
+                                       <tr>
+                                        <td >
+                                            <label
+                                                class="text-danger">Dag No :
+                                                 &nbsp;&nbsp;&nbsp;<?= $value->dag_no;?></span>
+                                            </label>
+                                        </td>
+                                        <td><label
+                                            class="text-danger">Patta Type :
+                                            : &nbsp;&nbsp;&nbsp;<?= $this->utilityclass->getPattaName($value->patta_type_code) ?></label>
+                                        </td>
+                                        <td><label
+                                            class="text-danger">Patta No.
+                                            : &nbsp;&nbsp;&nbsp;<?= $value->patta_no ?></label>
+                                             <label
+                                                class="text-danger"> &nbsp;&nbsp;&nbsp;&nbsp;Date :
+                                                 &nbsp;&nbsp;&nbsp;<?= date('Y-m-d') ?></span>
+                                            </label>
+                                        </td>
+
+                                </tr>
+                                   <?php } ?>
+                                    
+                            </table>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">&nbsp;</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <span style="color:#3c8198; font-size: 18px" class="bold">
+                                <?php echo $this->lang->line('applicant_information'); ?> (First Party)
+                            </span>
+                            <?php if($field_mut_basic->mut_type=='02') { ?>
+                            <button class="btn btn-sm btn-warning pull-right btnAddPartyFP">Add Additional Party&nbsp;<i class="fa fa-plus-square"></i></button>
+                            <?php } ?>
+                            <table class='table table-bordered unicode'>
+                                <thead>
+                                    <tr class="text-bold table-success">
+                                        <th><label
+                                            class="text-danger"><?php echo $this->lang->line('applicants_name'); ?></label>
+                                        </th>
+                                        <th><label
+                                            class="text-danger"><?php echo $this->lang->line('guardian_name'); ?></label>
+                                        </th>
+                                        <th><label
+                                            class="text-danger"><?php echo $this->lang->line('address1'); ?>
+                                            / <?php echo $this->lang->line('address2'); ?></label>
+                                        </th>
+                                        
+                                        <?php if($field_mut_basic->mut_type=='01'){ ?>
+                                            <th><label class="text-danger">Land Area</label></th>
+                                            <th><label class="text-danger ">Edit | Delete</label></th>
+                                        <?php } else { ?>
+                                            <th><label class="text-danger">Delete</label></th>
+                                        <?php } ?>
+                                                                            
+                                    </tr>
+                                </thead>
+                                <tbody id="field_mut_petitioner">
+                                    <?php foreach ($field_mut_petitioner as $key=>$applicant) {
+
+                                        $bigha = (($applicant->applied_b==null)?'0':$applicant->applied_b);
+                                        $katha = (($applicant->applied_k==null)?'0':$applicant->applied_k);
+                                        $lessa = (($applicant->applied_lc==null)?'0':$applicant->applied_b);
+
+                                        $land = 'B:'.$bigha.' / K:'.$katha.' / L:'.$lessa.' / Kr: 0';
+                                        $add2 = $applicant->add2;
+
+                                        ?>
+                                        <tr id="<?=$applicant->pet_id?>" class="remove_<?=$applicant->pet_id?>">
+                                            <td><?= $applicant->pet_name ?></label>
+                                            </td>
+                                            <td><?= $applicant->guard_name ?></label>
+                                            </td>
+                                            <td>Add 1: <?= $applicant->add1 ?><br>
+                                            <?=(($add2=='')?'':'Add 2:'. $add2)?>
+                                            </td>
+                                            <?php if($field_mut_basic->mut_type=='01'){ ?>
+                                            <td><label class="text-danger"><?=$land?></label></td>
+                                            <?php } ?>
+                                            <td>
+                                                <?php if($field_mut_basic->mut_type=='01'){ ?>
+                                                <button class="btn <?=$hide?> btn-sm btn-primary btnFirstApplEditLM" id="<?=$applicant->pet_id?>" title="Click to Edit Applicant <?= $applicant->pet_name ?>"><i class="fa fa-edit"></i></button>&nbsp;
+                                                <button class="btn btn-sm <?=$hide?> btn-danger btnApplDeleteLM" title="Click to Delete Applicant <?= $applicant->pet_name ?>" id="<?=$applicant->pet_id?>"><i class="fa fa-trash"></i></button>
+                                                <?php }else if($field_mut_basic->mut_type=='02') { ?>
+                                                    <button class="btn btn-sm  <?=$hide?> btn-danger btnPartDeleteAppl" title="Click to Delete Applicant <?= $applicant->pet_name ?>" id="<?=$applicant->pet_id?>"><i class="fa fa-trash"></i></button>
+                                                <?php } ?>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+
+
+                        <?php //if($field_mut_basic->mut_type=='02') { ?>
+                        <div class="col-lg-12 col-xs-12 col-md-12 col-sm-12">
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                    <th style="background-color: #136a6f; color: #fff" colspan="6">Modify Mutated Land Details</th>
+                                </thead>
+                                <thead style="white-space:nowrap; width:100%">
+                                    <tr class="text-bold table-success">
+                                        <th></th>
+                                        <th>B (বি :)</th>
+                                        <th>K (ক :)</th>
+                                        <th>L (লে :)</th>
+                                        <th>G (গ :)</th>
+                                        <th>Kr (ক্ৰা :)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <?php foreach ($dag_details as $key => $value) { ?>
+                                    <tr>
+                                        <td><?=$this->lang->line('total_land_area')?></td>
+                                        <td>
+                                            <span class="text-bold"><?=$value->dag_area_b?></span>
+                                            <input type='hidden' id="b_fp" 
+                                            value="<?=$value->dag_area_b?>"/>
+                                        </td>
+                                        <td>
+                                            <span class="text-bold"><?=$value->dag_area_k?></span>
+                                            <input type='hidden' maxlength="2" id="k_fp"
+                                            value="<?=$value->dag_area_k?>"/>
+                                        </td>
+                                        <td>
+                                            <span class="text-bold"><?=$value->dag_area_lc?></span>
+                                            <input type='hidden' maxlength="5" id="lc_fp" 
+                                            value="<?=$value->dag_area_lc?>"/>
+                                        </td>
+                                        <td>
+                                            <span class="text-bold"><?=$value->dag_area_g?></span>
+                                            <input type='hidden' maxlength="2" id="g_fp" 
+                                            value="<?=$value->dag_area_g?>"/>
+                                        </td>
+                                        <td>
+                                            <span class="text-bold"><?=$value->dag_area_kr?></span>
+                                            <input type='hidden' maxlength="2" id="kr_fp"
+                                            value="<?=$value->dag_area_kr?>"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-red text-bold"><?=$this->lang->line('mutated_land_area')?></td>
+                                        <td>
+                                            <input type='number' maxlength="6" <?=$readonly?>  name="mut_b_fp" id="mut_b_fp" value="<?=$value->m_dag_area_b?>" />
+                                            <div id="err_lm_report_mut_b_fp"></div>
+                                        </td>
+                                        <td>
+                                            <input type='number' maxlength="2" <?=$readonly?>  name="mut_k_fp" id="mut_k_fp" value="<?=$value->m_dag_area_k?>"/>
+                                            <div id="err_lm_report_mut_k_fp"></div>
+                                        </td>
+                                        <td>
+                                            <input type='number' maxlength="5" <?=$readonly?>  name="mut_lc_fp" id="mut_lc_fp" value="<?=$value->m_dag_area_lc?>" />
+                                            <div id="err_lm_report_mut_lc_fp"></div>
+                                        </td>
+                                        <td>
+                                            <input type='number' maxlength="2" <?=$readonly?>  name="mut_g_fp" id="mut_g_fp" value="<?=$value->m_dag_area_g?>" />
+                                            <div id="err_lm_report_mut_g_fp"></div>
+                                        </td>
+                                        <td>
+                                            <input type='number' maxlength="2" <?=$readonly?>  name="mut_kr_fp" id="mut_kr_fp" value="0" readonly />
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <?php //} ?>
+
+                
+                        <div class="form-group" style="padding-left:10px;">
+                             <?php
+                                if(!empty($basundharaAttachment)){
+                                echo '<h2 class="red"> Attachments</h2>';
+                                foreach ($basundharaAttachment  as $attachment):
+                                ?>
+                                <h6><a href="<?php echo base_url()."index.php/basundhara/document/".$attachment->name  ?>" class="red" target="_blank"><i class='fa fa-paperclip'></i>&nbsp;&nbsp;<?php echo $attachment->name;?> (Click to see the attachment)</a></h6>
+                                <?php 
+                                endforeach; 
+                                }
+                            ?>   
+                        </div>
+                <?php if($field_mut_basic->mut_type=='01') { ?>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">&nbsp;</div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 <?=$hide?>">
+                        <span style="color:#3c8198; font-size: 18px" class="bold">Pattadar Details (Second Party)
+                        </span>
+
+                        <?php if($field_mut_basic->trans_code=='03' && $basuCase) { ?>
+                            <button class="btn btn-sm btn-danger pull-right btnAddSecondPartyFM uni_text" style="border: 1px solid #000"><i class="fa fa-plus-square"></i>&nbsp;Add Second Party</button>
+                        <?php } ?>
+
+                        <table class='table table-bordered unicode'>
+                            <thead>
+                                <tr>
+                                    <th><label
+                                        class="text-danger"><?php echo $this->lang->line('sl_no'); ?></label>
+                                    </th>
+                                    <th><label
+                                        class="text-danger">Pattadar Name</label>
+                                    </th>
+                                    <th><label
+                                        class="text-danger"><?php echo $this->lang->line('guardian_name'); ?></label>
+                                    </th>
+                                    <th><label
+                                        class="text-danger"><?php echo $this->lang->line('address1'); ?>
+                                        / <?php echo $this->lang->line('address2'); ?></label>
+                                    </th>
+                                    <th><label class="text-danger">Inplace Alongwith</label>
+                                    </th>
+                                    <?php if($field_mut_basic->trans_code=='03' && $basuCase) { ?>
+                                    <th><label class="text-danger">Delete</label></th>
+                                    <?php } ?>
+                                </tr>
+                            </thead>
+                            <tbody id="secondParty_table">
+                                <?php foreach ($field_mut_pattadar as $key=>$pattadar) {?>
+                                    <tr>
+                                        <td><?=++$key?></td>
+                                        <td><?=$pattadar->pdar_name?></td>
+                                        <td><?=$pattadar->pdar_guardian?></td>
+                                        <td>Add 1: <?=$pattadar->pdar_add1?>
+                                        / Add 2: <?= $pattadar->pdar_add2 ?>
+                                        </td>
+                                        <td>
+                                            <?php if($pattadar->striked_out == 1) { ?>
+                                                Inplace
+                                            <?php } else if($pattadar->striked_out == 0) { ?>
+                                                    Alongwith
+                                            <?php }?>
+                                        </td>
+                                        <?php if($field_mut_basic->trans_code=='03' && $basuCase) { ?>
+                                        <td align="center">
+                                            <button id="<?=$pattadar->pdar_id?>,<?=$pattadar->dist_code?>,<?=$pattadar->subdiv_code?>,<?=$pattadar->cir_code?>,<?=$pattadar->mouza_pargona_code?>,<?=$pattadar->lot_no?>,<?=$pattadar->vill_townprt_code?>,<?=$pattadar->dag_no?>,<?=$pattadar->patta_no?>,<?=$pattadar->patta_type_code?>,<?=$pattadar->pdar_cron_no?>" type="button" class="btn btn-sm <?=$hide?> btn-danger btnFMSPdel"><i class="fa fa-trash"></i></button>
+                                        </td>
+                                        <?php } ?>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 delete_error_SP_FM text-bold text-red"></div>
+                
+                <hr style="border-bottom: 2px solid #000;">
+                <!-- <form class="form-horizontal <?=$hide?>" id="nok_applicant" method="post" > -->
+                <form class="form-horizontal" id="nok_applicant" method="post" >
+                    <div class="col-md-4 col-lg-4 col-sm-6 col-xs-12">
+                        <label for="inputEmail3"
+                        class="uni_text control-label required applicant_name_label1"><?php echo $this->lang->line('applicants_name') ?></label>
+                        <input type="text" class="form-control" required1=""
+                        name="name_asm" id="name_asm" autocomplete="off"
+                        placeholder="<?php echo $this->lang->line('applicants_name') ?>">
+                        <span style="color:red; font-size: 14px; padding-top:5px;" id="error_a_name_asm"
+                        class="error_class_a"></span>
+                    </div>
+                    <div class="col-md-4 col-lg-4 col-sm-6 col-xs-12">
+                        <label for="inputEmail3"
+                        class="uni_text control-label required applicant_name_label1"><?php echo $this->lang->line('gender') ?></label>
+                        <select class="form-control relation-type" name="gender" required1
+                        id="relation">
+                        <option selected disabled value="">Select Gender</option>
+                        <?php foreach ($genders as $g): ?>
+                            <option value="<?php echo $g->short_name; ?>">
+                                <?php echo $g->gen_name_ass; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <span style="color:red; font-size: 14px; padding-top:5px;" id="error_a_gender"
+                        class="error_class_a"></span>
+                    </div>
+                    <div class="col-md-4 col-lg-4 col-sm-6 col-xs-12">
+                        <label for="inputEmail3"
+                        class="uni_text control-label"><?php echo $this->lang->line('date_of_birth') ?></label>
+                        <div class="input-group col-sm-12 date datepicker"
+                        data-date-format="dd-mm-yyyy">
+                        <input type="text" readonly class="form-control dating" id="dob"
+                        placeholder="<?php echo $this->lang->line('date_of_birth') ?>"
+                        name="dob" autocomplete="off" />
+                    </div>
+                    <span style="color:red; font-size: 14px; padding-top:5px;"
+                    id="error_a_dob" class="error_class_a"></span>
+                </div>
+                <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">&nbsp;</div>
+                <div class="col-md-4 col-lg-4 col-sm-6 col-xs-12">
+                    <label for="inputEmail3"
+                    class="uni_text control-label required applicant_name_label1"><?php echo $this->lang->line('guardian_name') ?></label>
+                    <input type="text" class="form-control" required1=""
+                    name="guardian_name_asm" id="guardian_name_asm" autocomplete="off"
+                    placeholder="<?php echo $this->lang->line('guardian_name') ?>">
+                    <span style="color:red; font-size: 14px; padding-top:5px;" id="error_a_guardian_name_asm"
+                    class="error_class_a"></span>
+                </div>
+                <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                    <label for="inputEmail3"
+                    class="uni_text control-label required applicant_name_label1"><?php echo $this->lang->line('guardian_relation') ?></label>
+                    <select class="form-control relation-type" name="relation" required1=""
+                    id="relation">
+                    <option selected disabled value="">
+                        <?php echo $this->lang->line('select_relation') ?></option>
+                        <?php foreach ($relation as $r): ?>
+                            <option value="<?php echo $r->guard_rel; ?>">
+                                <?php echo $r->guard_rel_desc_as; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <span style="color:red; font-size: 14px; padding-top:5px;" id="error_a_relation"
+                        class="error_class_a"></span>
+                    </div>
+                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">&nbsp;</div>
+                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                        <label for="inputEmail3"
+                        class="uni_text control-label required">Address</label>
+                        <input type="text" maxlength="100" class="form-control" name="address" id="address" placeholder=" Address">
+                        <span style="color:red; font-size: 14px; padding-top:5px;" id="error_a_address"
+                        class="error_class_a"></span>
+                    </div>
+                    <input type='hidden' name='case_id' id="case_id" value='<?php echo $this->input->get('case_no'); ?>'>
+                    <span style="color:red; font-size: 14px; padding-top:5px;" id="error_a_case_id"
+                    class="error_class_a"></span>
+                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">&nbsp;</div>
+                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12" >
+                        <center><button type="submit" class="btn btn-success btnLoc applicant_form"><i
+                            class='fa fa-save'></i>&nbsp;Save & Add More
+                        </button></center>
+                    </div>
+                </form>
+
+                <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">&nbsp;</div>
+                <!-- <table width="100%" class="table table-striped table-bordered <?=$hide?>" style=" overflow:auto;"> -->
+                <table width="100%" class="table table-striped table-bordered " style=" overflow:auto;">
+                    <thead style="white-space:nowrap; ">
+                        <tr class="text-bold table-success">
+                            <th align='center'>#</th>
+                            <th>Applicant Name</th>
+                            <th>Gender</th>
+                            <th>Date of Birth</th>
+                            <th>Guardian Name</th>
+                            <th>Guardian Relation</th>
+                            <th>Address</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applicant_table_show">
+                        <?php $i=1; foreach($nok_temp as $tp){ ?>
+                        <tr>
+                            <td><?=$i++;?></td>
+                            <td><?=$tp->name_asm;?></td>
+                            <td><?=$tp->gender;?></td>
+                            <td><?=$tp->dob;?></td>
+                            <td><?=$tp->guardian_name_asm;?></td>
+                            <td><?=$tp->relation_name;?></td>
+                            <td><?=$tp->address;?></td>
+                            <td><span data-id="<?=$tp->serial_id;?>" id="delete_application_row" class="text-center"><button class="btn btn-danger delete_application_row" type="button"><i class="fa fa-trash"></i></button></span></td>
+                        </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+                <?php } ?>
+
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">&nbsp;</div>
+                <div class="col-lg-12 text-bold text-red" id="alert_message"></div>
+                <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                    <label><u>Upload Supportive Document</u></label>
+                    &nbsp;
+                    <i class="fa fa-info-circle text-red" 
+                    title="1. Uploaded file types should be jpeg|jpg|png|pdf only.
+                    2. Uploaded file size should not be more than 4MB"></i>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">&nbsp;</div>
+                <?php include(APPPATH.'views/multipleUpload.php')?>
+                <?php if(!empty($sup_doc)): ?>
+                 <div class="row col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                    <label><span class="pull-left">View Document Uploaded</span></label>
+                    <table class="table table-striped table-bordered">
+                    <tbody> 
+                        <?php foreach($sup_doc as $jama): ?>
+                        <tr>
+                            <td width="20%"><span class="text-bold"><?=$jama->file_name?$jama->file_name:JAMABANDI?></span>
+                            </td>
+                            <td width="20%">
+                                <button class="btn btn-sm btn-info"><a href="<?=base_url()?>index.php/uploadDocuments/downloadDocuments/<?=$jama->id?>" target="_blank">View Jamabandi&nbsp;<i class="fa fa-plus-square"></i></a></button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                    </table>
+                </div>
+                <?php endif;?>
+                <?php if($field_mut_basic->mut_type=='01') { ?>
+                <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                    <table class="table table-striped table-bordered">
+                        <tbody id='certi_tab'>
+                            
+                            <tr>
+                                <td><span class="text-bold"><?=DEATH_CERTIFICATE?></span>
+                                </td>
+                                <td><input type='file' name="death_cer" id="death_cer"></td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-warning uploadFreshDocumentLM" id='1'>Upload Death Certificate&nbsp;<i class='fa fa-upload'></i></button>
+                                </td>
+                                <td>
+                                    <?php if(!empty($d_id)) { if($d_id->id!='' || $d_id->id!=null) { ?>
+                                    <div id="div_death">
+                                        <button class="btn btn-sm btn-info"><a  style="color: red; text-decoration: none;" href="<?=base_url()?>index.php/lmmutation/downloadDocuments/<?=$d_id->id?>" target="_blank">VIEW <?=$d_id->file_name?></a></button>&nbsp;&nbsp;
+                                        <button type="button" class="btn btn-sm btn-danger removeFreshReportDocumentLM removeDeath" id='1'>Remove&nbsp;<i class='fa fa-minus-square'></i></button>
+                                    </div>
+                                    <?php }} ?>
+                                    <div id="file_1"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="text-bold"><?=NOC?></span>
+                                </td>
+                                <td><input type='file' name="noc_file" id="noc_file"></td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-warning uploadFreshDocumentLM" id='2'>Upload NOC&nbsp;<i class='fa fa-upload'></i></button>
+                                    </a>
+                                </td>
+                                <td>
+
+                                    <?php if(!empty($noc_id)) { if($noc_id->id!='' || $noc_id->id!=null) { ?>
+                                    <div id="div_noc">
+                                        <button class="btn btn-sm btn-info"><a style="color: red; text-decoration: none;" href="<?=base_url()?>index.php/lmmutation/downloadDocuments/<?=$noc_id->id?>" target="_blank">VIEW <?=$noc_id->file_name?></a></button>&nbsp;&nbsp;
+                                        <button type="button" class="btn btn-sm btn-danger removeFreshReportDocumentLM removeNOC" id='2'>Remove&nbsp;<i class='fa fa-minus-square'></i></button>
+                                    </div>
+                                    <?php }} ?>
+                                    <div id="file_2"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span cujm lass="text-bold"><?=NOK_CONSENT?></span>
+                                </td>
+                                <td><input type='file' name="nok_file" id="nok_file"></td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-warning uploadFreshDocumentLM" id='3'>Upload NOK&nbsp;<i class='fa fa-upload'></i></button>
+                                </td>
+                                <td>
+
+                                    <?php if(!empty($nok_id)) { if($nok_id->id!='' || $nok_id->id!=null) { ?>
+                                    <div id="div_nok">
+                                        <button class="btn btn-sm btn-info"><a style="color: red; text-decoration: none;" href="<?=base_url()?>index.php/lmmutation/downloadDocuments/<?=$nok_id->id?>" target="_blank">VIEW <?=$nok_id->file_name?></a></button>
+                                        &nbsp;
+                                        <button type="button" class="btn btn-sm btn-danger removeFreshReportDocumentLM" id='3'>Remove&nbsp;<i class='fa fa-minus-square'></i></button>
+                                    </div>
+                                    <?php }} ?>
+                                    <div id="file_3"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <?php } ?>
+
+
+                <?php if($field_mut_basic->mut_type=='02') { ?>
+                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                        <table class="table table-striped table-bordered">
+                        <tbody id='certi_tab'>
+                            <tr>
+                                <td><span class="text-bold"><?=JAMABANDI?></span>
+                                </td>
+                                <td><input type='file' name="jama_cer" id="jama_cer"></td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-warning uploadJamaFPART" id='4'>Upload Jamabandi&nbsp;<i class='fa fa-upload'></i></button>
+                                </td>
+                                <td>
+                                    <?php if(!empty($jama_id)) { if($jama_id->id!='' || $jama_id->id!=null) { ?>
+                                    <div id="div_jama">
+                                        <button class="btn btn-sm btn-info"><a title="View" style="color: red; text-decoration: none;" href="<?=base_url()?>index.php/lmmutation/downloadDocuments/<?=$jama_id->id?>" target="_blank"><i class="fa fa-search"></i></a></button>&nbsp;&nbsp;
+                                        <button title="Remove" type="button" class="btn btn-sm btn-danger removeFPARTDocument removeJama" id='4'><i class='fa fa-trash'></i></button>
+                                    </div>
+                                    <?php }} ?>
+                                    <div id="file_4"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                <?php } ?>
+
+
+                <form id="revert_Report_LM_FPart" method="post">
+                    <input type="hidden" name="executionDate" value="<?=date('Y-m-d H:i:s')?>">
+                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                        <label for="inputEmail3"
+                        class="uni_text control-label required">Type Note</label>
+                        <textarea class="form-control" rows="5" name='note_order' id="textArea" placeholder="Please Type Your Report"><?=$dag_details[0]->remark;?></textarea>
+                        <div id="err_lm_report_note_order"></div>
+                    </div>
+                    <input type='hidden' name='case_no' value='<?php echo $this->input->get('case_no'); ?>'>
+                    <hr style="border-bottom: 2px solid #000;">
+                    <center>
+                        <button type="submit" id='submit' class="btn btn-primary uni_text"><i class='fa fa-check'></i> <?php echo $this->lang->line('submit_button'); ?></button>
+                    </center>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+
+    <!---// Edit Applicant Modal --->
+    <?php foreach($field_mut_petitioner as $appl): ?>
+
+    <div class="modal" id="editAppl_<?=$appl->pet_id?>" role="dialog">
+        <div class="modal-dialog" style="max-width: 70%;">
+            <div class="modal-content">
+                <!-- <form id="first_applicant_edit_<?=$appl->pet_id?>" method="post"> -->
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="background-color: #136a6f; color: white">
+                                <span class="text-bold">Update Applicant : &nbsp;&nbsp;<?=$appl->pet_name?></span>
+                            </div>
+                            
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">&nbsp;</div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">Applicant`s Name</span>
+                                <span class="text-danger text-bold">&nbsp;*</span>
+                                <input type="text" class="form-control" name="pet_name" id="pet_name_<?=$appl->pet_id?>" placeholder="<?php echo $this->lang->line('applicants_name') ?>"
+                                value="<?=$appl->pet_name?>">
+                                <div id="alert_pet_name"></div>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold"><?php echo $this->lang->line('gender') ?></span>
+                                <span class="text-danger text-bold">&nbsp;*</span>
+                                <select class="form-control" name="pet_gender" id='pet_gender_<?=$appl->pet_id?>'>
+                                    <option disabled selected value="">-- Select Gender --</option>
+                                    <?php foreach ($genders as $r): ?>
+                                    <option value="<?=$r->short_name?>"  <?=(($appl->pet_gender==$r->short_name)?'selected':'')?>><?=$r->gen_name_ass?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div id="alert_pet_gender"></div>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 applicant_guard_name main_guard">
+                                <span class="text-bold"><?php echo $this->lang->line('guardian_name') ?></span>
+                                <span class="text-danger text-bold">&nbsp;*</span>
+                                <input type="text" class="form-control guard_name" 
+                                name="guard_name" id="guard_name_<?=$appl->pet_id?>" value="<?=$appl->guard_name?>"
+                                placeholder="<?php echo $this->lang->line('guardian_name') ?>">
+                                <div id="alert_guard_name"></div>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12"><!--guardian relation-->
+                                <span class="text-bold">Guardian Relation</span>
+                                <span class="text-danger text-bold">&nbsp;*</span>
+                                <select class="form-control" id="relation_guardian_<?=$appl->pet_id?>" name="relation_guardian">
+                                <option selected disabled value="0">
+                                    <?php echo $this->lang->line('select_relation') ?></option>
+                                    <?php foreach ($relation as $r): ?>
+                                        <option value="<?php echo $r->guard_rel; ?>" <?=(($appl->guard_rel==$r->guard_rel)?'selected':'')?>><?php echo $r->guard_rel_desc_as; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div id="alert_relation_guardian"></div>
+                            </div>
+                            
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">&nbsp;</div>
+                            <div class="col-md-5 col-lg-5 col-sm-6 col-xs-12">
+                                <span class="text-bold"><?php echo $this->lang->line('address1') ?></span>
+                                <span class="text-danger text-bold">&nbsp;*</span>
+                                <input type="text" maxlength="100" class="form-control" name="add1"
+                                id="add1_<?=$appl->pet_id?>" placeholder=" <?php echo $this->lang->line('address1') ?>"
+                                value="<?=$appl->add1?>">
+                                <div id="alert_add1"></div>
+                            </div>
+                            <div class="col-md-4 col-lg-4 col-sm-6 col-xs-12">
+                                <span class="text-bold"><?php echo $this->lang->line('address2') ?></span>
+                                <span class="text-danger text-bold">&nbsp;*</span>
+                                <input type="text" maxlength="100" class="form-control" name="add2"
+                                id="add2_<?=$appl->pet_id?>" placeholder=" <?php echo $this->lang->line('address2') ?>" value="<?=$appl->add2?>">
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">Phone Number</span>
+                                <input type="text" readonly class="form-control" value="<?=$appl->pdar_mobile?>"/>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">&nbsp;</div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">&nbsp;</div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        
+                        <input type="hidden" value="<?=$appl->pet_id?>" name="pet_id" id="pet_id">
+                        <input type="hidden" value="<?=$appl->case_no?>" name="case_no" id="case_no">
+                        <input type="hidden" value="<?=$appl->petition_no?>" name="petition_no" id="petition_no">
+
+                        <button class="btn btn-sm btn-info btnUpdateApplicantCO" 
+                        id="<?=$appl->pet_id?>" type="submit">Update Applicant</button>
+                        <button type="button" class="btn btn-sm btn-default btnApplicantCloseModal" id="<?=$appl->pet_id?>">Close</button>
+                    </div>
+                <!-- </form> -->
+
+                
+            </div>
+        </div>
+    </div>
+    <?php endforeach;?>
+    <!---// Edit Applicant --->
+
+
+
+
+    <!---// Add pattadar --->
+    <div class="modal" id="editPattadar" role="dialog">
+        <div class="modal-dialog" style="max-width: 70%;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 text-red text-bold">
+                            Additional First Party Adding Form
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12"><hr></div>
+
+                        <form id="add_additional_pattadar_FP" method="post">
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">Select Applicant</span>
+                                <select class="form-control" name="add_pattadar_FP" id='add_pattadar_FP'>
+                                    <option value="">Select Applicant</option>
+                                    <?php foreach($pattadar_list as $row):?>
+                                        <option value="<?=$row->pdar_id?>"><?=$row->pdar_name?></option>
+                                    <?php endforeach;?>
+                                </select>
+                                <div id="error_patta_add_pattadar_FP"></div>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">Applicant Name</span>
+                                <span class="text-red text-bold">*</span>
+                                <input type="text" class="form-control" name="appl_name" id="appl_name" value="" readonly>
+                                <div id="error_patta_appl_name"></div>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">Guardian Name</span>
+                                <span class="text-red text-bold">*</span>
+                                <input type="text" class="form-control" name="guardian_name" id="guardian_name" value="" readonly>
+                                <div id="error_patta_guardian_name"></div>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">Relation</span>
+                                <span class="text-red text-bold">*</span>
+                                <select class="form-control" name="relation" id='relation'>
+                                    <option value="">Select Relation</option>
+                                    <?php foreach($relation as $rel):?>
+                                        <option value="<?=$rel->guard_rel?>"><?=$rel->guard_rel_desc_as?></option>
+                                    <?php endforeach;?>
+                                </select>
+                                <div id="error_patta_relation"></div>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">Gender</span>
+                                <span class="text-red text-bold">*</span>
+                                <select class="form-control" name="gender" id='gender'>
+                                    <option value="">Select Gender</option>
+                                    <?php foreach($genders as $r):?>
+                                        <option value="<?=$r->short_name?>"><?=$r->gen_name_ass?></option>
+                                    <?php endforeach;?>
+                                </select>
+                                <div id="error_patta_gender"></div>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">DOB</span>
+                                <span class="text-red text-bold">*</span>
+                                <input type="text" class="form-control dating" name="dob" id="dob" value="" readonly>
+                                <div id="error_patta_dob"></div>
+                            </div>
+                            <style type="text/css">
+                                .datepick-popup{
+                                    position: fixed;
+                                    left:0 px;
+                                    right:0 px;
+                                    z-index:10000;
+                                }
+                            </style>
+                            <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
+                                <span class="text-bold">Address</span>
+                                <span class="text-red text-bold">*</span>
+                                <input type="text" name="address" id="address" value="" class="form-control">
+                                <div id="error_patta_address"></div>
+                            </div>
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">&nbsp;<hr></div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 pull-right">
+                                <button type="submit" id="btnAddFP" class="btn btn-sm btn-primary">Add First Party</button>
+                                <button type="button" class="btn btn-sm btn-default btnCloseFP" id="">Close</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!---// Add pattadar --->
+
+
+
+
+    <!---// Add Second pattadar --->
+    <div class="modal" id="editSecondPattadar" role="dialog">
+        <div class="modal-dialog" style="max-width: 70%;">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 text-red text-bold">
+                            Additional Second Party Adding Form
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12"><hr></div>
+
+                        <form id="add_additional_second_party_FM" method="post">
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">Select Applicant</span>
+                                <select class="form-control" name="appl_sec_party_FM" id='appl_sec_party_FM'>
+                                    <option value="">Select Applicant</option>
+                                </select>
+                                <div id="error_appl_sec_party_FM"></div>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">Guardian Name</span>
+                                <span class="text-red text-bold">*</span>
+                                <input type="text" class="form-control" 
+                                name="guardian_name_sec_party_FM" 
+                                id="guardian_name_sec_party_FM" value="" readonly>
+                                <div id="error_patta_guardian_name_sec_party_FM"></div>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">Relation</span>
+                                <span class="text-red text-bold">*</span>
+                                <select class="form-control" name="relation_sec_party_FM" 
+                                id='relation_sec_party_FM'>
+                                    <option value="">Select Relation</option>
+                                </select>
+                                <div id="error_relation_sec_party_FM"></div>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">Gender</span>
+                                <span class="text-red text-bold">*</span>
+                                <select class="form-control" name="gender_sec_party_FM" 
+                                id='gender_sec_party_FM'>
+                                    <option value="">Select Gender</option>
+                                </select>
+                                <div id="error_gender_sec_party_FM"></div>
+                            </div>
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">&nbsp;</div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">DOB</span>
+                                <span class="text-red text-bold">*</span>
+                                <input type="text" class="form-control dating" 
+                                name="dob_sec_party_FM" id="dob_sec_party_FM" value="" readonly>
+                                <div id="error_dob_sec_party_FM"></div>
+                            </div>   
+                            <style type="text/css">
+                                .datepick-popup{
+                                    position: fixed;
+                                    left:0 px;
+                                    right:0 px;
+                                    z-index:10000;
+                                }
+                            </style>
+                            <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
+                                <span class="text-bold">Address</span>
+                                <span class="text-red text-bold">*</span>
+                                <input type="text" name="address_sec_party_FM" 
+                                id="address_sec_party_FM" value="" class="form-control">
+                                <div id="error_address_sec_party_FM"></div>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12">
+                                <span class="text-bold">Select Inplace/Alongwith</span>
+                                <select class="form-control" name="strikeout_sec_party_FM" id='strikeout_sec_party_FM'>
+                                    <option selected disabled>Select Inplace/Alongwith</option>
+                                    <option value="1">Inplace</option>
+                                    <option value="0">Alongwith</option>
+                                </select>
+                                <div id="error_strikeout_sec_party_FM"></div>
+                            </div>
+                            <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">&nbsp;<hr></div>
+                            <div class="col-md-3 col-lg-3 col-sm-6 col-xs-12 pull-right">
+                                <button type="submit" id="saveSecPartyFM" class="btn btn-sm btn-primary">Save Second Party</button>
+                                <button type="button" class="btn btn-sm btn-default btnCloseSecPartyFM" id="">Close</button>
+                                <input type="hidden" name="dist" id="dist" value="<?=$field_mut_basic->dist_code?>">
+                                <input type="hidden" id="sub" name="sub" value="<?=$field_mut_basic->subdiv_code?>">
+                                <input type="hidden" id="cir" name="cir" value="<?=$field_mut_basic->cir_code?>">
+                                <input type="hidden" id="mouza" name="mouza" value="<?=$field_mut_basic->mouza_pargona_code?>">
+                                <input type="hidden" id="lot" name="lot" value="<?=$field_mut_basic->lot_no?>">
+                                <input type="hidden" id="vill" name="vill" value="<?=$field_mut_basic->vill_townprt_code?>">
+                                <input type="hidden" id="dag" name="dag" value="<?= $dag_details[0]->dag_no ?>">
+                                <input type="hidden" id="ptype" name="ptype" value="<?=$dag_details[0]->patta_type_code?>">
+                                <input type="hidden" id="pn" name="pn" value="<?=$dag_details[0]->patta_no?>">
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12 div_error_SP_FM text-bold text-red"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!---// Add second pattadar ends here --->
+
+
+
+
+
+    <!--///////////////////////LM UPDATE REPORT///////////////////////////////-->
+    <script src="<?php echo base_url(); ?>application/views/js/blockUI.js"></script>
+    <script>
+
+    $('#revert_Report_LM_FPart').submit(function(e){
+        e.preventDefault();
+        $.blockUI({
+            message: $('#displayBox'),
+            css: {
+                border:'none',
+                backgroundColor:'transparent'
+            }
+        });
+        $.ajax({
+            url: baseurl + "lmmutation/freshReportBack",
+            type: 'POST',
+            data: $("#revert_Report_LM_FPart").serialize()+
+                    "&mut_b_fp="+$('#mut_b_fp').val()+
+                    "&mut_k_fp="+$('#mut_k_fp').val()+
+                    "&mut_lc_fp="+$('#mut_lc_fp').val()+
+                    "&mut_g_fp="+$('#mut_g_fp').val()+
+                    "&mut_kr_fp="+$('#mut_kr_fp').val(),
+            dataType: "json",
+            success: function (data) 
+            {
+                $.unblockUI();
+                console.log(data);
+                if(data.error){
+                    $.each(data.error, function (index, value) {
+                        $('#err_lm_report_'+value['field']).fadeIn();
+                        $('#err_lm_report_'+value['field']).html('<span style="color:red">'+value['message']+'</span>');
+                        setTimeout(function(){
+                            $('#err_lm_report_'+value['field']).fadeOut();
+                        }, 5000);
+                    });    
+                }
+                if(data.final == "true"){
+                    alert("Case has successfully forwarded to CO");
+                    window.location.href = baseurl + "lmmutation/revertedcases";
+                }
+            },
+                error:function(data){
+                    alert("Something went wrong");
+                    $.unblockUI();
+                }
+        });
+    });
+
+    function landCalc() 
+    {
+        var bigha = $('#b_fp').val();
+        var katha = $('#k_fp').val();
+        var lessa = $('#lc_fp').val();  
+        var ganda = $('#g_fp').val();
+        var krantik = $('#kr_fp').val();
+        window.sourcelessa = parseInt(bigha) * 100 + parseInt(katha) * 20 + parseFloat(lessa);
+        console.log(window.sourcelessa);
+
+        var mbigha = $('#mut_b_fp').val();
+        var mkatha = $('#mut_k_fp').val();
+        var mlessa = $('#mut_lc_fp').val();
+        var mg = $('#mut_g_fp').val();
+        var mk = $('#mut_kr_fp').val();
+        window.targetlessa = parseInt(mbigha) * 100 + parseInt(mkatha) * 20 + parseFloat(mlessa);
+        
+        if (window.sourcelessa < window.targetlessa) {
+            alert('Mutated Land Area should be less than the area available in Chitha..');
+
+            $('#mut_b_fp').val(0);
+            $('#mut_k_fp').val(0);
+            $('#mut_lc_fp').val(0);
+            $('#mut_g_fp').val(0);
+            $('#mut_kr_fp').val(0);
+        }
+
+        if(parseInt(mkatha) >= 5)
+        {
+            bigha_cal = Math.floor((mkatha*20)/100);
+            bigha_value = (mkatha*20)/100;
+            bigha1 = bigha_value.toFixed(2);
+
+            decimalbigha = bigha1 - Math.floor(bigha1);
+            kathareminder = decimalbigha.toFixed(2);
+
+            katha_cal = (kathareminder*100)/20;
+
+            $('#mut_b_fp').val(bigha_cal);
+            $('#mut_k_fp').val(katha_cal);
+            $('#mut_lc_fp').val(0);
+            $('#mut_g_fp').val(0);
+            $('#mut_kr_fp').val(0);
+        }
+        //lessa katha calculation
+        if(parseInt(mlessa) >= 20)
+        {   
+            katha_cal = Math.floor((mlessa)/20);
+            katha_value = (mlessa)/20;
+            katha1 = katha_value.toFixed(2);
+            decimalkatha = katha1 - Math.floor(katha1);
+            lessa_cal = decimalkatha.toFixed(2);
+            $('#mut_b_fp').val(0);
+            $('#mut_k_fp').val(katha_cal);
+            $('#mut_lc_fp').val(lessa_cal);
+            $('#mut_g_fp').val(0);
+            $('#mut_kr_fp').val(0);
+         }
+        //lessa bigha calculation
+        if(parseInt(mlessa) >= 100)
+        {   
+            bigha_cal = Math.floor((mlessa)/100);
+            bigha_value = (mlessa)/100;
+            bigha1 = bigha_value.toFixed(2);
+            decimalbigha = bigha1 - Math.floor(bigha1);
+            kathareminder = decimalbigha.toFixed(2);
+            katha_cal = Math.floor((kathareminder*20)/100);
+            katha_value = (kathareminder*20)/100;
+            katha1 = katha_value.toFixed(2);
+            decimalkatha = katha1 - Math.floor(katha1);
+            lessa_cal = decimalkatha.toFixed(2);
+            $('#mut_b_fp').val(bigha_cal);
+            $('#mut_k_fp').val(katha_cal);
+            $('#mut_lc_fp').val(lessa_cal);
+            $('#mut_g_fp').val(0);
+            $('#mut_kr_fp').val(0);
+        }
+    }
+
+    $('#mut_b_fp').change(function(){
+        landCalc();
+    });
+
+    $('#mut_k_fp').change(function(){
+        var mbigha = $('#mut_b_fp').val();
+        var mkatha = $('#mut_k_fp').val();
+        var mlessa = $('#mut_lc_fp').val();
+        landCalc();
+        if(parseInt(mkatha) >= 5)
+        {
+            bigha_cal = Math.floor((mkatha*20)/100);
+            bigha_value = (mkatha*20)/100;
+            bigha1 = bigha_value.toFixed(2);
+
+            decimalbigha = bigha1 - Math.floor(bigha1);
+            kathareminder = decimalbigha.toFixed(2);
+
+            katha_cal = (kathareminder*100)/20;
+
+            $('#mut_b_fp').val(bigha_cal);
+            $('#mut_k_fp').val(katha_cal);
+            $('#mut_lc_fp').val(0);
+        }
+    });
+
+    $('#mut_lc_fp').change(function(){
+        var mbigha = $('#mut_b_fp').val();
+        var mkatha = $('#mut_k_fp').val();
+        var mlessa = $('#mut_lc_fp').val();
+        landCalc();
+        //lessa katha calculation
+        if(parseInt(mlessa) >= 20)
+        {   
+            katha_cal = Math.floor((mlessa)/20);
+            katha_value = (mlessa)/20;
+            katha1 = katha_value.toFixed(2);
+
+            decimalkatha = katha1 - Math.floor(katha1);
+            lessa_cal = decimalkatha.toFixed(2);
+
+            $('#mut_b_fp').val(0);
+            $('#mut_k_fp').val(katha_cal);
+            $('#mut_lc_fp').val(lessa_cal);
+        }
+
+        //lessa bigha calculation
+        if(parseInt(mlessa) >= 100)
+        {   
+            bigha_cal = Math.floor((mlessa)/100);
+            bigha_value = (mlessa)/100;
+            bigha1 = bigha_value.toFixed(2);
+
+            decimalbigha = bigha1 - Math.floor(bigha1);
+            kathareminder = decimalbigha.toFixed(2);
+
+            katha_cal = Math.floor((kathareminder*20)/100);
+            katha_value = (kathareminder*20)/100;
+            katha1 = katha_value.toFixed(2);
+
+            decimalkatha = katha1 - Math.floor(katha1);
+            lessa_cal = decimalkatha.toFixed(2);
+
+            $('#mut_b_fp').val(bigha_cal);
+            $('#mut_k_fp').val(katha_cal);
+            $('#mut_lc_fp').val(lessa_cal);
+        }    
+    });
+
+
+        $(document).on('click','.btnAddPartyFP', function(){
+            $('#editPattadar').modal('show');
+        });
+        $(document).on('click','.btnCloseFP', function(){
+            $('#editPattadar').modal('hide');
+        });
+
+        $('#add_pattadar_FP').change(function(){
+            $.blockUI({
+                message: $('#displayBox'),
+                css: {
+                    border:'none',
+                    backgroundColor:'transparent'
+                }
+            });
+            case_no = $('#case_no').val();
+            id = $('#add_pattadar_FP').val();
+            $.ajax({
+                url: baseurl + "lmmutation/getPattadarDetail",
+                type: 'POST',
+                data: {case_no:case_no, id:id},
+                dataType: "json",
+                success: function (data) 
+                {
+                    $.unblockUI();
+                    if(data.details){
+                        $('#appl_name').val(data.details.pdar_name);
+                        $('#guardian_name').val(data.details.pdar_father);
+                        $('#relation').val('');
+                        $('#gender').val(data.details.pdar_gender);
+                        $('#dob').val(data.details.pdar_minor_dob);
+                        $('#address').val(data.details.pdar_add1);
+                    }
+                },
+                error:function(data){
+                    alert("Something went wrong");
+                    $.unblockUI();
+                }
+            });
+        });
+
+        $('#add_additional_pattadar_FP').submit(function(e){
+            e.preventDefault();
+            $.blockUI({
+                message: $('#displayBox'),
+                css: {
+                    border:'none',
+                    backgroundColor:'transparent'
+                }
+            });
+            $.ajax({
+                url: baseurl + "lmmutation/addAdditionalFirstParty",
+                type: 'POST',
+                data: $("#add_additional_pattadar_FP").serialize()+
+                        "&case_no="+$('#case_no').val(),
+                dataType: "json",
+                success: function (data) 
+                {
+                    $.unblockUI();
+                    console.log(data.mut_type);
+                    if(data.error){
+                        $.each(data.error, function (index, value) {
+                            $('#error_patta_'+value['field']).fadeIn();
+                            $('#error_patta_'+value['field']).html('<span style="color:red">'+value['message']+'</span>');
+                            setTimeout(function(){
+                                $('#error_patta_'+value['field']).fadeOut();
+                            }, 5000);
+                        });    
+                    }
+                    if(data.details)
+                    {
+                        alert("Applicant detail has successfully updated");
+                        $('#editPattadar').modal('hide');
+                        var table = '';
+                        $.each(data.details, function (i, val) { 
+                        i++;
+
+                        table +=                     
+                            '<tr id="'+val['pdar_id']+'" class="remove_'+val['pdar_id']+'">'+
+                                '<td>' + val["pdar_name"] + '</td>' +
+                                '<td>' + val["pdar_guardian"] + '</td>' +
+                                '<td>' + ((val["pdar_add1"]==null || val["pdar_add1"]=='')?'-':val["pdar_add1"]) + '</td>' +
+
+                                '<td><button class="btn btn-sm btn-danger btnPartDeleteAppl" title="Click to Delete Applicant '+val['pdar_name']+' " id="'+
+                                    val['pdar_id']+'"><i class="fa fa-trash"></i></button></td>' +
+                            '</tr>'
+                        });
+                        $('#field_mut_petitioner').html(table);
+                        $('#add_additional_pattadar_FP').trigger('reset');
+
+                        var templates = "<option value=''>Select Applicant</option>";
+                        $.each(data.pattadar_list, function (index, value) {
+                            templates += '<option value = ' +
+                            value["pdar_id"] +' >' + value["pdar_name"] + ' </option>'
+                        });
+                        $('#add_pattadar_FP').html(templates);
+                    }
+                },
+                error: function(data){
+                    alert("Unable to Process");
+                     $.unblockUI();
+                }
+            });
+        });
+
+
+
+        $(document).on('click', '.btnPartDeleteAppl', function(){
+            id = $(this).attr('id');
+            case_no = $('#case_no').val();        
+            data = {id:id, case_no:case_no}
+
+            if(confirm("Are you sure to delete first party ? Once deleted, it cannot be undone..")){
+
+                $.blockUI({
+                    message: $('#displayBox'),
+                    css: {
+                        border:'none',
+                        backgroundColor:'transparent'
+                    }
+                });
+                $.ajax({
+                    url: baseurl + "lmmutation/deleteFirstPartyFPART/",
+                    type:'POST',
+                    data:data,
+                    dataType:'json',
+                    success: function (data) {
+                        $.unblockUI();
+                        console.log(data);
+
+                        if(data.delete === false){
+                            alert("All applicants cannot be deleted");
+                            return;
+                        }
+                        if(data.details)
+                        {
+                            var table = '';
+                            $.each(data.details, function (i, val) { 
+                            i++;
+                            id = val['pet_id'];
+                            add2 = val['add2'];
+                            address2 = ((add2==null || add2=='')?'':'Add2: '+val['add2']);
+                            table +=                     
+                                '<tr id="pet_'+id+'"  '+' class="remove_'+val['pet_id']+'">'+
+                                    '<td>' + val["pet_name"] + '</td>' +
+                                    '<td>' + val["guard_name"] + '</td>' +
+                                    '<td>Add 1: ' + val["add1"] + '<br>' + address2 + '</td>' +
+                                    '<td><button class="btn btn-sm btn-danger btnPartDeleteAppl" title="Click to Delete Applicant '+val['pet_name']+' " id="'+
+                                    val['pet_id']+'"><i class="fa fa-trash"></i></button>'+
+                                    '</td>'+
+                                '</tr>'
+                            });
+                            $('#field_mut_petitioner').html(table);
+
+                            var templates = "<option value=''>Select Applicant</option>";
+                            $.each(data.pattadar_list, function (index, value) {
+                                templates += '<option value = ' +
+                                value["pdar_id"] +' >' + value["pdar_name"] + ' </option>'
+                            });
+                            $('#add_pattadar_FP').html(templates);
+                        }
+                    },
+                error:function(data){
+                    alert("Something went wrong");
+                    $.unblockUI();
+                }
+                });
+            } 
+            else {
+                return false;
+            } 
+        });
+
+
+        $('.uploadJamaFPART').click(function(){
+            flag = $(this).attr('id');
+            var formdata = new FormData();
+            if(flag == 4){
+                formdata.append("jama_cer", $('#jama_cer')[0].files[0]);
+            }
+            formdata.append("case_no", $('#case_no').val());
+            formdata.append("flag", $(this).attr('id'));
+            formdata.append("mut_type", '02');
+
+            console.log(formdata);
+
+            $.blockUI({
+                message: $('#displayBox'),
+                css: {
+                    border:'none',
+                    backgroundColor:'transparent'
+                }
+            });
+
+            $.ajax({
+                url: baseurl + "uploadDocuments/uploadSupportiveDocs/",
+                type: 'POST',
+                enctype: 'multipart/form-data',
+                data: formdata,
+                contentType: false,
+                cache: false,
+                processData:false,
+                dataType: "json",
+
+                success: function (data) 
+                {
+                    $.unblockUI();
+                    console.log(data);
+                    if(data.img_upload === true){
+                        alert("File has successfully uploaded..");
+                        $('#div_jama').html('');
+                    }
+
+                    if(data.flag_set == '4'){
+                        $('#file_4').html('<button class="btn btn-sm btn-info"><a style="color: red; text-decoration: none;" href="'+baseurl+'uploadDocuments/downloadDocuments/'+data.doc_id+'" target="_blank"><i class="fa fa-search"></i></a></button>'+'  '+'<button type="button" class="btn btn-sm btn-danger removeFPARTDocument" id="4"><i class="fa fa-trash"></i></button>');
+                    }
+                    if(data.img_upload === false){
+                        alert("File Uploading Failed..");
+                    }
+                    if(data.error != null)
+                    {
+                        $('#alert_message').html('');
+                        var error_message = '';
+
+                        $.each(data.error, function (index, value) {
+                            $('#alert_message').fadeIn();
+                            error_message += '<li>'+value['message']+'</li>'
+                        });
+                        $('#alert_message')
+                            .html('<div class="bg-gradient-danger p-2 rounded">'+error_message +
+                                '<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">&nbsp;</div></div>');
+                        setTimeout(function(){
+                            $('#alert_message').fadeOut();
+                        }, 5000);
+                        return false;
+                    }
+                },
+                error:function(data){
+                    alert("Something went wrong");
+                    $.unblockUI();
+                }
+            });
+        });
+
+        $(document).on('click','.removeFPARTDocument', function(){
+
+            flag = $(this).attr('id');
+            case_no = $('#case_no').val();
+            data = {flag:flag, case_no:case_no}
+
+            if(confirm("Are you sure to delete Jamabandi Certificate ?")){
+
+                $.blockUI({
+                    message: $('#displayBox'),
+                    css: {
+                        border:'none',
+                        backgroundColor:'transparent'
+                    }
+                });
+
+                $.ajax({
+                    url: baseurl + "uploadDocuments/removeSupportiveDocs",
+                    type: 'POST',
+                    data: data,
+                    dataType: "json",
+
+                    success: function (data) 
+                    {
+                        $.unblockUI();
+                        console.log(data);
+                        if(data.flag == '4'){
+                            $('#file_4').html('');
+                            $('#div_jama').html('');
+                        }
+                    },
+                    error:function(data){
+                        alert("Something went wrong");
+                        $.unblockUI();
+                    }
+                });
+            }  
+        });
+
+
+
+
+        $(function() {
+            $('#nok_applicant').submit(function(e) {
+                e.preventDefault();
+                if(!confirm("Are you sure you want to add applicant?"))
+                {
+                    return false;
+                }
+                $.ajax({
+                    url: baseurl + "lmmutation/FmAddApplicant",
+                    method: "POST",
+                    data: $('#nok_applicant').serialize(),
+                    dataType: "json",
+                    beforeSend: function () {
+                        console.log("beforeSend");
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        if (data.error) {
+                            $('.error_class_a').html('');
+                            $.each(data.error, function (index, value) {
+                                $('#error_a_' + value['field'])
+                                .html(value['message']);
+                            });
+                        }
+                        else if (data.validation_success == 'true' && data.success === true) {
+                            $('#nok_applicant').trigger("reset");
+                            $('.error_class_a').html('');
+                            alert(data.msg);
+                                //if (data.nok_tmp) {
+                                    var nok_tmp_table = '';
+                                    $.each(data.nok_tmp, function (index, value) {
+                                        index++;
+                                        nok_tmp_table +=
+                                        '<tr>' +
+                                        '<td align="center">' + index + '</td>' +
+                                        '<td>' + value["name_asm"] + '</td>' +
+                                        '<td>' + value["gender"] + '</td>' +
+                                        '<td>' + value["dob"] + '</td>' +
+                                        '<td>' + value["guardian_name_asm"] + '</td>' +
+                                        '<td>' + value["relation_name"] + '</td>' +
+                                        '<td>' + value["address"] + '</td>' +
+                                        '<td><span data-id="' + value["serial_id"] + '" id="delete_application_row" class="text-center"><button class="btn btn-danger delete_application_row" type="button"><i class="fa fa-trash"></i></button></span></td>' +
+                                        '</tr>'
+                                    });
+                                    console.log(nok_tmp_table);
+                                    $('#applicant_table_show').html(nok_tmp_table);
+                                //}
+                            }
+                            else
+                            {
+                                alert(data.msg);
+                            }
+                        },
+                    error:function(data){
+                        alert("Something went wrong");
+                    }
+                    })
+            });
+        });
+    </script>
+    <script>
+
+    ////////////////////////////DELETE APPLICANT SINGLE ROW/////////////////////////////////////
+    $(document).on('click', '#delete_application_row', function (e) {
+        if (! confirm('Are you sure want to delete this applicant?'))
+        {
+            return false;
+        }
+        var row_id = $(this).attr('data-id');
+        var obj = this;
+        $.ajax({
+                url: baseurl + "lmmutation/DeleteNokTmpFMApp",
+                type : "POST",
+                data : {
+                row_id : row_id,
+                case_id: $('#case_id').val(),
+            },
+            dataType : "json",
+            success: function (data) {
+                console.log(data);
+                if (data === true)
+                {
+                    $(obj).parent().parent().remove();
+                }
+                else
+                {
+                    alert('Delete failed..!');
+                }
+            },
+            error:function(data){
+                alert("Something went wrong");
+            }
+        });
+    });
+    ////////////////////////////END DELETE APPLICANT SINGLE ROW////////////////////////////
+
+
+    ////////////    06-04-22 field mutation second party add & delete     /////////////
+    //close modal
+    $(document).on('click','.btnCloseSecPartyFM', function(){
+        $('#editSecondPattadar').modal('hide');
+    });
+    //popup and load applicant detail
+    $(document).on('click', '.btnAddSecondPartyFM', function(){
+        $.blockUI({
+            message: $('#displayBox'),
+            css: {
+                border:'none',
+                backgroundColor:'transparent'
+            }
+        });
+        no = $('#case_no').val();
+        dist = $('#dist').val();
+        sub = $('#sub').val();
+        cir = $('#cir').val();
+        mouza = $('#mouza').val();
+        lot = $('#lot').val();
+        vill = $('#vill').val();
+        dag = $('#dag').val();
+        pno = $('#pn').val();
+        ptype = $('#ptype').val();
+
+        $('#editSecondPattadar').modal('show');
+
+        $.ajax({
+            url: baseurl + "lmmutation/getSecondPartyApplicantDetailFM",
+            type:'POST',
+            data:{no:no, dist:dist, sub:sub, cir:cir, mouza:mouza, lot:lot, vill:vill, dag:dag, pno:pno, ptype:ptype},
+            dataType:'json',
+            success: function (data) {
+                $.unblockUI();
+                $("#add_additional_second_party_FM").trigger('reset');
+                if(data.sec_party){
+                    var template = '<option selected disabled value="">Select Applicant</option>';
+                    $.each(data.sec_party, function (index, val) {
+                        template += '<option value='+val["pdar_id"]+'>'+val["pdar_name"]+' </option>'
+                    });
+                    $('#appl_sec_party_FM').html(template);
+                }
+                //relation list
+                if(data.relation){
+                    var relTemp = '<option selected disabled value="">Select Relation</option>';
+                    $.each(data.relation, function (index, val) {
+                        relTemp += '<option value='+val["guard_rel"]+'>'+val["guard_rel_desc_as"]+' </option>'
+                    });
+                    $('#relation_sec_party_FM').html(relTemp);
+                }
+                //gender list
+                if(data.genders){
+                    var genTemp = '<option selected disabled value="">Select Gender</option>';
+                    $.each(data.genders, function (index, val) {
+                        genTemp += '<option value='+val["short_name"]+'>'+val["gen_name_ass"]+' </option>'
+                    });
+                    $('#gender_sec_party_FM').html(genTemp);
+                }
+            },
+            error: function(data){
+                $.unblockUI();
+                alert("Something Went wrong");
+            }
+        });
+    });
+    //onchange applicant, get respective detail
+    $('#appl_sec_party_FM').change(function(){
+        $.blockUI({
+            message: $('#displayBox'),
+            css: {
+                border:'none',
+                backgroundColor:'transparent'
+            }
+        });
+        case_no = $('#case_no').val();
+        id = $('#appl_sec_party_FM').val();
+        $.ajax({
+            url: baseurl + "lmmutation/getPattadarDetail",
+            type: 'POST',
+            data: {case_no:case_no, id:id},
+            dataType: "json",
+            success: function (data) 
+            {
+                $.unblockUI();
+                if(data.details){
+                    $('#guardian_name_sec_party_FM').val(data.details.pdar_father);
+                    $('#dob_sec_party_FM').val(data.details.pdar_minor_dob);
+                    $('#address_sec_party_FM').val(data.details.pdar_add1);
+                }
+            },
+            error:function(data){
+                alert("Something went wrong");
+                $.unblockUI();
+            }
+        });
+    });
+    //insert second party
+    $('#add_additional_second_party_FM').submit(function(e){
+        e.preventDefault();
+        $.blockUI({
+            message: $('#displayBox'),
+            css: {
+                border:'none',
+                backgroundColor:'transparent'
+            }
+        });
+        $.ajax({
+            url: baseurl + "lmmutation/addAdditionalSecondPartyFM",
+            type: 'POST',
+            data: $("#add_additional_second_party_FM").serialize()+
+                    "&case_no="+$('#case_no').val()+
+                    "&applicant_name="+$("#appl_sec_party_FM option:selected").text(),
+            dataType: "json",
+            success: function (data) 
+            {
+                $.unblockUI();
+                if(data.message != null){
+                    $('.div_error_SP_FM').fadeIn();
+                    $('.div_error_SP_FM').html(data.message);
+                    setTimeout(function(){
+                        $('.div_error_SP_FM').fadeOut();
+                    }, 30000);
+                }
+                if(data.success == 'true'){
+                    alert("Second Party has added successfully");
+                    $('#editSecondPattadar').modal('hide');
+                    var table = '';
+                    $.each(data.details, function (i, val) { 
+                        table +=                     
+                        '<tr>'+
+                            '<td>' + ++i + '</td>' +
+                            '<td>' + val["pdar_name"] + '</td>' +
+                            '<td>' + val["pdar_guardian"] + '</td>' +
+                            '<td>' + ((val["pdar_add1"]==null || val["pdar_add1"]=='')?'-':val["pdar_add1"]) + '</td>' +
+                            '<td>' + ((val["striked_out"]==1)?'Inplace':'Alongwith') + '</td>' +
+                            '<td align="center">' +
+                                '<button type="button" class="btn btn-sm btn-danger btnFMSPdel" id="'+val["pdar_id"]+','+val["dist_code"]+','+val["subdiv_code"]+','+val["cir_code"]+','+val["mouza_pargona_code"]+','+val["lot_no"]+','+val["vill_townprt_code"]+','+val["dag_no"]+','+val["patta_no"]+','+val["patta_type_code"]+','+val["pdar_cron_no"]+'">' +
+                                    '<i class="fa fa-trash"></i></button>' +
+                            '</td>'+
+                        '</tr>'
+                    });
+                    $('#secondParty_table').html(table);
+                }
+
+                if(data.pattadarList){
+                    var template = '<option selected disabled value="">Select Applicant</option>';
+                    $.each(data.pattadarList, function (index, val) {
+                        template += '<option value='+val["pdar_id"]+'>'+val["pdar_name"]+' </option>'
+                    });
+                    $('#appl_sec_party_FM').html(template);
+                }
+                if(data.error){
+                    $.each(data.error, function (index, value) {
+                        $('#error_'+value['field']).fadeIn();
+                        $('#error_'+value['field']).html('<span style="color:red">'+value['message']+'</span>');
+                        setTimeout(function(){
+                            $('#error_'+value['field']).fadeOut();
+                        }, 30000);
+                    });    
+                }
+            },
+            error: function(data){
+                $.unblockUI();
+                alert("Unable to Process");
+            }
+        });
+    });
+    //delete second party
+    $(document).on('click', '.btnFMSPdel', function(){
+        id = $(this).attr('id');
+        arr = id.split(',');
+        pid = arr[0];
+        dist = arr[1];
+        sub = arr[2];
+        cir = arr[3];
+        mouza = arr[4];
+        lot = arr[5];
+        vill = arr[6];
+        dag = arr[7];
+        pno = arr[8];
+        ptype = arr[9];
+        cron= arr[10];
+        case_no = $('#case_no').val();        
+
+        data = {pid:pid, dist:dist, sub:sub, cir:cir, mouza:mouza, lot:lot, vill:vill, dag:dag, pno:pno, ptype:ptype, cron:cron, case_no:case_no}
+
+        if(confirm("Are you sure to delete second party ? Once deleted, it cannot be undone..")){
+            $.blockUI({
+                message: $('#displayBox'),
+                css: {
+                    border:'none',
+                    backgroundColor:'transparent'
+                }
+            });
+            $.ajax({
+                url: baseurl + "lmmutation/deleteSecondPartyFM/",
+                type:'POST',
+                data:data,
+                dataType:'json',
+                success: function (data) {
+                    $.unblockUI();
+                    //for message display purpose
+                    if(data.message != null){
+                        $('.delete_error_SP_FM').fadeIn();
+                        $('.delete_error_SP_FM').html(data.message);
+                        setTimeout(function(){
+                            $('.delete_error_SP_FM').fadeOut();
+                        }, 30000);
+                    }
+                    //pattadar table details after deletion
+                    if(data.success == 'true'){
+                        $('#editSecondPattadar').modal('hide');
+                        var table = '';
+                        $.each(data.details, function (i, val) { 
+                            table +=                     
+                            '<tr>'+
+                                '<td>' + ++i + '</td>' +
+                                '<td>' + val["pdar_name"] + '</td>' +
+                                '<td>' + val["pdar_guardian"] + '</td>' +
+                                '<td>' + ((val["pdar_add1"]==null || val["pdar_add1"]=='')?'-':val["pdar_add1"]) + '</td>' +
+                                '<td>' + ((val["striked_out"]==1)?'Inplace':'Alongwith') + '</td>' +
+                                '<td align="center">' +
+                                    '<button type="button" class="btn btn-sm btn-danger btnFMSPdel" id="'+val["pdar_id"]+','+val["dist_code"]+','+val["subdiv_code"]+','+val["cir_code"]+','+val["mouza_pargona_code"]+','+val["lot_no"]+','+val["vill_townprt_code"]+','+val["dag_no"]+','+val["patta_no"]+','+val["patta_type_code"]+','+val["pdar_cron_no"]+'">' +
+                                        '<i class="fa fa-trash"></i></button>' +
+                                '</td>'+
+                            '</tr>'
+                        });
+                        $('#secondParty_table').html(table);
+                    }
+                    //pattadar dropdwon list after deletion
+                    if(data.pattadarList){
+                        var template = '<option selected disabled value="">Select Applicant</option>';
+                        $.each(data.pattadarList, function (index, val) {
+                            template += '<option value='+val["pdar_id"]+'>'+val["pdar_name"]+' </option>'
+                        });
+                        $('#appl_sec_party_FM').html(template);
+                    }
+                },
+                error:function(data){
+                    alert("Something went wrong");
+                    $.unblockUI();
+                }
+            });
+        } 
+        else {
+            return false;
+        } 
+    });
+    ////////////    06-04-22 field mutation second party add & delete ends here   /////////////
+
+
+</script>

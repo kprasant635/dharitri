@@ -1,0 +1,443 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : May 11, 2015, 1:51:03 PM
+    Author     : andro
+*/
+
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+    
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+body{
+    //background: #F1F2F6;
+    //background: #fff;
+    overflow-x: hidden;
+}
+
+.headerwrap{
+    background: #434A54 url('../images/texture.png');
+   
+    
+}
+
+.header{
+    padding: 10px 0;
+    padding-left: 20px;
+    
+}
+
+.headerhome{
+}
+
+.header h1{
+    font-size: 1.5em;
+}
+
+.top-separator{
+    height: 6px;
+    background: #C93756;
+}
+
+h1.title{
+    color:#fff;
+    font-size: 2em;
+    font-family: 'Open Sans Extra Bold';
+}
+
+.tag{
+    color:#fff;
+    font-family: 'Open Sans regular',sans-serif;
+    font-size: .9em;
+}
+
+
+.emblem{
+    background: url('../images/emblame1.png') no-repeat left;
+    height: 64px;
+    
+}
+.left {
+   padding:8px;
+   text-indent: 49px;
+}
+
+.login{
+    //margin-top: 10px;
+    font-family: 'Open Sans Extra Light',sans-serif;
+    font-size: .9em;
+    padding-left: 20px;
+    padding-right: 20px;
+    background: #dedede;
+    padding-top: 10px;
+    padding-bottom: 0px;
+    min-height: 600px;
+}
+
+.login label{
+    font-family: 'Open Sans',sans-serif;
+    text-indent: 6px;
+}
+
+.login-leftwrap{
+
+    padding-top: 0px;
+}
+
+.search-only .red{
+    color: #ffcccc;
+}
+
+.homebox{
+    color:   #37BC9B;
+    font-family: 'Open Sans Regular',sans-serif;
+}
+
+.designedby{
+    background: url('../images/logo1.png') no-repeat;
+    width:200px;
+    height: 50px;
+}
+
+@font-face {
+    font-family: 'Open Sans Bold';
+    src: url('../fonts/OpenSans-Bold.ttf'); /* IE9 Compat Modes */
+    src: url('../fonts/OpenSans-Bold.ttf?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+        url('../fonts/OpenSans-Bold.ttf') format('truetype'), /* Super Modern Browsers */
+        url('../fonts/OpenSans-Bold.ttf') format('truetype'), /* Pretty Modern Browsers */
+        url('../fonts/OpenSans-Bold.ttf')  format('truetype') /* Safari, Android, iOS */
+}
+
+@font-face {
+    font-family: 'Open Sans Regular';
+    src: url('../fonts/OpenSans-Regular.ttf'); /* IE9 Compat Modes */
+    src: url('../fonts/OpenSans-Regular.ttf?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+        url('../fonts/OpenSans-Regular.ttf') format('truetype'), /* Super Modern Browsers */
+        url('../fonts/OpenSans-Regular.ttf') format('truetype'), /* Pretty Modern Browsers */
+        url('../fonts/OpenSans-Regular.ttf')  format('truetype') /* Safari, Android, iOS */
+}   
+
+@font-face {
+    font-family: 'Open Sans Extra Bold';
+    src: url('../fonts/OpenSans-ExtraBold.ttf'); /* IE9 Compat Modes */
+    src: url('../fonts/OpenSans-ExtraBold.ttf?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+        url('../fonts/OpenSans-ExtraBold.ttf') format('truetype'), /* Super Modern Browsers */
+        url('../fonts/OpenSans-ExtraBold.ttf') format('truetype'), /* Pretty Modern Browsers */
+        url('../fonts/OpenSans-ExtraBold.ttf')  format('truetype') /* Safari, Android, iOS */
+} 
+
+@font-face {
+    font-family: 'Open Sans Extra Light';
+    src: url('../fonts/OpenSans-Light.ttf'); /* IE9 Compat Modes */
+    src: url('../fonts/OpenSans-Light.ttf?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+        url('../fonts/OpenSans-Light.ttf') format('truetype'), /* Super Modern Browsers */
+        url('../fonts/OpenSans-Light.ttf') format('truetype'), /* Pretty Modern Browsers */
+        url('../fonts/OpenSans-Light.ttf')  format('truetype') /* Safari, Android, iOS */
+} 
+
+@font-face {
+    font-family: 'Roboto Black';
+    src: url('../fonts/Roboto-Black.ttf'); /* IE9 Compat Modes */
+    src: url('../fonts/Roboto-Black.ttf?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+        url('../fonts/Roboto-Black.ttf') format('truetype'), /* Super Modern Browsers */
+        url('../fonts/Roboto-Black.ttf') format('truetype'), /* Pretty Modern Browsers */
+        url('../fonts/Roboto-Black.ttf')  format('truetype') /* Safari, Android, iOS */
+} 
+
+.mid-separator{
+    background: #C3C3C3;
+    height: 4px;
+}
+
+hr {
+    margin: 17px 0 18px;
+    height: 0;
+    clear: both;
+    border: solid #ddd;
+    border-width: 1px 0 0;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #fff;
+}
+
+.features li{
+    margin: 14px 0;
+    color: #434A54;
+    font-family: 'Open Sans Regular';
+    font-size: 1em;
+}
+
+.menu{
+    border-radius: 0px !important;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 0px;
+    margin-bottom: 10px;
+}
+
+.menu a{
+   
+    font-family: 'Open Sans Regular',sans-serif !important;
+    color:#fff !important;
+    font-size: .9em;
+}
+
+.red{
+    color:#E6E9ED;
+}
+
+.brand{
+    font-family: 'Open Sans bold',sans-serif !important;
+    font-size: 2em;
+}
+
+.wrap {
+    position:relative;
+    margin:0 auto;
+    padding: 10px 0;
+    padding-left: 20px;
+    /*replace 900px with your width*/
+    //width:900px;
+    background: #434A54 url('../images/texture.png');
+}
+#footer {
+    width:100%;
+    float:left;
+    position:fixed;
+    bottom:0;
+    z-index:999999;
+}
+
+
+
+.navigation a {
+    display: block;
+    position: relative;
+    float: left;
+    height: 32px;
+    box-sizing: border-box;
+  
+    margin-right: 2px;
+    margin-bottom: 5px;
+  
+    text-decoration: none;
+    font-family: sans-serif;
+    color: #333;
+}
+.navigation a > .upperArrowElement {
+    display: block;
+    width: 100%;
+    height: 50%;
+    position: absolute;
+    -webkit-transform: skewX(35deg);
+    -ms-transform: skewX(35deg); /* IE 9 */
+    transform: skewX(35deg);
+    background-color: #E5E6E8;
+}
+.navigation a > .lowerArrowElement {
+  display: block;
+  width: 100%;
+  height: 50%;
+  position: absolute;
+  bottom: 0;
+  -webkit-transform: skewX(-35deg);
+  transform: skewX(-35deg);
+  background-color: #E5E6E8;
+}
+.navigation a > .content {
+  display: block;
+  padding: 0.5em 1.3em;
+  position: relative;
+  top: 0;
+  left: 0;
+}
+.navigation a:first-child > .content {
+  left: -2px;
+}
+.navigation a:first-child::before {
+    content: '';
+    display: block;
+    position: absolute;
+    background-color: #E5E6E8;
+    height: 100%;
+    width: 50%;
+    top: 0;
+    left: -5px;
+    z-index: -1;
+}
+.p {
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+.map {
+    margin-bottom: 10px;
+    border: 2px solid #adadad;
+    border-top-left-radius: 60px 90px;
+    border-bottom-right-radius: 60px 90px;
+}
+.map:hover{
+-moz-box-shadow:    inset 0 0 10px #000000;
+   -webkit-box-shadow: inset 0 0 10px #000000;
+   box-shadow:         inset 0 0 10px #000000;
+}
+.map svg {
+  height: auto;
+  width: 89%;
+  margin: 0 auto;
+  display: block;
+  
+}
+
+.map path {
+  fill: #ccc;
+  stroke: #333;
+  stroke-width: 1;
+}
+
+.map path:hover {
+  fill: #fc0 !important;
+  cursor: help;
+}
+
+.info_panel {
+  background-color: rgba(255,255,255, .8);
+  padding: 5px;
+  font-size: 12px;
+  font-family: Helvetica, Arial, sans-serif;
+  position: absolute;
+  border: 1px solid #333;
+  color: #333;
+  white-space: nowrap;
+}
+
+.info_panel::first-line {
+  font-weight: bold;
+}
+
+.panel label{
+    line-height: 200%;
+}
+
+ol.progtrckr {
+    margin: 0;
+    padding: 0;
+    list-style-type:none;
+    margin-bottom: 10px;
+}
+ol.progtrckr li {
+    display: inline-block;
+    text-align: center;
+    line-height: 3em;
+}
+ol.progtrckr[data-progtrckr-steps="2"] li { width: 49%; }
+ol.progtrckr[data-progtrckr-steps="3"] li { width: 33%; }
+ol.progtrckr[data-progtrckr-steps="4"] li { width: 24%; }
+ol.progtrckr[data-progtrckr-steps="5"] li { width: 19%; }
+ol.progtrckr[data-progtrckr-steps="6"] li { width: 16%; }
+ol.progtrckr[data-progtrckr-steps="7"] li { width: 14%; }
+ol.progtrckr[data-progtrckr-steps="8"] li { width: 12%; }
+ol.progtrckr[data-progtrckr-steps="9"] li { width: 11%; }
+ol.progtrckr li.progtrckr-done {
+    color: black;
+    border-bottom: 4px solid yellowgreen;
+}
+ol.progtrckr li.progtrckr-todo {
+    color: silver; 
+    border-bottom: 4px solid silver;
+}
+ol.progtrckr li:after {
+    content: "\00a0\00a0";
+}
+ol.progtrckr li:before {
+    position: relative;
+    bottom: -2.5em;
+    float: left;
+    left: 50%;
+    line-height: 1em;
+}
+ol.progtrckr li.progtrckr-done:before {
+    content: "\2713";
+    color: white;
+    background-color: yellowgreen;
+    height: 1.2em;
+    width: 1.2em;
+    line-height: 1.2em;
+    border: none;
+    border-radius: 1.2em;
+}
+ol.progtrckr li.progtrckr-todo:before {
+    content: "\039F";
+    color: silver;
+    background-color: white;
+    font-size: 1.5em;
+    bottom: -1.6em;
+}
+
+.center{
+    text-align: center;
+}
+
+.control-label{
+    font-family: 'Open Sans Extra Bold' !important;
+}
+
+.bold{
+    font-family: 'Open Sans Extra Bold' !important;
+}
+
+.panel-form{
+    background: #E1E1E1 url('../images/crossword.png')!important;
+}
+.badge{ background: #0fb2fc; color: #FFF}
+
+.red-tooltip + .tooltip > .tooltip-inner {background-color: #f00;}
+.red-tooltip + .tooltip > .tooltip-arrow { border-bottom-color:#f00; }
+

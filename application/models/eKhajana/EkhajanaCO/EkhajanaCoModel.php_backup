@@ -1,0 +1,2605 @@
+<?php
+
+class EkhajanaCoModel extends CI_Model {
+
+    //getting pending list for co 
+    public function pendingListForCo($dist_code,$subdiv_code,$cir_code){
+        $query = $this->db->select('*')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('status', EKHAJANA_STATUS_LM_FORWARD)
+                    ->from('ekhajana_basic')
+                    ->get(); 
+        return $query->result();
+    }
+
+    //getting pending list count for co 
+    public function pendingForCoCount($dist_code,$subdiv_code,$cir_code){
+        $query = $this->db->select('count(*)')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('status', EKHAJANA_STATUS_LM_FORWARD)
+                    ->from('ekhajana_basic')
+                    ->get(); 
+        //return $this->db->last_query();
+        if($query->num_rows() != 0 ){
+            return $query->row()->count;
+        }else{
+            return 0;
+        }
+    }
+
+    //getting pending case details 
+    public function getPendingCaseDetailsFromId($id){
+        $query = $this->db->select('*')
+                    ->where('id', $id)
+                    ->from('ekhajana_basic')
+                    ->get(); 
+        //return $this->db->last_query();
+        if($query->num_rows() != 0 ){
+            return $query->row();
+        }else{
+            return false;
+        }
+    }
+
+    //forward to co method
+    public function forwardToAssistant($posted_data){        
+        $this->db->trans_begin();
+        //updating ekhajana basic table status
+        $update_data = array(
+            'pending_with_officer' => 'AST',
+            'status'               => EKHAJANA_STATUS_CO_FORWARD,
+            'co_remark'            => $posted_data['co_report'],
+            'modified_at'          => date('Y-m-d h:i:s'),
+        ); 
+        $this->db->where('case_no', $posted_data['case_no']);
+        $this->db->update('ekhajana_basic', $update_data);
+        if($this->db->affected_rows() != 1){ 
+            $this->db->trans_rollback();
+            log_message("error", "#EKCOF001, Error in update, table 'ekhajana_basic'  with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCOF001'];
+        }
+        //ekhajana basic proceeding details insert
+        $proceeding_details_data = array(
+            'ld_application_no' => $posted_data['ld_application_no'],
+            'application_no'    => $posted_data['application_no'],
+            'remark'            => $posted_data['co_report'],            
+            'user_code'         => $this->session->all_userdata()['user_code'],
+            "created_at"        => date('Y-m-d h:i:s'),
+            "case_no"           => $posted_data['case_no'],
+            'status'            => EKHAJANA_STATUS_CO_FORWARD
+        ); 
+        $tstatus2 = $this->db->insert('ekhajana_basic_proceedings', $proceeding_details_data); 
+        if ($tstatus2!= 1)
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKCOF002, Error in insert on ekhajana_basic_proceedings table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCOF002'];
+        }
+        if(trim($posted_data['aadhaar_pan_ref_no']) == 'NA' || trim($posted_data['aadhaar_pan_ref_no']) == '' || trim($posted_data['aadhaar_pan_ref_no']) === null)
+        {
+            log_message("error", "#EKHERRAUTH001, auth token not found for application_no".$posted_data['application_no']);
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKHERRAUTH001'];
+        }
+        //*********************************************************/
+        //checking row in chitha pattadar whether aadhar linked or not 
+        $query = $this->db->select('*')
+                    ->where('dist_code', $posted_data['dist_code'])
+                    ->where('subdiv_code', $posted_data['subdiv_code'])
+                    ->where('cir_code', $posted_data['cir_code'])
+                    ->where('mouza_pargona_code', $posted_data['mouza_pargona_code'])
+                    ->where('lot_no', $posted_data['lot_no'])
+                    ->where('vill_townprt_code', $posted_data['vill_townprt_code'])
+                    ->where('patta_no', $posted_data['patta_no'])
+                    ->where('patta_type_code', $posted_data['patta_type_code'])
+                    ->where('pdar_id', $posted_data['pdar_id'])   
+                    ->from('chitha_pattadar')                 
+                    ->get();
+                  
+        if($query!="" && $query!=null && $query->num_rows()==1){
+            if($posted_data['aadhaar_pan_type'] == 'AADHAAR'){
+                $update_data = array(
+                    'pdar_aadharno' => $posted_data['aadhaar_pan_ref_no'],
+                ); 
+            }else if($posted_data['aadhaar_pan_type'] == 'PAN'){
+                $update_data = array(
+                    'pdar_pan_no' => $posted_data['aadhaar_pan_ref_no'],
+                ); 
+            }
+            $this->db->where('dist_code', $posted_data['dist_code'])
+                    ->where('subdiv_code', $posted_data['subdiv_code'])
+                    ->where('cir_code', $posted_data['cir_code'])
+                    ->where('mouza_pargona_code', $posted_data['mouza_pargona_code'])
+                    ->where('lot_no', $posted_data['lot_no'])
+                    ->where('vill_townprt_code', $posted_data['vill_townprt_code'])
+                    ->where('patta_no', $posted_data['patta_no'])
+                    ->where('patta_type_code', $posted_data['patta_type_code'])
+                    ->where('pdar_id', $posted_data['pdar_id'])   
+                    ->update('chitha_pattadar', $update_data);
+                    
+            if($this->db->affected_rows() != 1){ 
+                $this->db->trans_rollback();
+                log_message("error", "#EKCOADHL001, Error in update, table 'chitha_pattadar'  with query- ". json_encode($this->db->last_query()));
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCOADHL001'];
+            }
+        } 
+        //*********************************************************/
+        //final transaction status check 
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            log_message("error", "#EKCU0003, Transaction Status Error In Saving Land Details with query- ". json_encode($this->db->last_query()));
+            return ['result' => false, 'msg' => 'Some error occured, Error-Code : #EKCU0003'];
+        }else{
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => EKHAJANA_CO_FORAWRDED_API,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_SSL_VERIFYPEER => FALSE,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_POSTFIELDS => array(
+                    'ld_application_no' => $posted_data['ld_application_no'],
+                    'application_no'    => $posted_data['application_no'],
+                    'dharitree_case_no' => $posted_data['case_no'],
+                    'user_code'         => $this->session->all_userdata()['user_code'],                    
+                    'date_of_action'    => date("Y-m-d"),
+                    "patta_no"          => $posted_data['patta_no'],
+                    'remark'            => $posted_data['co_report'],
+                ),
+            ));
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+            if($httpcode == 200){
+                $response_obj = json_decode($response);
+                if($response_obj->result == "Y"){
+                    $this->db->trans_commit();
+                    return ['result' => 'SUCCESS', 'msg' => 'Ekhajana Case Details Forwared To Assistant Successfully!'];                 
+                }else{
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKCORCRLD004, Curl Error(Y) In Api ".EKHAJANA_CO_FORAWRDED_API);
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORCRLD004'];
+                } 
+            }else{
+                $this->db->trans_rollback();
+                log_message("error", "#EKCORCRLD005, Curl Error(200) In Api ".EKHAJANA_CO_FORAWRDED_API);
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORCRLD005'];
+            }
+        } 
+    }
+
+    //handling the case rejection
+    public function rejectCase_old($posted_data){
+        error_reporting(0);
+        $this->db->trans_begin();
+        //updating ekhajana basic table status
+        $update_data = array(
+            'modified_at' => date('Y-m-d h:i:s'),
+            'status' => EKHAJANA_STATUS_REJECTED,
+            'co_remark' => $posted_data['co_report']
+        ); 
+        $this->db->where('id', $posted_data['ek_details_id']);
+        $this->db->update('ekhajana_basic', $update_data);
+        if($this->db->affected_rows() != 1){ 
+            $this->db->trans_rollback();
+            log_message("error", "#EKCORD001, Error in update, table 'ekhajana_basic ' with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORD001'];
+        }
+        //ekhajana basic proceeding details insert
+        $proceeding_details_data = array(
+            'ld_application_no' => $posted_data['ld_application_no'],
+            'application_no' => $posted_data['application_no'],
+            'remark' => $posted_data['co_report'],            
+            'user_code' => $this->session->all_userdata()['user_code'],
+            "created_at" => date('Y-m-d h:i:s'),
+            "case_no" => $posted_data['case_no']
+        ); 
+        $tstatus2 = $this->db->insert('ekhajana_basic_proceedings', $proceeding_details_data); 
+        if ($tstatus2!= 1)
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKCORD006, Error in insert on ekhajana_basic_proceedings table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORD006'];
+        }
+        //final transaction status
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            log_message("error", "#EKCORD002, Transaction Status Error In Saving Land Details with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORD002'];
+        }else{
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => EKHAJANA_CO_REJECTED_API,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_SSL_VERIFYPEER => FALSE,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_POSTFIELDS => array(
+                    'ld_application_no' => $posted_data['ld_application_no'],
+                    'application_no'    => $posted_data['application_no'],
+                    'dharitree_case_no' => $posted_data['case_no'],
+                    'user_code'         => $this->session->all_userdata()['user_code'],                    
+                    'date_of_action'    => date("Y-m-d"),
+                    "patta_no"          => $posted_data['patta_no'],
+                    'remark'            => $posted_data['co_report'],
+                ),
+            ));
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+            if($httpcode == 200){
+                //return "curl successfull";
+                $response_obj = json_decode($response);
+                if($response_obj->result == "Y"){
+                    $this->db->trans_commit();
+                    return ['result' => 'SUCCESS', 'msg' => 'Case Rejected Successfully!'];                   
+                }else{
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKCORCRLD004, Curl Error(Y) In Api ".EKHAJANA_CO_REJECTED_API);
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORCRLD004'];
+                } 
+            }else{
+                $this->db->trans_rollback();
+                log_message("error", "#EKCORCRLD005, Curl Error(200) In Api ".EKHAJANA_CO_REJECTED_API);
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORCRLD005'];
+            }  
+        } 
+    }
+
+    //handling the case rejection
+    public function rejectCase($posted_data){
+        error_reporting(0);
+        $this->db->trans_begin();
+        $array = json_decode(json_encode($posted_data['reject_code']),true);
+        $reject_codes_str = implode(',', $array);
+        $sql = "select string_agg(remark::text,',') as rmk from reject_master rm where reject_code in (".$reject_codes_str.")";
+        $query = $this->db->query($sql);
+        $codes_rmk = $query->row()->rmk;
+        $rmk_all_str = $posted_data['remark'].", ".$codes_rmk;
+        //updating ekhajana basic table status
+        $update_data = array(
+            'modified_at'   => date('Y-m-d h:i:s'),
+            'status'        => EKHAJANA_STATUS_REJECTED,
+            'co_remark'     => $rmk_all_str,
+            'reject_codes'  => json_encode($posted_data['reject_code'])
+        ); 
+        $this->db->where('id', $posted_data['ek_details_id']);
+        $this->db->update('ekhajana_basic', $update_data);
+        if($this->db->affected_rows() != 1){ 
+            $this->db->trans_rollback();
+            log_message("error", "#EKCORD001, Error in update, table 'ekhajana_basic ' with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORD001'];
+        }
+        //ekhajana basic proceeding details insert
+        $proceeding_details_data = array(
+            'ld_application_no' => $posted_data['ld_application_no'],
+            'application_no'    => $posted_data['application_no'],
+            'remark'            => $rmk_all_str,           
+            'user_code'         => $this->session->all_userdata()['user_code'],
+            "created_at"        => date('Y-m-d h:i:s'),
+            "case_no"           => $posted_data['case_no'],
+            'reject_codes'      => json_encode($posted_data['reject_code']),
+            'status'            => EKHAJANA_STATUS_REJECTED
+        ); 
+        $tstatus2 = $this->db->insert('ekhajana_basic_proceedings', $proceeding_details_data); 
+        if ($tstatus2!= 1)
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKCORD006, Error in insert on ekhajana_basic_proceedings table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORD006'];
+        }
+        //final transaction status
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            log_message("error", "#EKCORD002, Transaction Status Error In Saving Land Details with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORD002'];
+        }else{
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => EKHAJANA_CO_REJECTED_API,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_SSL_VERIFYPEER => FALSE,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_POSTFIELDS => array(
+                    'ld_application_no' => $posted_data['ld_application_no'],
+                    'application_no'    => $posted_data['application_no'],
+                    'dharitree_case_no' => $posted_data['case_no'],
+                    'user_code'         => 'CO',                    
+                    'date_of_action'    => date("Y-m-d"),
+                    "patta_no"          => $posted_data['patta_no'],
+                    'remark'            => $rmk_all_str,
+                    'reject_codes'      => json_encode($posted_data['reject_code'])
+                ),
+            ));
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+            if($httpcode == 200){
+                $response_obj = json_decode($response);
+                if($response_obj->result == "Y"){
+                    $this->db->trans_commit(num_rows);
+                    return ['result' => 'SUCCESS', 'msg' => 'Case Rejected Successfully!'];                   
+                }else{
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKCORCRLD004, Curl Error(Y) In Api ".EKHAJANA_CO_REJECTED_API);
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORCRLD004'];
+                } 
+            }else{
+                $this->db->trans_rollback();
+                log_message("error", "#EKCORCRLD005, Curl Error(200) In Api ".EKHAJANA_CO_REJECTED_API);
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORCRLD005'];
+            }  
+        } 
+    }
+    
+    //getting the count of revert cases 
+    public function revertedForCoCount($dist_code,$subdiv_code,$cir_code){
+        $query = $this->db->select('count(*)')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('status', EKHAJANA_AST_MOU_REVERT)
+                    ->from('ekhajana_basic')
+                    ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->row()->count;
+        }else{
+            return 0;
+        }
+    }
+
+    //getting the reverted list for co 
+    public function revertedListForCo($dist_code,$subdiv_code,$cir_code){
+        $query = $this->db->select('*')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('status', EKHAJANA_AST_MOU_REVERT)
+                    ->from('ekhajana_basic')
+                    ->get(); 
+        return $query->result();
+    }
+
+    //getting jama wasil details 
+    public function getJamaWasilDetails($dist_code,$subdiv_code,$cir_code, $mouza_pargona_code, $lot_no, $vill_townprt_code, $patta_type_code, $patta_no){
+        $query = $this->db->select('*')
+                          ->where('dist_code', $dist_code)
+                          ->where('subdiv_code', $subdiv_code)
+                          ->where('cir_code', $cir_code)
+                          ->where('mouza_pargona_code', $mouza_pargona_code)
+                          ->where('lot_no', $lot_no)
+                          ->where('vill_townprt_code', $vill_townprt_code)
+                          ->where('patta_type_code', $patta_type_code)
+                          ->where('patta_no', $patta_no)
+                          ->from('jama_wasil')
+                          ->get();
+
+        if($query->num_rows() == 1){
+            $jama_wasil_details = $query->row();
+            if($jama_wasil_details->status == JAMA_WASIL_STATUS_ONLINE){
+                return "KHAJANA FOR PATTA ".$patta_no." IS PAID, YOU CAN FORWARD THIS CASE TO ASSISTNAT/MOUZADAR TO DISPOSE. AFTER DISPOSED, THE PATTADAR CAN DOWNLOAD THE KHAJANA RECEIPT";
+            }else{
+                return "KHAJANA FOR PATTA ".$patta_no." IS UPDATED, BUT PAYMENT IS NOT RECIEVED FOR THIS PATTA";
+            }
+        }else{
+            return "KHAJANA FOR PATTA ".$patta_no." IS NOT UPDATED YET";
+        }
+    }
+
+    //function to fetch the data where jamawasil status is offline
+    public function JamaWasilOfflineData($dist_code,$subdiv_code,$cir_code){
+        $query = $this->db->select('(select loc_name from location where
+         subdiv_code=j.subdiv_code and cir_code=j.cir_code and mouza_pargona_code=j.mouza_pargona_code 
+         and lot_no=j.lot_no and vill_townprt_code=j.vill_townprt_code) as village_name,*')
+                          ->where('dist_code', $dist_code)
+                          ->where('subdiv_code', $subdiv_code)
+                          ->where('cir_code', $cir_code)  
+                          ->where('status', JAMA_WASIL_STATUS_OFFLINE)
+                          ->from('jama_wasil j')
+                          ->get();
+            return $query->result();
+    }
+   
+    //getting the details of dharitree from id
+    public function getEkBasicDetailsFromId($ek_basic_id){        
+        $query = $this->db->select('*')
+                    ->where('id', $ek_basic_id)
+                    ->from('ekhajana_basic')
+                    ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->row();
+        }else{
+            return false;
+        }
+    }
+
+    //getting current revenue and local tax
+    public function getCurrentRevenueAndLocalTaxFromDoul($village_uuid,$patta_type_code,$patta_no){
+        $query = $this->db->select("*")
+                ->where('uuid', $village_uuid)
+                ->where('patta_type_code', $patta_type_code)
+                ->where('patta_no', $patta_no)
+                ->from('current_doul_demand')
+                ->get(); 
+        if($query->num_rows() != 0){
+            return ['flag' => true, 'result' => $query->row()];
+        }else{
+            return ['flag' => false, 'result' => []];
+        }        
+    }
+
+    //updating and inserting in jama wasil and updating status in basundhara
+    public function arrearReUpdate($jama_wasil_update_data,
+    $jama_wasil_backup_table_update_data,$jama_wasil_details){
+        error_reporting(0);
+        $this->db->trans_begin();
+        //**************************************************//
+        //update data in jama_wasil 
+        $this->db->where('dist_code',$jama_wasil_details->dist_code)
+                    ->where('subdiv_code',$jama_wasil_details->subdiv_code)
+                    ->where('cir_code',$jama_wasil_details->cir_code)
+                    ->where('mouza_pargona_code',$jama_wasil_details->mouza_pargona_code) 
+                    ->where('lot_no',$jama_wasil_details->lot_no)
+                    ->where('vill_townprt_code',$jama_wasil_details->vill_townprt_code) 
+                    ->where('village_uuid',$jama_wasil_details->village_uuid) 
+                    ->where('patta_type_code',$jama_wasil_details->patta_type_code)
+                    ->where('patta_no',$jama_wasil_details->patta_no)
+                    ->where('case_no',$jama_wasil_details->case_no)
+                    ->update('jama_wasil', $jama_wasil_update_data); 
+        if ($this->db->affected_rows() != 1)
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKHRED001, Error in update on jama_wasil table with  query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKHRED001'];
+        }
+        //**************************************************//
+        //update data in jama_wasil_transaction 
+        $this->db->where('dist_code',$jama_wasil_details->dist_code)
+                    ->where('subdiv_code',$jama_wasil_details->subdiv_code)
+                    ->where('cir_code',$jama_wasil_details->cir_code)
+                    ->where('mouza_pargona_code',$jama_wasil_details->mouza_pargona_code) 
+                    ->where('lot_no',$jama_wasil_details->lot_no)
+                    ->where('vill_townprt_code',$jama_wasil_details->vill_townprt_code) 
+                    ->where('village_uuid',$jama_wasil_details->village_uuid) 
+                    ->where('patta_type_code',$jama_wasil_details->patta_type_code)
+                    ->where('patta_no',$jama_wasil_details->patta_no)
+                    ->where('case_no',$jama_wasil_details->case_no)
+                    ->update('jama_wasil_transaction', $jama_wasil_update_data); 
+        if ($this->db->affected_rows() <= 0)
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKHRED002, Error in update on jama_wasil_transaction table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKHRED002'];
+        }
+        //**************************************************//
+        //insert data in jama_wasil_backup
+        $tstatus4 = $this->db->insert('jama_wasil_backup', $jama_wasil_backup_table_update_data); 
+        if ($tstatus4 != 1 )
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKHRED003, Error in insert on jama_wasil_backup table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKHRED003'];
+        }
+        //**************************************************//
+        
+        //ekhajana basic proceeding details insert
+        $proceeding_details_data = array(
+            'ld_application_no' => $jama_wasil_details->ld_application_no,
+            'application_no'    => $jama_wasil_details->application_no,
+            'remark'            => "CO-ARREAR-RE-UPDATED",            
+            'user_code'         => $this->session->all_userdata()['user_code'],
+            "created_at"        => date('Y-m-d h:i:s'),
+            "case_no"           => $jama_wasil_details->case_no,
+            'status'            => EKHAJANA_STATUS_COMPLETED
+        ); 
+        $tstatus2 = $this->db->insert('ekhajana_basic_proceedings', $proceeding_details_data); 
+        if ($tstatus2!= 1)
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKHRED005, Error in insert on ekhajana_basic_proceedings table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKHRED005'];
+        }
+        //**************************************************//
+        //transaction final check
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            log_message("error", "#EKHRED006, Transaction Status Error In Mouzadar Arrear Update Details with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKHRED006'];
+        }else{
+            //basundhara ekhajana payment update
+            //basundhara ekhajana land details update
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => EKHAJANA_PAYMENT_RE_UPDATE_BY_CO_API,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_SSL_VERIFYPEER => FALSE,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_POSTFIELDS => array(
+                        'ld_application_no' => $jama_wasil_details->ld_application_no,
+                        'application_no' => $jama_wasil_details->application_no,
+                        'dharitree_case_no' => $jama_wasil_details->case_no,
+                        'due_payment' => $jama_wasil_update_data['due_payment'],
+                        'user_code' => $this->session->all_userdata()['user_code'],                  
+                        'date_of_action' => date("Y-m-d"),
+                        "patta_no" => $jama_wasil_details->patta_no,
+                        'remark' => "CO ARREAR RE-UPDATED",
+                    ),
+            ));
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+            if($httpcode == 200){
+                //return "curl successfull";
+                $response_obj = json_decode($response);
+                if($response_obj->result == "Y"){
+                    $this->db->trans_commit();
+                    return ['result' => 'SUCCESS', 'msg' => 'Arrear Re-Updated Sucessfully..!'];                 
+                }else{
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKREAUCRL007, Curl Error(Y) In Api ".EKHAJANA_PAYMENT_RE_UPDATE_BY_CO_API);
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKREAUCRL007'];
+                } 
+            }else{
+                $this->db->trans_rollback();
+                log_message("error", "#EKREAUCRL008, Curl Error(200) In Api ".EKHAJANA_PAYMENT_RE_UPDATE_BY_CO_API);
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKREAUCRL008'];
+            }
+        } 
+    }
+
+    //function to chck the payment reponse from rtps
+    public function checkPaymentQuerybeforeUpdate($case_no){
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => EKHAJANA_CHECK_PAYMENT_STATUS_BEFORE_REUPDATE,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+                    'application_no' => $case_no,
+                ),
+        ));
+        $response = curl_exec($curl);
+        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if($httpcode == 200){
+            $response_obj = json_decode($response);
+            if($response_obj->result == "Y"){
+                return 'Y';                 
+            }else{
+                log_message("error", "#EKREAUCRL011, Curl Error(Y) In Api ".EKHAJANA_CHECK_PAYMENT_STATUS_BEFORE_REUPDATE);
+                return 'N';
+            } 
+        }else{
+            log_message("error", "#EKREAUCRL012, Curl Error(200) In Api ".EKHAJANA_CHECK_PAYMENT_STATUS_BEFORE_REUPDATE);
+            return 'N';
+        }
+    } 
+
+    //getting the details of jamawasil from id
+    public function getjamaWasilDetailsFromId($jama_wasil_id){        
+        $query = $this->db->select('*')
+                    ->where('id', $jama_wasil_id)
+                    ->from('jama_wasil')
+                    ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->row();
+        }else{
+            return false;
+        }
+    }
+
+    public function checkDoulStatusBeforeForward($dist_code,$subdiv_code,$cir_code,$mouza_pargona_code,$lot_no,$vill_townprt_code,$patta_type_code,$patta_no){
+        $query = $this->db->select("*")
+                ->where('dist_code', $dist_code)
+                ->where('subdiv_code', $subdiv_code)
+                ->where('cir_code', $cir_code)
+                ->where('mouza_pargona_code', $mouza_pargona_code)
+                ->where('lot_no', $lot_no)
+                ->where('vill_townprt_code', $vill_townprt_code)
+                ->where('patta_type_code', $patta_type_code)
+                ->where('patta_no', $patta_no)
+                ->from('current_doul_demand')
+                ->get(); 
+        if($query->num_rows() != 0){
+            $row = $query->row();
+            if(($row->dag_revenue=='' || $row->dag_revenue==null) || ($row->dag_local_tax=='' || $row->dag_local_tax==null)){
+                return ['result' => false, 'msg' => 'Revenue Or Local Tax Not Found in Doul For The Patta : '.$patta_no. ", Please verify the patta no in current doul.!" ];
+            }else{
+                return ['result' => true, 'msg' => ''];
+            }
+            
+        }else{
+            return ['result' => false, 'msg' => 'Doul Entry Not Found For The Patta : '.$patta_no. ", Please verify the patta no in current doul.!" ];
+        }        
+    }
+
+    //getting pending list count for co 
+    public function pendingForCoCountMouzadari($dist_code,$subdiv_code,$cir_code){
+        $query = $this->db->select('count(*)')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('status', EKHAJANA_STATUS_COMBINE_FORWARD)
+                    ->from('ekhajana_basic')
+                    ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->row()->count;
+        }else{
+            return 0;
+        }
+        // $pendingListQuery = $this->db->query("select count(*) as c from ekhajana_basic eb join ekhajana_arrear_pre_updation 
+        //                 epau on eb.dist_code=epau.dist_code and eb.subdiv_code=epau.subdiv_code and eb.cir_code=epau.cir_code
+        //                 and eb.mouza_pargona_code=epau.mouza_pargona_code and eb.lot_no=epau.lot_no and
+        //                 eb.vill_townprt_code=epau.vill_townprt_code and eb.patta_type_code=epau.patta_type_code
+        //                 and eb.patta_no=epau.patta_no where eb.status=? and epau.status=? and eb.dist_code=? 
+        //                 and eb.subdiv_code=? and eb.cir_code=?",
+        //                 array(EKHAJANA_STATUS_COMBINE_FORWARD,'CP',$dist_code,$subdiv_code,$cir_code));
+        // return $pendingListQuery->row()->c;
+    }
+
+    //getting the count of objection cases in mouzadari sytem 
+    public function mouzadarObjectionForCoCount($dist_code,$subdiv_code,$cir_code){
+        $query = $this->db->select('count(*)')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('status', EKHAJANA_MOUZADAR_OBJECTION)
+                    ->where('objectionflag', '1')
+                    ->from('ekhajana_basic')
+                    ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->row()->count;
+        }else{
+            return 0;
+        }
+    }
+
+    //getting pending list for co 
+    public function pendingListForCoMouzadari($dist_code,$subdiv_code,$cir_code){
+        $query = $this->db->select('*')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('status', EKHAJANA_STATUS_COMBINE_FORWARD)
+                    ->from('ekhajana_basic')
+                    ->get(); 
+        return $query->result();
+        
+        // $pendingListQuery = $this->db->query("select eb.* from ekhajana_basic eb join ekhajana_arrear_pre_updation 
+        //                     epau on eb.dist_code=epau.dist_code and eb.subdiv_code=epau.subdiv_code and eb.cir_code=epau.cir_code
+        //                     and eb.mouza_pargona_code=epau.mouza_pargona_code and eb.lot_no=epau.lot_no and
+        //                     eb.vill_townprt_code=epau.vill_townprt_code and eb.patta_type_code=epau.patta_type_code
+        //                     and eb.patta_no=epau.patta_no where eb.status=? and eb.dist_code=? and eb.subdiv_code=? and eb.cir_code=? 
+        //                     and epau.status=?",
+        //                     array(EKHAJANA_STATUS_COMBINE_FORWARD,$dist_code,$subdiv_code,$cir_code,'CP'));
+        // return $pendingListQuery->result();
+    }
+
+    //checking jama wasil exists or not against dharitree case number
+    public function CheckJamaWasil($caseDetails){
+        $query = $this->db->select('*')
+                        ->where('dist_code', $caseDetails['dist_code'])
+                        ->where('subdiv_code', $caseDetails['subdiv_code'])
+                        ->where('cir_code', $caseDetails['cir_code'])
+                        ->where('mouza_pargona_code', $caseDetails['mouza_pargona_code'])
+                        ->where('lot_no', $caseDetails['lot_no'])
+                        ->where('vill_townprt_code', $caseDetails['vill_townprt_code'])
+                        ->where('patta_type_code', $caseDetails['patta_type_code'])
+                        ->where('patta_no', $caseDetails['patta_no'])
+                        ->where('pay_status', 'PAID')
+                        ->from('jama_wasil')
+                        ->get(); 
+            if($query->num_rows() != 0 ){
+                return $query->row();
+            }else{
+                return false;
+            }
+    }
+
+    //function to get the arrear details of the case
+    public function getEkhajanaPreArrearDetails($caseDetails){
+        $query = $this->db->select('*')
+                        ->where('dist_code', $caseDetails['dist_code'])
+                        ->where('subdiv_code', $caseDetails['subdiv_code'])
+                        ->where('cir_code', $caseDetails['cir_code'])
+                        ->where('mouza_pargona_code', $caseDetails['mouza_pargona_code'])
+                        ->where('lot_no', $caseDetails['lot_no'])
+                        ->where('vill_townprt_code', $caseDetails['vill_townprt_code'])
+                        ->where('patta_type_code', $caseDetails['patta_type_code'])
+                        ->where('patta_no', $caseDetails['patta_no'])
+                        ->from('ekhajana_arrear_pre_updation')
+                        ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->row();
+        }else{
+            return false;
+        }
+    }
+
+
+    //function to get the arrear details of the case
+    public function getEkhajanaMouzadarArrearDetails($caseDetails){
+        $query = $this->db->select('*')
+                        ->where('dist_code', $caseDetails['dist_code'])
+                        ->where('subdiv_code', $caseDetails['subdiv_code'])
+                        ->where('cir_code', $caseDetails['cir_code'])
+                        ->where('mouza_pargona_code', $caseDetails['mouza_pargona_code'])
+                        ->where('lot_no', $caseDetails['lot_no'])
+                        ->where('vill_townprt_code', $caseDetails['vill_townprt_code'])
+                        ->where('patta_type_code', $caseDetails['patta_type_code'])
+                        ->where('patta_no', $caseDetails['patta_no'])
+                        ->from('ekhajana_mouzadar_arrear_details')
+                        ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->row();
+        }else{
+            return false;
+        }
+    }
+
+    //getting ekhajana basic details form id 
+    public function getEkBasicDetailsFromldAppNo($ld_application_no){        
+        $query = $this->db->select('*')
+                    ->where('ld_application_no', $ld_application_no)
+                    ->from('ekhajana_basic')
+                    ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->row();
+        }else{
+            return false;
+        }
+    }
+
+    //method to link aadhaar with chitha
+    public function linkAadhar($ekBasicDetails,$posted_data){
+        //checking row in chitha pattadar whether aadhar linked or not 
+        if($posted_data['co_pattadar_identification_flag']!= 'Y'){
+            return ['result' => true, 'msg' => ''];
+        }
+        //*********************************************************/
+        if(trim($ekBasicDetails->aadhaar_pan_ref_no) == 'NA' || trim($ekBasicDetails->aadhaar_pan_ref_no) == '' || trim($ekBasicDetails->aadhaar_pan_ref_no) === null)
+        {
+            log_message("error", "#EKHERRAUTH002, auth token not found for application_no".$ekBasicDetails->application_no);
+            return ['result' => false, 'msg' => 'Some error occured, Error-Code : #EKHERRAUTH002'];
+        }
+        $this->db->trans_begin();
+        //checking row in chitha pattadar whether aadhar linked or not 
+        $query = $this->db->select('*')
+                    ->where('dist_code', $ekBasicDetails->dist_code)
+                    ->where('subdiv_code', $ekBasicDetails->subdiv_code)
+                    ->where('cir_code', $ekBasicDetails->cir_code)
+                    ->where('mouza_pargona_code', $ekBasicDetails->mouza_pargona_code)
+                    ->where('lot_no', $ekBasicDetails->lot_no)
+                    ->where('vill_townprt_code', $ekBasicDetails->vill_townprt_code)
+                    ->where('patta_no', $ekBasicDetails->patta_no)
+                    ->where('patta_type_code', $ekBasicDetails->patta_type_code)
+                    ->where('pdar_id', $ekBasicDetails->pdar_id)   
+                    ->from('chitha_pattadar')                 
+                    ->get();
+                  
+        if($query!="" && $query!=null && $query->num_rows()==1){
+            
+            if($ekBasicDetails->aadhaar_pan_type == 'AADHAAR'){
+                $update_data = array(
+                    'pdar_aadharno' => $ekBasicDetails->aadhaar_pan_ref_no,
+                ); 
+            }else if($ekBasicDetails->aadhaar_pan_type == 'PAN'){
+                $update_data = array(
+                    'pdar_pan_no' => $ekBasicDetails->aadhaar_pan_ref_no,
+                ); 
+            }
+            
+            $this->db->where('dist_code', $ekBasicDetails->dist_code)
+                    ->where('subdiv_code', $ekBasicDetails->subdiv_code)
+                    ->where('cir_code', $ekBasicDetails->cir_code)
+                    ->where('mouza_pargona_code', $ekBasicDetails->mouza_pargona_code)
+                    ->where('lot_no', $ekBasicDetails->lot_no)
+                    ->where('vill_townprt_code', $ekBasicDetails->vill_townprt_code)
+                    ->where('patta_no', $ekBasicDetails->patta_no)
+                    ->where('patta_type_code', $ekBasicDetails->patta_type_code)
+                    ->where('pdar_id', $ekBasicDetails->pdar_id)   
+                    ->update('chitha_pattadar', $update_data);
+                     
+            if($this->db->affected_rows() != 1){ 
+                $this->db->trans_rollback();
+                log_message("error", "#EKCOADHL001, Error in update, table 'chitha_pattadar'  with query- ". json_encode($this->db->last_query()));
+                return ['result' => false, 'msg' => 'Some error occured, Error-Code : #EKCOADHL001'];
+            }else{
+                $this->db->trans_commit();
+                return ['result' => true, 'msg' => 'Aadhar Linked'];    
+            }
+        }else{
+            log_message("error", "#EKCOADHL00189, chitha pattadra details not found  with query- ". json_encode($this->db->last_query()));
+            return ['result' => false, 'msg' => 'Some error occured, Error-Code : #EKCOADHL00189'];
+        }
+    }
+
+    //inserting in jama wasil and updating status in basundhara
+    public function COdisposeCaseMouzadariSystem($posted_data,$ArrearData,$ekBasicDetails,$jama_wasil_data,
+                    $jama_wasil_payee_list_data,$jama_wasil_backup_table_data){
+        error_reporting(0);
+        $this->db->trans_begin();
+        //**************************************************//
+        //insert data in jama_wasil 
+        $tstatus1 = $this->db->insert('jama_wasil', $jama_wasil_data); 
+        if ($tstatus1 != 1 )
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU001, Error in insert on jama_wasil table with  query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU001'];
+        }
+        //**************************************************//
+        $jama_wasil_inserted_id = $this->db->insert_id(); 
+        //**************************************************//
+        //insert data in jama_wasil_transaction 
+        $jama_wasil_data['jama_wasil_id'] = $jama_wasil_inserted_id;
+        $tstatus2 = $this->db->insert('jama_wasil_transaction', $jama_wasil_data); 
+        if ($tstatus2 != 1 )
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU002, Error in insert on jama_wasil_transaction table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU002'];
+        }
+        //**************************************************//
+        $jama_wasil_transaction_inserted_id = $this->db->insert_id();
+        //**************************************************//
+        //insert data in jama_wasil_payee_list 
+        $jama_wasil_payee_list_data['jama_wasil_id'] = $jama_wasil_inserted_id;
+        $jama_wasil_payee_list_data['jama_wasil_transaction_id'] = $jama_wasil_transaction_inserted_id;
+        $tstatus3 = $this->db->insert('jama_wasil_payee_list', $jama_wasil_payee_list_data); 
+        if ($tstatus3 != 1 )
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU003, Error in insert on jama_wasil_payee_list table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU003'];
+        }
+        //**************************************************//
+        //insert data in jama_wasil_backup
+        $tstatus4 = $this->db->insert('jama_wasil_backup', $jama_wasil_backup_table_data); 
+        if ($tstatus4 != 1 )
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU004, Error in insert on jama_wasil_backup table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU004'];
+        }
+        //**************************************************//
+        //ekhajana basic update 
+        $update_data = array(
+            'status'                          => EKHAJANA_STATUS_COMPLETED,
+            'pending_with_officer'            => '--',
+            'co_remark'                       => $posted_data['co_report'],
+            'user_code'                       => $this->session->all_userdata()['user_code'],
+            'modified_at'                     => date('Y-m-d h:i:s'),
+            'co_pattadar_identification_flag' => $posted_data['co_pattadar_identification_flag']
+        ); 
+        $this->db->where('case_no', $ekBasicDetails->case_no);
+        $this->db->update('ekhajana_basic', $update_data);
+        if($this->db->affected_rows() != 1){ 
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU005, Error in update , table 'ekhajana_basic' with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU005'];
+        }
+        //ekhajana basic proceeding details insert
+        $proceeding_details_data = array(
+            'ld_application_no'     => $ekBasicDetails->ld_application_no,
+            'application_no'        => $ekBasicDetails->application_no,
+            'remark'                => "CO-CASE-DISPOSED",            
+            'user_code'             => $this->session->all_userdata()['user_code'],
+            "created_at"            => date('Y-m-d h:i:s'),
+            "case_no"               => $ekBasicDetails->case_no,
+            'status'                => EKHAJANA_STATUS_COMPLETED
+        ); 
+        $tstatus2 = $this->db->insert('ekhajana_basic_proceedings', $proceeding_details_data); 
+        if ($tstatus2!= 1)
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU009, Error in insert on ekhajana_basic_proceedings table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU009'];
+        }
+        //**************************************************//
+        //transaction final check
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU006, Transaction Error In Ekhajana Co Dispose");
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU006'];
+        }else{
+            //basundhara ekhajana payment update
+            //basundhara ekhajana land details update
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => EKHAJANA_DISPOSE_UPDATE_API,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_SSL_VERIFYPEER => FALSE,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_POSTFIELDS => array(
+                        'ld_application_no' => $ekBasicDetails->ld_application_no,
+                        'application_no'    => $ekBasicDetails->application_no,
+                        'dharitree_case_no' => $ekBasicDetails->case_no,
+                        'due_payment'       => $jama_wasil_data['due_payment'],
+                        'user_code'         => 'CO',                    
+                        'date_of_action'    => date("Y-m-d"),
+                        "patta_no"          => $ekBasicDetails->patta_no,
+                        'remark'            => "CO CASE DISPOSED",
+                    ),
+            ));
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+            if($httpcode == 200){
+                $response_obj = json_decode($response);
+                if($response_obj->result == "Y"){
+                    $this->db->trans_commit();
+                    return ['result' => 'SUCCESS', 'msg' => 'Case Disposed Sucessfully..!'];                 
+                }else{
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKIAUCRL007, Curl Error(Y) In Api ".EKHAJANA_DISPOSE_UPDATE_API);
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAUCRL007'];
+                } 
+            }else{
+                $this->db->trans_rollback();
+                log_message("error", "#EKIAUCRL008, Curl Error(200) In Api ".EKHAJANA_DISPOSE_UPDATE_API);
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAUCRL008'];
+            }
+        } 
+    }
+
+    //function to dispose case that is already in jama wasil
+    public function COdisposeCaseMouzadariSystemWithoutInsert($posted_data,$ekBasicDetails){
+        error_reporting(0);
+        $this->db->trans_begin();
+         //**************************************************//
+        //ekhajana basic update 
+        $update_data = array(
+            'status'                => EKHAJANA_STATUS_COMPLETED,
+            'pending_with_officer'  => '--',
+            'co_remark'             => $posted_data['co_report'],
+            'user_code'             => $this->session->all_userdata()['user_code'],
+            'modified_at'           => date('Y-m-d h:i:s')
+        ); 
+        $this->db->where('case_no', $ekBasicDetails->case_no);
+        $this->db->update('ekhajana_basic', $update_data);
+        if($this->db->affected_rows() != 1){ 
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU009, Error in update  table 'ekhajana_basic' with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU009'];
+        }
+        //ekhajana basic proceeding details insert
+        $proceeding_details_data = array(
+            'ld_application_no'     => $ekBasicDetails->ld_application_no,
+            'application_no'        => $ekBasicDetails->application_no,
+            'remark'                => "CO-CASE-DISPOSED",            
+            'user_code'             => $this->session->all_userdata()['user_code'],
+            "created_at"            => date('Y-m-d h:i:s'),
+            "case_no"               => $ekBasicDetails->case_no,
+            'status'                => EKHAJANA_STATUS_COMPLETED
+        ); 
+        $tstatus2 = $this->db->insert('ekhajana_basic_proceedings', $proceeding_details_data); 
+        if ($tstatus2!= 1)
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU0010, Error in insert on ekhajana_basic_proceedings table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU0010'];
+        }
+        //**************************************************//
+        //transaction final check
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU0011, Transaction Status Error  Update Details with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU0011'];
+        }else{
+            //basundhara ekhajana payment update
+            //basundhara ekhajana land details update
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => EKHAJANA_DISPOSE_UPDATE_API,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_SSL_VERIFYPEER => FALSE,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_POSTFIELDS => array(
+                        'ld_application_no' => $ekBasicDetails->ld_application_no,
+                        'application_no'    => $ekBasicDetails->application_no,
+                        'dharitree_case_no' => $ekBasicDetails->case_no,
+                        'user_code'         => $this->session->all_userdata()['user_code'],                    
+                        'date_of_action'    => date("Y-m-d"),
+                        "patta_no"          => $ekBasicDetails->patta_no,
+                        'remark'            => "CO CASE DISPOSED",
+                    ),
+            ));
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+            if($httpcode == 200){
+                $response_obj = json_decode($response);
+                if($response_obj->result == "Y"){
+                    $this->db->trans_commit();
+                    return ['result' => 'SUCCESS', 'msg' => 'Case Disposed Sucessfully..!'];                 
+                }else{
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKIAUCRL007, Curl Error(Y) In Api ".EKHAJANA_DISPOSE_UPDATE_API);
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAUCRL007'];
+                } 
+            }else{
+                $this->db->trans_rollback();
+                log_message("error", "#EKIAUCRL008, Curl Error(200) In Api ".EKHAJANA_DISPOSE_UPDATE_API);
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAUCRL008'];
+            }
+        } 
+
+    }
+
+    //method to link aadhaar with chitha
+    public function linkAadharInRejectCase($ekBasicDetails){
+        $this->db->trans_begin();
+        if(trim($ekBasicDetails->aadhaar_pan_ref_no) == 'NA' || trim($ekBasicDetails->aadhaar_pan_ref_no) == '' || trim($ekBasicDetails->aadhaar_pan_ref_no) === null)
+        {
+            log_message("error", "#EKHERRAUTH003, auth token not found for application_no".$ekBasicDetails->application_no);
+            return ['result' => false, 'msg' => 'Some error occured, Error-Code : #EKHERRAUTH003'];
+        }
+        //checking row in chitha pattadar whether aadhar linked or not 
+        $query = $this->db->select('*')
+                    ->where('dist_code', $ekBasicDetails->dist_code)
+                    ->where('subdiv_code', $ekBasicDetails->subdiv_code)
+                    ->where('cir_code', $ekBasicDetails->cir_code)
+                    ->where('mouza_pargona_code', $ekBasicDetails->mouza_pargona_code)
+                    ->where('lot_no', $ekBasicDetails->lot_no)
+                    ->where('vill_townprt_code', $ekBasicDetails->vill_townprt_code)
+                    ->where('patta_no', $ekBasicDetails->patta_no)
+                    ->where('patta_type_code', $ekBasicDetails->patta_type_code)
+                    ->where('pdar_id', $ekBasicDetails->pdar_id)   
+                    ->from('chitha_pattadar')                 
+                    ->get();
+                  
+        if($query!="" && $query!=null && $query->num_rows()==1){
+            
+            if($ekBasicDetails->aadhaar_pan_type == 'AADHAAR'){
+                $update_data = array(
+                    'pdar_aadharno' => $ekBasicDetails->aadhaar_pan_ref_no,
+                ); 
+            }else if($ekBasicDetails->aadhaar_pan_type == 'PAN'){
+                $update_data = array(
+                    'pdar_pan_no' => $ekBasicDetails->aadhaar_pan_ref_no,
+                ); 
+            }
+            
+            $this->db->where('dist_code', $ekBasicDetails->dist_code)
+                    ->where('subdiv_code', $ekBasicDetails->subdiv_code)
+                    ->where('cir_code', $ekBasicDetails->cir_code)
+                    ->where('mouza_pargona_code', $ekBasicDetails->mouza_pargona_code)
+                    ->where('lot_no', $ekBasicDetails->lot_no)
+                    ->where('vill_townprt_code', $ekBasicDetails->vill_townprt_code)
+                    ->where('patta_no', $ekBasicDetails->patta_no)
+                    ->where('patta_type_code', $ekBasicDetails->patta_type_code)
+                    ->where('pdar_id', $ekBasicDetails->pdar_id)   
+                    ->update('chitha_pattadar', $update_data);
+                     
+            if($this->db->affected_rows() != 1){ 
+                $this->db->trans_rollback();
+                log_message("error", "#EKCOADHL001, Error in update, table 'chitha_pattadar'  with query- ". json_encode($this->db->last_query()));
+                return ['result' => false, 'msg' => 'Some error occured, Error-Code : #EKCOADHL001'];
+            }else{
+                $this->db->trans_commit();
+                return ['result' => true, 'msg' => 'Aadhar Linked'];    
+            }
+        }else{
+            log_message("error", "#EKCOADHL00185, chitha pattadra details not found for the patta  with query- ". json_encode($this->db->last_query()));
+            return ['result' => false, 'msg' => 'Some error occured, Error-Code : #EKCOADHL00185'];
+        } 
+    }
+
+    //handling the case rejection in mouzadari system
+    public function rejectCaseMouzadariSystem($posted_data){
+        error_reporting(0);
+        $this->db->trans_begin();
+        $array = json_decode(json_encode($posted_data['reject_code']),true);
+        $reject_codes_str = implode(',', $array);
+        $sql = "select string_agg(remark::text,',') as rmk from reject_master rm where reject_code in (".$reject_codes_str.")";
+        $query = $this->db->query($sql);
+        $codes_rmk = $query->row()->rmk;
+        $rmk_all_str = $posted_data['remark'].", ".$codes_rmk;
+        //updating ekhajana basic table status
+        $update_data = array(
+            'modified_at'                     => date('Y-m-d h:i:s'),
+            'status'                          => EKHAJANA_STATUS_REJECTED,
+            'co_remark'                       => $rmk_all_str,
+            'pending_with_officer'            => '--',
+            'reject_codes'                    => json_encode($posted_data['reject_code']),
+            'co_pattadar_identification_flag' => $posted_data['co_pattadar_identification_flag'],
+            'user_code'                       => $this->session->all_userdata()['user_code'],
+        ); 
+        $this->db->where('id', $posted_data['ek_details_id']);
+        $this->db->update('ekhajana_basic', $update_data);
+        if($this->db->affected_rows() != 1){ 
+            $this->db->trans_rollback();
+            log_message("error", "#EKCORD001, Error in update, table 'ekhajana_basic ' with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORD001'];
+        }
+        //ekhajana basic proceeding details insert
+        $proceeding_details_data = array(
+            'ld_application_no' => $posted_data['ld_application_no'],
+            'application_no'    => $posted_data['application_no'],
+            'remark'            => $rmk_all_str,           
+            'user_code'         => $this->session->all_userdata()['user_code'],
+            "created_at"        => date('Y-m-d h:i:s'),
+            "case_no"           => $posted_data['case_no'],
+            'reject_codes'      => json_encode($posted_data['reject_code']),
+            'status'            => EKHAJANA_STATUS_REJECTED
+        ); 
+        $tstatus2 = $this->db->insert('ekhajana_basic_proceedings', $proceeding_details_data); 
+        if ($tstatus2!= 1)
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKCORD006, Error in insert on ekhajana_basic_proceedings table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORD006'];
+        }
+        //final transaction status
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            log_message("error", "#EKCORD002, Transaction Status Error In Saving Land Details with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORD002'];
+        }else{
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => EKHAJANA_CO_REJECTED_API,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_SSL_VERIFYPEER => FALSE,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_POSTFIELDS => array(
+                    'ld_application_no' => $posted_data['ld_application_no'],
+                    'application_no'    => $posted_data['application_no'],
+                    'dharitree_case_no' => $posted_data['case_no'],
+                    'user_code'         => $this->session->all_userdata()['user_code'],                    
+                    'date_of_action'    => date("Y-m-d"),
+                    "patta_no"          => $posted_data['patta_no'],
+                    'remark'            => $rmk_all_str,
+                    'reject_codes'      => json_encode($posted_data['reject_code'])
+                ),
+            ));
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+            if($httpcode == 200){
+                //return "curl successfull";
+                $response_obj = json_decode($response);
+                if($response_obj->result == "Y"){
+                    $this->db->trans_commit();
+                    return ['result' => 'SUCCESS', 'msg' => 'Case Rejected Successfully!'];                   
+                }else{
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKCORCRLD004, Curl Error(Y) In Api ".EKHAJANA_CO_REJECTED_API);
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORCRLD004'];
+                } 
+            }else{
+                $this->db->trans_rollback();
+                log_message("error", "#EKCORCRLD005, Curl Error(200) In Api ".EKHAJANA_CO_REJECTED_API);
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCORCRLD005'];
+            }  
+        } 
+    }
+
+    //function to get the objection list in mouzadari system
+    public function mouzadarobjectionListForCo($dist_code,$subdiv_code,$cir_code){
+        $query = $this->db->select('*')
+                        ->where('dist_code', $dist_code)
+                        ->where('subdiv_code', $subdiv_code)
+                        ->where('cir_code', $cir_code)
+                        ->where('status', EKHAJANA_MOUZADAR_OBJECTION)
+                        ->where('objectionflag', '1')
+                        ->from('ekhajana_basic')
+                        ->get(); 
+            return $query->result();
+    }
+
+    //getting details of the objection case in mouzadari system
+    public function getmouzadarObjectionCaseDetailsFromId($id){
+        $query = $this->db->select('*')
+                        ->where('id', $id)
+                        ->from('ekhajana_basic')
+                        ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->row();
+                }else{
+            return false;
+        }
+    }
+
+    //function to get the arrear details of the case
+    public function getEkhajanaMouzadarArrearDetailsNew($caseDetails){
+        $query = $this->db->select('*')
+                        ->where('dist_code', $caseDetails['dist_code'])
+                        ->where('subdiv_code', $caseDetails['subdiv_code'])
+                        ->where('cir_code', $caseDetails['cir_code'])
+                        ->where('mouza_pargona_code', $caseDetails['mouza_pargona_code'])
+                        ->where('lot_no', $caseDetails['lot_no'])
+                        ->where('vill_townprt_code', $caseDetails['vill_townprt_code'])
+                        ->where('patta_type_code', $caseDetails['patta_type_code'])
+                        ->where('patta_no', $caseDetails['patta_no'])
+                        ->from('ekhajana_mouzadar_arrear_details')
+                        ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->row();
+        }else{
+            return false;
+            
+        }
+    }
+
+
+    //function to get the daetils of ekhjana basic prooceedings
+    public function getmouzadarObjectionProceedingDetails($caseDetails){    
+        $query =$this->db->select('*')
+                ->where('application_no', $caseDetails->application_no)
+                ->where('ld_application_no', $caseDetails->ld_application_no)
+                ->from('ekhajana_basic_proceedings')
+                ->get(); 
+            if($query->num_rows() != 0 ){
+                return $query->result();
+            }else{
+                return [];
+            }
+    }
+
+     //*********************/    EKHAJANA ACTIONS ON DOUL CHANGE    /****************************//
+
+    //method to move current doul in archive table and insert into arrear table
+    public function updateEkhajanaBeforeDoulChange($dist_code,$subdiv_code,$cir_code,$current_year){
+        // error_reporting(0);
+        $old_year =(int)$current_year-1;
+        log_message('error','searching data for the year in jama wasil '.$old_year);
+        //creating a jama wasil archive table 
+        $jama_wasil_new = 'jama_wasil_2025';
+        $jama_wasil_table = 'jama_wasil';
+
+        $count_of_jama_wasil_old = $this->db->query("select count(*) as old_jama_wasil from jama_wasil where dist_code=? and subdiv_code=? and cir_code=?",array($dist_code,$subdiv_code,$cir_code))->row()->old_jama_wasil;
+        log_message("error","OLD JAMA WASIL COUNT ==> ".$count_of_jama_wasil_old);
+        $this->db->query("CREATE TABLE IF NOT EXISTS $jama_wasil_new (LIKE $jama_wasil_table including all)");
+        
+        $checkTableCreated = $this->checkTableCreated($jama_wasil_new);
+        if (trim($checkTableCreated[0]->exists) != 't')
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKCNTODC001321, Error in insert on jama_wasil_archive table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCNTODC001321'];
+        }else{
+            $sql123 = $this->db->query("select * from jama_wasil where dist_code=? and subdiv_code=? and cir_code=? and dol_year_no=?",array($dist_code,$subdiv_code,$cir_code,(string)$old_year));
+            if($sql123->num_rows()!= 0){
+                $insert_jama_wasil_archive = $this->db->query("INSERT INTO $jama_wasil_new SELECT * FROM $jama_wasil_table where dist_code = '$dist_code'
+                and subdiv_code = '$subdiv_code' and cir_code = '$cir_code' and dol_year_no = '$old_year'");
+                if(!$insert_jama_wasil_archive)
+                {
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKCNTODC00223, Error in insert on jama_Wasil_archive table with query- ". json_encode($this->db->last_query()));
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCNTODC00223'];
+                }
+            }
+        }
+        $count_of_jama_wasil_arch = $this->db->query("select count(*) as arc_jama_wasil from $jama_wasil_new where dist_code=? and subdiv_code=? and cir_code=?",array($dist_code,$subdiv_code,$cir_code))->row()->arc_jama_wasil;
+        log_message("error","ARCHIVE JAMA WASIL COUNT ==> ".$count_of_jama_wasil_arch);
+        if($count_of_jama_wasil_old !=  $count_of_jama_wasil_arch){
+            $this->db->trans_rollback();
+            log_message("error", "#EKCNTODC844, mismatch in count in the archive table created with the jama_wasil table count-- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCNTODC844'];
+        }
+        //creating a archive doul table
+        $current_demand_new = 'current_doul_demand_'.$old_year;
+        $current_doul_demand = 'current_doul_demand';
+        $this->db->query("CREATE TABLE IF NOT EXISTS $current_demand_new (LIKE $current_doul_demand including all)");
+        $checkTableCreated = $this->checkTableCreated($current_demand_new);
+        if (trim($checkTableCreated[0]->exists) != 't')
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKCNTODC001, Error in insert on current_doul_demand_new table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCNTODC001'];
+        }
+        else
+        {
+            $old_doul_count = $this->db->query("select count(*) as old_doul_count from current_doul_demand where dist_code=? and subdiv_code=? and cir_code=?",array($dist_code,$subdiv_code,$cir_code))->row()->old_doul_count;
+            log_message("error","OLD CURRENT DOUL COUNT ==> ".$old_doul_count);
+            //insert the current doul demand data to the archive table
+            $insertStatus = $this->db->query("INSERT INTO $current_demand_new SELECT * FROM $current_doul_demand where dist_code = '$dist_code'
+                                and subdiv_code = '$subdiv_code' and cir_code = '$cir_code' and year_no = '$old_year'");
+        
+            if(!$insertStatus)
+            {
+                $this->db->trans_rollback();
+                log_message("error", "#EKCNTODC002, Error in insert on current_doul_demand_new table with query- ". json_encode($this->db->last_query()));
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCNTODC002'];
+            }
+            $archive_doul_count = $this->db->query("select count(*) as arc_doul_count from $current_demand_new where dist_code=? and subdiv_code=? and cir_code=?",array($dist_code,$subdiv_code,$cir_code))->row()->arc_doul_count;
+            log_message("error","ARCHIVE CURRENT DOUL COUNT ==> ".$archive_doul_count);
+            //cheching if all the data are correctly inserted into the archive table before deletingg
+            if($old_doul_count != $archive_doul_count){
+                $this->db->trans_rollback();
+                log_message("error", "#EKCNTODC845, mismatch in count in the archive table created with the old_doul count- ". json_encode($this->db->last_query()));
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCNTODC845'];
+            }
+            else
+            {
+                //delete the data upto cir_code from current doul demand
+                $query = $this->db->query("SELECT COUNT(*) AS cnt FROM current_doul_demand WHERE dist_code = ? AND subdiv_code = ? AND cir_code = ? AND year_no = ?", array($dist_code, $subdiv_code, $cir_code, (string)$old_year));
+                $doul_demand_row_count = $query->row()->cnt;
+
+                if($doul_demand_row_count != 0){
+                    $this->db->where('dist_code', $dist_code)
+                                ->where('subdiv_code', $subdiv_code)
+                                ->where('cir_code', $cir_code)
+                                ->where('year_no', (string)$old_year)
+                                ->delete('current_doul_demand');
+                    if($this->db->affected_rows() <= 0){
+                        $this->db->trans_rollback();
+                        log_message("error", "#EKCNTODC003, Error in delete, table current_doul_demand with query- ". json_encode($this->db->last_query()));
+                        return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCNTODC003'];
+                    }else{
+                        return ['result' => 'SUCCESS', 'msg' => 'Archive table created successfully'];
+                    }
+                }
+                else
+                {
+                    log_message("error","data not deleted from current doul demand since no data is available against the circle in the year");
+                    return ['result' => 'SUCCESS', 'msg' => 'data not deleted from current doul demand'];
+                }
+            } 
+        }
+    }
+
+    //method to update the jama wasil with new doul data and with arrear data
+    public function updateEkhajanaAfterDoulChange($dist_code,$subdiv_code,$cir_code,$year){
+        
+        $current_year = date('Y');
+        $old_year = ($year-1);
+        $getJamaWasilData = $this->getAllJamaWasilData($dist_code,$subdiv_code,$cir_code,$old_year);
+        log_message('error','searching data for the year in jama wasil after doul change '.$old_year);
+        
+        if($getJamaWasilData != 'NO-DATA-FOUND'){
+            
+            $is_deleted = 0;
+            $count = 1;
+            
+            foreach($getJamaWasilData as $jamaData){
+                $rev_query = $this->getCurrentRevenueData($jamaData->dist_code,$jamaData->subdiv_code,$jamaData->cir_code,$jamaData->mouza_pargona_code,$jamaData->lot_no,$jamaData->vill_townprt_code,$jamaData->patta_type_code,$jamaData->patta_no,$year);
+                if($rev_query->num_rows() > 0)
+                {
+                    $row = $rev_query->row();
+                    if(isset($row->dag_revenue) && $row->dag_revenue!=0 && $row->dag_revenue!='' && $row->dag_revenue!=null){
+                        $revenue = $row->dag_revenue;
+                    }else{
+                        $revenue = 0;
+                        $is_deleted = 1;    
+                    }
+                    
+                }
+                else
+                {
+                    $revenue = 0;
+                    $is_deleted = 1;
+                }
+                
+                $localTaxQuery = $this->getCurrentLocalTax($jamaData->dist_code,$jamaData->subdiv_code,$jamaData->cir_code,$jamaData->mouza_pargona_code,$jamaData->lot_no,$jamaData->vill_townprt_code,$jamaData->patta_type_code,$jamaData->patta_no,$year); 
+
+                if($localTaxQuery->num_rows() > 0)
+                {
+                    $row1 = $localTaxQuery->row();
+                    if(isset($row1->dag_local_tax) && $row1->dag_local_tax!=0 && $row1->dag_local_tax!='' && $row1->dag_local_tax!=null){
+                        $local_tax = $row1->dag_local_tax;
+                    }else{
+                        $local_tax = 0;
+                        $is_deleted = 1;    
+                    }
+                }
+                else
+                {
+                    $local_tax = 0;
+                    $is_deleted = 1;
+                }
+
+                $previousArrearData = $this->getPreviousArrearData($jamaData->dist_code,$jamaData->subdiv_code,$jamaData->cir_code,$jamaData->mouza_pargona_code,
+                $jamaData->lot_no,$jamaData->vill_townprt_code,$jamaData->patta_type_code,$jamaData->patta_no, $old_year);
+                if($previousArrearData == false){
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKUEADC002, Error in fetching previous areear data- ". ($this->db->last_query()));
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKUEADC002'];   
+                }
+                if($previousArrearData->due_payment == 0)
+                {
+                    $opening_balance = 0;
+                }
+                else
+                {
+                    $opening_balance = $previousArrearData->revenue + $previousArrearData->local_tax + $previousArrearData->opening_balance;
+                }
+
+                $new_due_payment =  $opening_balance + $revenue + $local_tax;                   
+
+                $jama_Wasil_Details = array(
+                    'entry_year'        => $current_year,
+                    'revenue'           => $revenue,
+                    'due_payment'       => $new_due_payment,
+                    'opening_balance'   => $opening_balance,
+                    'local_tax'         => $local_tax,
+                    'dol_year_no'       => $year,
+                    'modified_at'       => date("Y-m-d h:i:s"),
+                    'financial_year'    => date("Y").'-'.(date("Y")+1),
+                    'pay_status'        => JAMA_WASIL_STATUS_UNPAID,
+                    'is_deleted'        => $is_deleted,
+                );
+                $this->db->where('dist_code', $jamaData->dist_code);
+                $this->db->where('subdiv_code', $jamaData->subdiv_code);
+                $this->db->where('cir_code', $jamaData->cir_code);
+                $this->db->where('mouza_pargona_code', $jamaData->mouza_pargona_code);
+                $this->db->where('lot_no', $jamaData->lot_no);
+                $this->db->where('vill_townprt_code', $jamaData->vill_townprt_code);
+                $this->db->where('patta_type_code', $jamaData->patta_type_code);
+                $this->db->where('patta_no', $jamaData->patta_no);
+                $this->db->where('id', $jamaData->id);
+                $this->db->update('jama_wasil', $jama_Wasil_Details);    
+                if($this->db->affected_rows() <= 0){ 
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKUEADC002, Error in update, table 'jama_wasil'  with query- ". ($this->db->last_query()));
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKUEADC002'];
+                }
+            
+                $jama_Wasil_transaction_array = array(
+                    'jama_wasil_id'                 => $jamaData->id,
+                    'due_payment'                   => $new_due_payment,
+                    'opening_balance'               => $opening_balance,
+                    'dist_code'                     => $jamaData->dist_code,
+                    'subdiv_code'                   => $jamaData->subdiv_code,
+                    'cir_code'                      => $jamaData->cir_code,           
+                    'mouza_pargona_code'            => $jamaData->mouza_pargona_code,
+                    "lot_no"                        => $jamaData->lot_no,
+                    "vill_townprt_code"             => $jamaData->vill_townprt_code,
+                    "village_uuid"                  => $jamaData->village_uuid,
+                    'patta_type_code'               => $jamaData->patta_type_code,
+                    'patta_no'                      => $jamaData->patta_no,
+                    'dag_no'                        => $jamaData->dag_no,
+                    'financial_year'                => date("Y").'-'.(date("Y")+1),
+                    'entry_year'                    => $current_year,
+                    'entry_date'                    => date("Y-m-d"),
+                    'revenue'                       => $revenue,
+                    'local_tax'                     => $local_tax,
+                    'other_payment'                 => null,
+                    'last_revenue_payment_amount'   => $jamaData->last_revenue_payment_amount,
+                    'last_local_tax_payment_amount' => $jamaData->last_revenue_payment_amount,
+                    'dol_year_no'                   => $year,
+                    'pdar_id'                       => $jamaData->pdar_id,
+                    'pdar_name'                     => $jamaData->pdar_name,
+                    'pdar_father_name'              => $jamaData->pdar_father_name,
+                    'status'                        => $jamaData->status,
+                    'created_at'                    => $jamaData->created_at,
+                    'modified_at'                   => $jamaData->modified_at,
+                    'user_code'                     => $jamaData->user_code,
+                    'application_no'                => $jamaData->application_no,
+                    'ld_application_no'             => $jamaData->ld_application_no,
+                    'case_no'                       => $jamaData->case_no,
+                    'pay_status'                    => JAMA_WASIL_STATUS_UNPAID,
+                    'is_deleted'                    => $is_deleted,
+
+                ); 
+                $tstatus2 = $this->db->insert('jama_wasil_transaction', $jama_Wasil_transaction_array); 
+                if ($tstatus2!= 1)
+                {
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKCOF002, Error in insert on jama_wasil_transaction table with query- ". json_encode($this->db->last_query()));
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKCOF002'];
+                }
+                $is_deleted = 0;    
+                $count = $count + 1;           
+            }
+            return ['result' => 'SUCCESS', 'msg' => 'Data Updated Successfully!!'];
+        }
+        log_message('error','jama wasil data not found but data updated!!');
+        return ['result' => 'SUCCESS', 'msg' => 'jama wasil data not available for the circle but data updated!!'];
+    }
+
+    //method to check whether new table(current doul demand) is created or not 
+    public function checkTableCreated($archive_table){
+        $query = $this->db->query("SELECT EXISTS (
+            SELECT FROM pg_tables
+            WHERE  schemaname = 'public'
+            AND    tablename  = '$archive_table'
+            )");
+        return $query->result();               
+    }
+
+    //function to get the jamawasil data 
+    public function getAllJamaWasilData($dist_code,$subdiv_code,$cir_code,$year){
+            $query = $this->db->select('*')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('dol_year_no',(string)$year)
+                    ->from('jama_wasil')
+                    ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->result();
+        }else{
+            return 'NO-DATA-FOUND';
+        }
+    }
+
+    //method to get the current doul demand data
+    public function getCurrentDoulData($dist_code,$subdiv_code,$cir_code,$year){
+        $query = $this->db->select('*')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('year_no',(string)$year)
+                    ->from('current_doul_demand')
+                    ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->result();
+        }else{
+            return false;
+        }
+    }
+
+    //method to get the current revenue from current doul demand  table
+    public function getCurrentRevenueData($dist_code,$subdiv_code,$cir_code,$mouza_code,$lot_no,$vill_townprt_code,
+    $patta_type_code,$patta_no,$year){
+        $query = $this->db->select('dag_revenue')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('mouza_pargona_code', $mouza_code)
+                    ->where('lot_no', $lot_no)
+                    ->where('vill_townprt_code', $vill_townprt_code)
+                    ->where('patta_type_code', $patta_type_code)
+                    ->where('patta_no', $patta_no)
+                    ->where('year_no',(string)$year)
+                    ->from('current_doul_demand')
+                    ->get();   
+            return $query;
+    }
+
+    //method to get the current local tax from current doul demand
+    public function getCurrentLocalTax($dist_code,$subdiv_code,$cir_code,$mouza_code,$lot_no,$vill_townprt_code,
+    $patta_type_code,$patta_no,$year){
+        $query = $this->db->select('dag_local_tax')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('mouza_pargona_code', $mouza_code)
+                    ->where('lot_no', $lot_no)
+                    ->where('vill_townprt_code', $vill_townprt_code)
+                    ->where('patta_type_code', $patta_type_code)
+                    ->where('patta_no', $patta_no)
+                    ->where('year_no',(string)$year)
+                    ->from('current_doul_demand')
+                    ->get(); 
+            //log_message('error',$this->db->last_query());
+            return $query;
+        
+    }
+
+    //method to get ekhajana arrear details table data
+    public function getPreviousArrearData($dist_code,$subdiv_code,$cir_code,$mouza_pargona_code,$lot_no,$vill_townprt_code,$patta_type_code,$patta_no,$old_year){
+        $query = $this->db->select('*')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('mouza_pargona_code', $mouza_pargona_code)
+                    ->where('lot_no', $lot_no)
+                    ->where('vill_townprt_code', $vill_townprt_code)
+                    ->where('patta_type_code', $patta_type_code)
+                    ->where('patta_no', $patta_no)
+                    ->where('dol_year_no', (string)$old_year)
+                    ->from('jama_wasil')
+                    ->get(); 
+        
+            if($query->num_rows() != 0 ){
+                return $query->row();
+            }else{
+                return false;
+            }
+
+    }
+
+    //getting the no of patta of a dp doul
+    public function getNoOfDpPattaFromCurrentDpDoul($dist_code,$subdiv_code,$cir_code){
+        $sql = "select count(*) from current_dp_doul_demand where dist_code=? and subdiv_code=? and cir_code=?";
+        return $this->db->query($sql,array($dist_code,$subdiv_code,$cir_code))->row()->count;
+    }
+
+    //checking additional documnt uploaded
+    public function checkAdditonalDocument($ld_application_no)
+    {
+        $query = $this->db->select('*')
+                          ->where('ld_application_no', $ld_application_no)
+                          ->from('ekhajana_additional_document')
+                          ->get();
+                if($query->num_rows() > 0){
+                    return $query->row();
+                }else{
+                    return "NO-DATA-FOUND";
+                }
+    }
+
+
+    //getting current revenue and local tax
+    public function getCurrentDoulDetails($ArrearData){
+        $query = $this->db->select("*")
+                            ->where('dist_code', $ArrearData->dist_code)
+                            ->where('subdiv_code', $ArrearData->subdiv_code)
+                            ->where('cir_code', $ArrearData->cir_code)
+                            ->where('mouza_pargona_code', $ArrearData->mouza_pargona_code)
+                            ->where('lot_no', $ArrearData->lot_no)
+                            ->where('vill_townprt_code', $ArrearData->vill_townprt_code)
+                            ->where('patta_type_code', $ArrearData->patta_type_code)
+                            ->where('patta_no', $ArrearData->patta_no)
+                            ->from('current_doul_demand')
+                            ->get(); 
+        //echo $this->db->last_query();
+        if($query->num_rows() != 0){
+            $row = $query->row();
+            if(($row->dag_revenue=='' || $row->dag_revenue==null) || ($row->dag_local_tax=='' || $row->dag_local_tax==null)){
+                return ['flag' => false, 'result' => 'Revenue Or Local Tax Not Found in Doul For The Patta : '.$land_details->patta_no. ", Please verify the patta no in current doul.!" ];
+            }else{
+                return ['flag' => true, 'result' => $row];
+            }
+            
+        }else{
+            return ['flag' => false, 'result' => 'Doul Entry Not Found For The Patta : '.$land_details->patta_no. ", Please verify the patta no in current doul.!" ];
+        }  
+    }
+
+
+    //checking jama wasil exists or not against dharitree case number
+    public function CheckJamaWasilWithUnpaidStatus($caseDetails){
+        $query = $this->db->select('*')
+                        ->where('dist_code', $caseDetails['dist_code'])
+                        ->where('subdiv_code', $caseDetails['subdiv_code'])
+                        ->where('cir_code', $caseDetails['cir_code'])
+                        ->where('mouza_pargona_code', $caseDetails['mouza_pargona_code'])
+                        ->where('lot_no', $caseDetails['lot_no'])
+                        ->where('vill_townprt_code', $caseDetails['vill_townprt_code'])
+                        //->where('village_uuid', $caseDetails['village_uuid'])
+                        ->where('patta_type_code', $caseDetails['patta_type_code'])
+                        ->where('patta_no', $caseDetails['patta_no'])
+                        ->where('pay_status', 'UNPAID')
+                        ->from('jama_wasil')
+                        ->get(); 
+            if($query->num_rows() != 0 ){
+                return $query->row();
+            }else{
+                return false;
+            }
+    }
+
+
+    public function COdisposeCaseMouzadariSystemWithJwUpdate($posted_data,$ArrearData,$ekBasicDetails,
+    $jama_wasil_data,$jama_wasil_payee_list_data,$jama_wasil_backup_table_data,$getJamaWasilUnpaidData){
+        error_reporting(0);
+        $this->db->trans_begin();
+        //**************************************************//
+        //update data in jama_wasil 
+        $tstatus1 = $this->db->where('id',$getJamaWasilUnpaidData->id)
+                            ->where('dist_code',$getJamaWasilUnpaidData->dist_code)
+                            ->where('subdiv_code',$getJamaWasilUnpaidData->subdiv_code)
+                            ->where('cir_code',$getJamaWasilUnpaidData->cir_code)
+                            ->where('mouza_pargona_code',$getJamaWasilUnpaidData->mouza_pargona_code)
+                            ->where('lot_no',$getJamaWasilUnpaidData->lot_no)
+                            ->where('vill_townprt_code',$getJamaWasilUnpaidData->vill_townprt_code)
+                            ->where('patta_type_code',$getJamaWasilUnpaidData->patta_type_code)
+                            ->where('patta_no',$getJamaWasilUnpaidData->patta_no)
+                            ->update('jama_wasil', $jama_wasil_data);    
+        if($this->db->affected_rows() != 1)
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU001, Error in update on jama_wasil table with  query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU001'];
+        }        
+        //**************************************************//
+        $jama_wasil_inserted_id = $getJamaWasilUnpaidData->id; 
+        //**************************************************//
+        //insert data in jama_wasil_transaction 
+        $jama_wasil_data['jama_wasil_id'] = $jama_wasil_inserted_id;
+        $jama_wasil_data['created_at'] = date('Y-m-d h:i:s');
+        $tstatus2 = $this->db->insert('jama_wasil_transaction', $jama_wasil_data); 
+        if ($tstatus2 != 1 )
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU002, Error in insert on jama_wasil_transaction table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU002'];
+        }
+        //**************************************************//
+        $jama_wasil_transaction_inserted_id = $this->db->insert_id();
+        
+        //**************************************************//
+        //insert data in jama_wasil_backup
+        $tstatus4 = $this->db->insert('jama_wasil_backup', $jama_wasil_backup_table_data); 
+        if ($tstatus4 != 1 )
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU004, Error in insert on jama_wasil_backup table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU004'];
+        }
+        //**************************************************//
+        //ekhajana basic update 
+        $update_data = array(
+            'status' => EKHAJANA_STATUS_COMPLETED,
+            'pending_with_officer' => '--',
+            'co_remark' => $posted_data['co_report'],
+            'user_code' => $this->session->all_userdata()['user_code'],
+            'modified_at' => date('Y-m-d h:i:s'),
+            'co_pattadar_identification_flag' => $posted_data['pattadar_identified']
+        ); 
+        $this->db->where('case_no', $ekBasicDetails->case_no);
+        $this->db->update('ekhajana_basic', $update_data);
+        if($this->db->affected_rows() != 1){ 
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU005, Error in update , table 'ekhajana_basic' with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU005'];
+        }
+        //ekhajana mouzadar arrear details update 
+        // $update_data_arrear = array(
+        //     'ek_basic_id' => $ekBasicDetails->id
+        // ); 
+        // $this->db->where('case_no', $ekBasicDetails->case_no);
+        // $this->db->update('ekhajana_mouzadar_arrear_details', $update_data_arrear);
+        // if($this->db->affected_rows() != 1){ 
+        //     $this->db->trans_rollback();
+        //     log_message("error", "#EKIAU0055, Error in update table 'ekhajana_mouzadar_arrear_details' with query- ". json_encode($this->db->last_query()));
+        //     return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU0055'];
+        // }
+        //ekhajana basic proceeding details insert
+        $proceeding_details_data = array(
+            'ld_application_no' => $ekBasicDetails->ld_application_no,
+            'application_no' => $ekBasicDetails->application_no,
+            'remark' => "CO-CASE-DISPOSED",            
+            'user_code' => $this->session->all_userdata()['user_code'],
+            "created_at" => date('Y-m-d h:i:s'),
+            "case_no" => $ekBasicDetails->case_no,
+            'status' => EKHAJANA_STATUS_COMPLETED
+        ); 
+        $tstatus2 = $this->db->insert('ekhajana_basic_proceedings', $proceeding_details_data); 
+        //return $this->db->last_query();
+        if ($tstatus2!= 1)
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU009, Error in insert on ekhajana_basic_proceedings table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU009'];
+        }
+        //**************************************************//
+        //transaction final check
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            log_message("error", "#EKIAU006, Transaction Error In Ekhajana Co Dispose");
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAU006'];
+        }else{
+            //basundhara ekhajana payment update
+            //basundhara ekhajana land details update
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => EKHAJANA_DISPOSE_UPDATE_API,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_SSL_VERIFYPEER => FALSE,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_POSTFIELDS => array(
+                        'ld_application_no' => $ekBasicDetails->ld_application_no,
+                        'application_no' => $ekBasicDetails->application_no,
+                        'dharitree_case_no' => $ekBasicDetails->case_no,
+                        'due_payment' => $jama_wasil_data['due_payment'],
+                        'user_code' => $this->session->all_userdata()['user_code'],                    
+                        'date_of_action' => date("Y-m-d"),
+                        "patta_no" => $ekBasicDetails->patta_no,
+                        'remark' => "CO CASE DISPOSED",
+                    ),
+            ));
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+            if($httpcode == 200){
+                //return "curl successfull";
+                $response_obj = json_decode($response);
+                if($response_obj->result == "Y"){
+                    $this->db->trans_commit();
+                    return ['result' => 'SUCCESS', 'msg' => 'Case Disposed Sucessfully..!'];                 
+                }else{
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKIAUCRL007, Curl Error(Y) In Api ".EKHAJANA_DISPOSE_UPDATE_API);
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAUCRL007'];
+                } 
+            }else{
+                $this->db->trans_rollback();
+                log_message("error", "#EKIAUCRL008, Curl Error(200) In Api ".EKHAJANA_DISPOSE_UPDATE_API);
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKIAUCRL008'];
+            }
+        }
+    }
+
+    public function getDPFlaggingStatus_old($dist_code,$subdiv_code,$cir_code,$mouza_pargona_code,$lot_no, $vill_townprt_code,$patta_type_code,$patta_no){
+        
+        $query = $this->db->select('dp_flag_yn')
+                            ->where('dist_code', $dist_code)
+                            ->where('subdiv_code', $subdiv_code)
+                            ->where('cir_code', $cir_code)
+                            ->where('mouza_pargona_code', $mouza_pargona_code)
+                            ->where('lot_no', $lot_no)
+                            ->where('vill_townprt_code', $vill_townprt_code)
+                            ->where('patta_type_code', $patta_type_code)
+                            ->where('patta_no', $patta_no)
+                            ->from('chitha_basic')
+                            ->get();            
+        if($query->num_rows() == 0){
+            //no chitha basic rows found
+            return false;
+        }
+        $chithaRes = $query->result();
+        foreach($chithaRes as $row){
+            if($row->dp_flag_yn == 'Y'){
+                //if atleast one dag found to be dp in mouzadari area then payment is not accepted
+                return "DP";
+            }
+        }
+        return "NON-DP";   
+    }
+
+
+    public function getDPFlaggingStatus($dist_code,$subdiv_code,$cir_code,$mouza_pargona_code,$lot_no, $vill_townprt_code,$patta_type_code,$patta_no){
+        $chitha_query = $this->db->query("select * from chitha_basic where dist_code=? and subdiv_code=?
+        and cir_code=? and mouza_pargona_code=? and lot_no=? and vill_townprt_code=? and patta_type_code=?
+        and patta_no=? and dp_flag_yn=?", array($dist_code,$subdiv_code,$cir_code,$mouza_pargona_code,$lot_no,
+        $vill_townprt_code,$patta_type_code,$patta_no,'Y'));
+        if($chitha_query->num_rows() == 0){
+            return "NON-DP";
+        }else{
+            $jama_query = $this->db->query("select * from jama_dag where dist_code=? and subdiv_code=?
+            and cir_code=? and mouza_pargona_code=? and lot_no=? and vill_townprt_code=? and patta_type_code=?
+            and patta_no=? and dp_flag_yn=?", array($dist_code,$subdiv_code,
+            $cir_code,$mouza_pargona_code,$lot_no,
+            $vill_townprt_code,$patta_type_code,$patta_no,'Y'));
+            if($jama_query->num_rows() == 0){
+                return "DP";
+            }else{
+                return "NON-DP";
+            }
+        }
+    }
+
+    public function getJamaWasil($caseDetails){
+        $query = $this->db->select('*')
+                        ->where('dist_code', $caseDetails['dist_code'])
+                        ->where('subdiv_code', $caseDetails['subdiv_code'])
+                        ->where('cir_code', $caseDetails['cir_code'])
+                        ->where('mouza_pargona_code', $caseDetails['mouza_pargona_code'])
+                        ->where('lot_no', $caseDetails['lot_no'])
+                        ->where('vill_townprt_code', $caseDetails['vill_townprt_code'])
+                        //->where('village_uuid', $caseDetails['village_uuid'])
+                        ->where('patta_type_code', $caseDetails['patta_type_code'])
+                        ->where('patta_no', $caseDetails['patta_no'])
+                        //->where('pay_status', 'PAID')
+                        ->from('jama_wasil')
+                        ->get(); 
+        if($query->num_rows() == 0){
+            return "jama_wasil_not_exists";
+        }else{
+            $row =  $query->row();
+            if($row->pay_status == 'PAID'){
+                return "paid_in_jama_wasil";
+            }elseif($row->pay_status == 'UNPAID'){
+                return "unpaid_in_jama_wasil";
+            }else{
+                return false;
+            }
+        }
+    }
+
+    public function getEkhajanaMouzadarArrearDetailsForObj($caseDetails){
+        $query = $this->db->select('*')
+                        ->where('dist_code', $caseDetails->dist_code)
+                        ->where('subdiv_code', $caseDetails->subdiv_code)
+                        ->where('cir_code', $caseDetails->cir_code)
+                        ->where('mouza_pargona_code', $caseDetails->mouza_pargona_code)
+                        ->where('lot_no', $caseDetails->lot_no)
+                        ->where('vill_townprt_code', $caseDetails->vill_townprt_code)
+                        ->where('patta_type_code', $caseDetails->patta_type_code)
+                        ->where('patta_no', $caseDetails->patta_no)
+                        ->from('ekhajana_mouzadar_arrear_details')
+                        ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->row();
+        }else{
+            return false;
+        }
+    }
+
+    //**************************DP ESTATE CODE STARTS HERE*********************************
+    //function to get pending count of dp eatste in circle office end
+    public function pendingForCoCountDpEstate($dist_code,$subdiv_code,$cir_code)
+    {
+        $query = $this->db->select('count(*)')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('status', EKHAJANA_STATUS_COMBINE_FORWARD_DP_ESTATE)
+                    ->from('ekhajana_basic')
+                    ->get(); 
+        if($query->num_rows() != 0 ){
+            return $query->row()->count;
+        }else{
+            return 0;
+        }
+    }
+
+    //function to get pending list of dp eatste in circle office end
+    public function pendingListofDpEstateForCo($dist_code,$subdiv_code,$cir_code)
+    {
+        $query = $this->db->select('*')
+                    ->where('dist_code', $dist_code)
+                    ->where('subdiv_code', $subdiv_code)
+                    ->where('cir_code', $cir_code)
+                    ->where('status', EKHAJANA_STATUS_COMBINE_FORWARD_DP_ESTATE)
+                    ->from('ekhajana_basic')
+                    ->get(); 
+        return $query->result();
+    }
+
+    //function to get pending case details of dp eatste in circle office end
+    public function getPendingCaseDetailsFromIdforDpEstate($id)
+    {
+        $query = $this->db->select('*')
+                        ->where('id', $id)
+                        ->from('ekhajana_basic')
+                        ->get(); 
+            if($query->num_rows() != 0 ){
+                return $query->row();
+            }else{
+                return false;
+            }
+    }
+
+    //getting jama wasil details 
+    public function getJamaWasilDetailsForDpEstate($dist_code,$subdiv_code,$cir_code, $mouza_pargona_code, $lot_no, $vill_townprt_code, $patta_type_code, $patta_no){
+        $query = $this->db->select('*')
+                          ->where('dist_code', $dist_code)
+                          ->where('subdiv_code', $subdiv_code)
+                          ->where('cir_code', $cir_code)
+                          ->where('mouza_pargona_code', $mouza_pargona_code)
+                          ->where('lot_no', $lot_no)
+                          ->where('vill_townprt_code', $vill_townprt_code)
+                          ->where('patta_type_code', $patta_type_code)
+                          ->where('patta_no', $patta_no)
+                          ->from('jama_wasil')
+                          ->get();
+
+        if($query->num_rows() == 1){
+            $jama_wasil_details = $query->row();
+            if($jama_wasil_details->status == JAMA_WASIL_STATUS_ONLINE){
+                return "KHAJANA FOR PATTA ".$patta_no." IS PAID, YOU CAN FORWARD THIS CASE TO ADC TO DISPOSE. AFTER DISPOSED, THE PATTADAR CAN DOWNLOAD THE KHAJANA RECEIPT";
+            }else{
+                return "KHAJANA FOR PATTA ".$patta_no." IS UPDATED, BUT PAYMENT IS NOT RECIEVED FOR THIS PATTA";
+            }
+        }else{
+            return "KHAJANA FOR PATTA ".$patta_no." IS NOT UPDATED YET";
+        }
+    }
+
+    //function to forward the case to adc from co
+    public function forwardToAdcDpEstate($posted_data)
+    {
+        $this->db->trans_begin();
+        //updating ekhajana basic table status
+        $update_data = array(
+            'pending_with_officer' => 'ADC',
+            'status' => EKHAJANA_STATUS_CO_FORWARD_DP_ESTATE,
+            'co_remark' => $posted_data['co_report'],
+            'modified_at' => date('Y-m-d h:i:s'),
+        ); 
+        $this->db->where('case_no', $posted_data['case_no']);
+        $this->db->update('ekhajana_basic', $update_data);
+        if($this->db->affected_rows() != 1){ 
+            $this->db->trans_rollback();
+            log_message("error", "#EKFTADC001, Error in update, table 'ekhajana_basic'  with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKFTADC001'];
+        }
+        //ekhajana basic proceeding details insert
+        $proceeding_details_data = array(
+            'ld_application_no' => $posted_data['ld_application_no'],
+            'application_no' => $posted_data['application_no'],
+            'remark' => $posted_data['co_report'],            
+            'user_code' => $this->session->all_userdata()['user_code'],
+            "created_at" => date('Y-m-d h:i:s'),
+            "case_no" => $posted_data['case_no'],
+            'status' => EKHAJANA_STATUS_CO_FORWARD_DP_ESTATE
+        ); 
+        $tstatus2 = $this->db->insert('ekhajana_basic_proceedings', $proceeding_details_data); 
+        if ($tstatus2!= 1)
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKFTADC002, Error in insert on ekhajana_basic_proceedings table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKFTADC002'];
+        }
+        //*********************************************************/
+        //checking row in chitha pattadar whether aadhar linked or not 
+        $query = $this->db->select('*')
+                    ->where('dist_code', $posted_data['dist_code'])
+                    ->where('subdiv_code', $posted_data['subdiv_code'])
+                    ->where('cir_code', $posted_data['cir_code'])
+                    ->where('mouza_pargona_code', $posted_data['mouza_pargona_code'])
+                    ->where('lot_no', $posted_data['lot_no'])
+                    ->where('vill_townprt_code', $posted_data['vill_townprt_code'])
+                    ->where('patta_no', $posted_data['patta_no'])
+                    ->where('patta_type_code', $posted_data['patta_type_code'])
+                    ->where('pdar_id', $posted_data['pdar_id'])   
+                    ->from('chitha_pattadar')                 
+                    ->get();
+                  
+        if($query!="" && $query!=null && $query->num_rows()==1){
+            if($posted_data['aadhaar_pan_type'] == 'AADHAAR'){
+                $update_data = array(
+                    'pdar_aadharno' => $posted_data['aadhaar_pan_ref_no'],
+                ); 
+            }else if($posted_data['aadhaar_pan_type'] == 'PAN'){
+                $update_data = array(
+                    'pdar_pan_no' => $posted_data['aadhaar_pan_ref_no'],
+                ); 
+            }
+            $this->db->where('dist_code', $posted_data['dist_code'])
+                    ->where('subdiv_code', $posted_data['subdiv_code'])
+                    ->where('cir_code', $posted_data['cir_code'])
+                    ->where('mouza_pargona_code', $posted_data['mouza_pargona_code'])
+                    ->where('lot_no', $posted_data['lot_no'])
+                    ->where('vill_townprt_code', $posted_data['vill_townprt_code'])
+                    ->where('patta_no', $posted_data['patta_no'])
+                    ->where('patta_type_code', $posted_data['patta_type_code'])
+                    ->where('pdar_id', $posted_data['pdar_id'])   
+                    ->update('chitha_pattadar', $update_data);
+                    
+            if($this->db->affected_rows() != 1){ 
+                $this->db->trans_rollback();
+                log_message("error", "#EKFTADC003, Error in update, table 'chitha_pattadar'  with query- ". json_encode($this->db->last_query()));
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKFTADC003'];
+            }
+        } 
+        //*********************************************************/
+        //final transaction status check 
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            log_message("error", "#EKFTADC004, Transaction Status Error In Saving data in dharitree with query- ". json_encode($this->db->last_query()));
+            return ['result' => false, 'msg' => 'Some error occured, Error-Code : #EKFTADC004'];
+        }else{
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => EKHAJANA_CO_FORWARD_FOR_DP_EASTAE_API,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_SSL_VERIFYPEER => FALSE,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_POSTFIELDS => array(
+                    'ld_application_no' => $posted_data['ld_application_no'],
+                    'application_no' => $posted_data['application_no'],
+                    'dharitree_case_no' => $posted_data['case_no'],
+                    'user_code' => $this->session->all_userdata()['user_code'],                    
+                    'date_of_action' => date("Y-m-d"),
+                    "patta_no" => $posted_data['patta_no'],
+                    'remark' => $posted_data['co_report'],
+                ),
+            ));
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+            if($httpcode == 200){
+                $response_obj = json_decode($response);
+                if($response_obj->result == "Y"){
+                    $this->db->trans_commit();
+                    return ['result' => 'SUCCESS', 'msg' => 'Ekhajana Case Details Forwared To ADC Successfully!'];                 
+                }else{
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKFTADCCRLL004, Curl Error(Y) In Api ".EKHAJANA_CO_FORWARD_FOR_DP_EASTAE_API);
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKFTADCCRLL004'];
+                } 
+            }else{
+                $this->db->trans_rollback();
+                log_message("error", "#EKFTADCCRLL005, Curl Error(200) In Api ".EKHAJANA_CO_FORWARD_FOR_DP_EASTAE_API);
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKFTADCCRLL005'];
+            }
+        }
+    }
+
+    public function getArrearData($dist_code,$subdiv_code,$cir_code, $mouza_pargona_code, $lot_no, $vill_townprt_code, $patta_type_code, $patta_no)
+    {
+        $query = $this->db->select('*')
+                          ->where('dist_code', $dist_code)
+                          ->where('subdiv_code', $subdiv_code)
+                          ->where('cir_code', $cir_code)
+                          ->where('mouza_pargona_code', $mouza_pargona_code)
+                          ->where('lot_no', $lot_no)
+                          ->where('vill_townprt_code', $vill_townprt_code)
+                          ->where('patta_type_code', $patta_type_code)
+                          ->where('patta_no', $patta_no)
+                          ->from('ekhajana_tn_branch_arrear_details')
+                          ->get();
+                          if($query->num_rows() > 0){
+                            return $query->row();
+                        }else{
+                            return "NO-DATA-FOUND";
+                        }
+    }
+
+    public function updateDataInDharitreeEkhajana($application_no)
+    {
+        $patta_detail = $this->db->query("select * from ekhajana_basic where application_no =?",array($application_no));
+        if($patta_detail->num_rows() == 0){
+            return ['result' => "SERVER-ERROR" , 'msg' => "#ERR19072024001 No case Found Against the Application No"];
+            log_message("error" ,"#ERR19072024001 No Cases Found with application no".$application_no);
+        }
+        $patta_details = $patta_detail->row();
+        $dist_code          = $patta_details->dist_code;
+        $subdiv_code        = $patta_details->subdiv_code;
+        $cir_code           = $patta_details->cir_code;
+        $mouza_pargona_code = $patta_details->mouza_pargona_code;
+        $lot_no             = $patta_details->lot_no;
+        $vill_townprt_code  = $patta_details->vill_townprt_code;
+        $patta_type_code    = $patta_details->patta_type_code;
+        $patta_no           = $patta_details->patta_no;
+
+        $jama_wasil= $this->db->query("select * from jama_wasil where dist_code=? and subdiv_code=? and cir_code=? and mouza_pargona_code=? and lot_no=? and vill_townprt_code=? and patta_type_code=? and patta_no=?",array($dist_code,$subdiv_code,$cir_code,$mouza_pargona_code,$lot_no,$vill_townprt_code,$patta_type_code,$patta_no));
+        if($jama_wasil->num_rows() == 0){
+            return ['result' => "SERVER-ERROR" , 'msg' => "#ERR19072024002 No case Found Against the Application No: $application_no"];
+            log_message("error" ,"#ERR19072024002 No Cases Found in jama wasil with application no".$application_no);
+        }
+        $jama_wasil_row = $jama_wasil->row();
+        $update_data = array(
+            "due_payment" => $jama_wasil_row->revenue + $jama_wasil_row->local_tax + $jama_wasil_row->opening_balance,
+            "pay_status"  => 'UNPAID',
+        ); 
+        $this->db->where('dist_code', $dist_code);
+        $this->db->where('subdiv_code', $subdiv_code);
+        $this->db->where('cir_code', $cir_code);
+        $this->db->where('mouza_pargona_code', $mouza_pargona_code);
+        $this->db->where('lot_no', $lot_no);
+        $this->db->where('vill_townprt_code', $vill_townprt_code);
+        $this->db->where('patta_type_code', $patta_type_code);
+        $this->db->where('patta_no', $patta_no);
+        $this->db->update('jama_wasil', $update_data);
+        if($this->db->affected_rows() != 1){ 
+            $this->db->trans_rollback();
+            log_message("error", "#ERR19072024003, Error in update, table 'jama_wasil'  with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #ERR19072024003'];
+        }else{
+            return ['result' => 'SUCCESS', 'msg' => 'Case Updated Successfully'];
+        }
+    }
+
+    public function fetchArrearByMouzadar($dist_code,$subdiv_code,$cir_code, $mouza_pargona_code, $lot_no, $vill_townprt_code, $patta_type_code, $patta_no)
+    {
+        $query = $this->db->query("select * from ekhajana_arrear_pre_updation where dist_code=? and subdiv_code=? and cir_code=? and mouza_pargona_code=? and lot_no=? and vill_townprt_code=? and patta_type_code=? and patta_no=?",array($dist_code,$subdiv_code,$cir_code, $mouza_pargona_code, $lot_no, $vill_townprt_code, $patta_type_code, $patta_no));
+       
+        if($query->num_rows() ==0){
+            return "NO-DATA-FOUND";
+        }elseif($query->num_rows() > 1){
+            return "NO-DATA-FOUND";
+        }else{
+            $arrear = $query->row();
+            return $arrear;
+        }
+
+    }
+
+    public function getCurrentDoulDemand($dist_code,$subdiv_code,$cir_code, $mouza_pargona_code, $lot_no, $vill_townprt_code, $patta_type_code, $patta_no)
+    {
+        $query = $this->db->query("select * from current_doul_demand where dist_code=? and subdiv_code=? and cir_code=? and mouza_pargona_code=? and lot_no=? and vill_townprt_code=? and patta_type_code=? and patta_no=?",array($dist_code,$subdiv_code,$cir_code, $mouza_pargona_code, $lot_no, $vill_townprt_code, $patta_type_code, $patta_no));
+        if($query->num_rows() ==0){
+            return "NO-DATA-FOUND";
+        }else{
+            $doul_demand = $query->row();
+            return $doul_demand;
+        }
+
+    }
+
+    public function getJamaWasilUnpaidData($caseDetails)
+    {
+        $query = $this->db->select('*')
+                    ->where('dist_code', $caseDetails['dist_code'])
+                    ->where('subdiv_code', $caseDetails['subdiv_code'])
+                    ->where('cir_code', $caseDetails['cir_code'])
+                    ->where('mouza_pargona_code', $caseDetails['mouza_pargona_code'])
+                    ->where('lot_no', $caseDetails['lot_no'])
+                    ->where('vill_townprt_code', $caseDetails['vill_townprt_code'])
+                    ->where('patta_type_code', $caseDetails['patta_type_code'])
+                    ->where('patta_no', $caseDetails['patta_no'])
+                    ->where('pay_status', 'UNPAID')
+                    ->from('jama_wasil')
+                    ->get(); 
+            if($query->num_rows() == 1 ){
+                return $query->row();
+            }else{
+                return false;
+            }
+    }
+
+    //checking additional documnt uploaded
+    public function checkAdditonalDocumentByMouzadar($ld_application_no)
+    {
+        $query = $this->db->query("select * from ekhajana_additional_document where 
+                        ld_application_no=? and user_code='MOU'",array($ld_application_no));
+        if($query->num_rows() > 0){
+            return $query->row();
+        }else{
+            return "NO-DATA-FOUND";
+        }
+    }
+
+    //checking additional documnt uploaded
+    public function checkAdditonalDocumentByLm($ld_application_no)
+    {
+        $query = $this->db->query("select * from ekhajana_additional_document where 
+                        ld_application_no=? and user_code!='MOU'",array($ld_application_no));
+        if($query->num_rows() > 0){
+            return $query->row();
+        }else{
+            return "NO-DATA-FOUND";
+        }
+    }
+
+    public function RevertToMouzadarFromCo($posted_data)
+    {
+        $this->db->trans_begin();
+        //updating ekhajana basic table status
+        $update_data = array(
+            'pending_with_officer'  => 'MOUZADAR',
+            'status'                => EKAHAJANA_CO_REVERT_TO_MOUZADAR_STATUS,
+            'co_remark'             => $posted_data['revert_reason'],
+            'user_code'             => $this->session->all_userdata()['user_code'],
+            'modified_at'           => date('Y-m-d h:i:s'),
+        ); 
+        $this->db->where('ld_application_no', $posted_data['ld_application_no']);
+        $this->db->update('ekhajana_basic', $update_data);
+        if($this->db->affected_rows() != 1){ 
+            $this->db->trans_rollback();
+            log_message("error", "#EKRTOMFCO021, Error in update, table 'ekhajana_basic'  with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKRTOMFCO021'];
+        }
+        //ekhajana basic proceeding details insert
+        $proceeding_details_data = array(
+            'ld_application_no' => $posted_data['ld_application_no'],
+            'application_no'    => $posted_data['application_no'],
+            'remark'            => $posted_data['revert_reason'],            
+            'user_code'         => $this->session->all_userdata()['user_code'],
+            "created_at"        => date('Y-m-d h:i:s'),
+            "case_no"           => $posted_data['case_no'],
+            'status'            => EKAHAJANA_CO_REVERT_TO_MOUZADAR_STATUS, 
+        ); 
+        $tstatus2 = $this->db->insert('ekhajana_basic_proceedings', $proceeding_details_data); 
+        if ($tstatus2!= 1)
+        {
+            $this->db->trans_rollback();
+            log_message("error", "#EKRTOMFCO022, Error in insert on ekhajana_basic_proceedings table with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKRTOMFCO022'];
+        }
+        
+        //*********************************************************/
+        //final transaction status check 
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            log_message("error", "#EKRTOMFCO023, Transaction Status Error In Saving data in dharitree with query- ". json_encode($this->db->last_query()));
+            return ['result' => false, 'msg' => 'Some error occured, Error-Code : #EKRTOMFCO023'];
+        }else{
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => EKHAJANA_CO_REVERT_TO_MOUZADAR_API,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_SSL_VERIFYPEER => FALSE,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_POSTFIELDS => array(
+                    'ld_application_no' => $posted_data['ld_application_no'],
+                    'application_no'    => $posted_data['application_no'],
+                    'dharitree_case_no' => $posted_data['case_no'],
+                    'user_code'         => $this->session->all_userdata()['user_code'],                    
+                    'date_of_action'    => date("Y-m-d"),
+                    'remark'            => $posted_data['revert_reason'],
+                    'patta_no'          => $posted_data['patta_no'],  
+                ),
+            ));
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+            if($httpcode == 200){
+                $response_obj = json_decode($response);
+                if($response_obj->result == "Y"){
+                    $this->db->trans_commit();
+                    return ['result' => 'SUCCESS', 'msg' => 'Ekhajana Case Details Reverted To Mouzadar Successfully!'];                 
+                }else{
+                    $this->db->trans_rollback();
+                    log_message("error", "#EKFTADCCRLL085404, Curl Error(Y) In Api ".EKHAJANA_CO_REVERT_TO_MOUZADAR_API);
+                    return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKFTADCCRLL085404'];
+                } 
+            }else{
+                $this->db->trans_rollback();
+                log_message("error", "#EKFTADCCRLL085405, Curl Error(200) In Api ".EKHAJANA_CO_REVERT_TO_MOUZADAR_API);
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #EKFTADCCRLL085405'];
+            }
+        }
+    }
+
+    //function to get ecfr generated for the patta
+    public function getEcfrGeneratedStatus($caseDetails){ 
+        $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => EKHAJANA_GET_ECFR_GENERATED_STATUS,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => array(
+                    'dist_code'         => $caseDetails->dist_code,
+                    'subdiv_code'       => $caseDetails->subdiv_code,
+                    'cir_code'          => $caseDetails->cir_code,
+                    'mouza_pargona_code'=> $caseDetails->mouza_pargona_code,                   
+                    'lot_no'            => $caseDetails->lot_no,
+                    'vill_townprt_code' => $caseDetails->vill_townprt_code,
+                    'patta_type_code'   => $caseDetails->patta_type_code,  
+                    'patta_no'          => $caseDetails->patta_no, 
+                ),
+            ));
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+            if($httpcode == 200){
+                return json_decode($response);                 
+            }else{
+                return "Could-Not-Fetch-Data";
+            }
+    }
+
+    public function getNewMb2Patta($dist_code,$subdiv_code,$cir_code)
+    {
+        $query = "SELECT 
+                cb.dist_code, cb.subdiv_code, cb.cir_code, cb.mouza_pargona_code,
+                cb.lot_no, cb.vill_townprt_code, cb.patta_type_code, cb.patta_no,
+                SUM(cb.dag_revenue) AS total_dag_revenue,
+                SUM(cb.dag_local_tax) AS total_dag_local_tax,
+                SUM(cb.dag_area_b*100+ cb.dag_area_k*20 + cb.dag_area_lc) AS total_lessa
+            FROM chitha_basic cb
+            LEFT JOIN current_doul_demand cdd
+            ON cb.dist_code = cdd.dist_code
+            AND cb.subdiv_code = cdd.subdiv_code
+            AND cb.cir_code = cdd.cir_code
+            AND cb.mouza_pargona_code = cdd.mouza_pargona_code
+            AND cb.lot_no = cdd.lot_no
+            AND cb.vill_townprt_code = cdd.vill_townprt_code
+            AND cb.patta_type_code = cdd.patta_type_code
+            AND cb.patta_no = cdd.patta_no
+            WHERE cdd.dist_code IS NULL
+            AND cb.possession_from IS NOT NULL
+            AND cb.patta_type_code IN (SELECT type_code FROM patta_code WHERE jamabandi = 'y')
+            GROUP BY cb.dist_code, cb.subdiv_code, cb.cir_code, cb.mouza_pargona_code,
+                    cb.lot_no, cb.vill_townprt_code, cb.patta_type_code, cb.patta_no";
+        $mb2_pattas_not_in_doul = $this->db->query($query)->result();
+        if (empty($mb2_pattas_not_in_doul)) {
+            log_message("error", "No new pattas found for migration.");
+            return "NO-NEW_PATTAS_FOUND";
+        }else{
+            return $mb2_pattas_not_in_doul;
+        }
+        
+
+    }
+
+    //getting village uuid
+    function getVillageUUID($dist_code,$subdiv_code,$cir_code,$mouza_code,$lot_no,$vill_code){    
+        $sql = "select uuid from location where dist_code = ? and subdiv_code = ? and cir_code = ? 
+                and mouza_pargona_code = ? and lot_no = ? and vill_townprt_code  = ?";
+        $query = $this->db->query($sql,array($dist_code,$subdiv_code,$cir_code,$mouza_code,$lot_no,$vill_code, '0000'));        
+        $result = $query->result(); 
+
+        if(count($result) != 0 ){
+            return $result[0]->uuid;
+        }else{
+            return "";
+        }
+    }
+
+    public function insertMB2PattaIntoDoul($all_data)
+    {
+        //current_doul_Demand insert with status 'N' (newly added)
+        foreach($all_data as $data){
+
+            $uuid = $this->getVillageUUID($data['dist_code'], $data['subdiv_code'], $data['cir_code'], $data['mouza_pargona_code'], $data['lot_no'], $data['vill_townprt_code']);
+            // Convert area
+            $area = $this->Total_Bigha_Katha_Lessa($data['total_lessa']);
+            // var_dump($data['total_lessa']);
+            // exit;
+            $bigha = $area[0];
+            $katha = $area[1];
+            $lessa = $area[2];
+            $gonda = $area[3];
+
+            //checking if the patta already exists
+            $checkDataExistence = $this->db->query("select * from current_doul_demand where dist_code=? and subdiv_code=? and cir_code=?
+                and mouza_pargona_code=? and lot_no=? and vill_townprt_code=? and patta_type_code=? and patta_no=?",array($data['dist_code'],$data['subdiv_code'],
+                $data['cir_code'],$data['mouza_pargona_code'],$data['lot_no'],$data['vill_townprt_code'],$data['patta_type_code'],$data['patta_no']));
+            if($checkDataExistence->num_rows() > 0)
+            {
+                $this->db->trans_rollback();
+                log_message("error", "#ERRICDD0784, Error in insert on current_doul_demand table with query- ". json_encode($this->db->last_query()));
+                return ['result' => 'SERVER-ERROR', 'msg' => '#ERRICDD0784 Patta Details Already exists in doul, Please check again...!!!'];
+            }
+
+            $current_doul_demand = array(
+                "dist_code"         => $data['dist_code'],
+                "subdiv_code"       => $data['subdiv_code'],
+                "cir_code"          => $data['cir_code'], 
+                "mouza_pargona_code"=> $data['mouza_pargona_code'], 
+                "lot_no"            => $data['lot_no'], 
+                "vill_townprt_code" => $data['vill_townprt_code'], 
+                "uuid"              => $uuid, 
+                "patta_type_code"   => $data['patta_type_code'], 
+                "patta_no"          => $data['patta_no'],
+                "dag_area_b"        => $bigha,
+                "dag_area_k"        => $katha,
+                "dag_area_lc"       => $lessa,
+                "dag_area_g "       => null,
+                "dag_area_kr"       => null,
+                "dag_revenue"       => $data['dag_revenue'],
+                "dag_local_tax"     => $data['dag_local_tax'],
+                "date_of_creation"  => date('Y-m-d h:i:s'),
+                "year_no"           => doul_year_no,
+                "port_by_user"      => $this->session->all_userdata()['user_code'],
+                "port_ip"           => $this->session->all_userdata()['ip_address'], 
+                "status"            => EKHAJANA_MB2_PATTA_STATUS_IN_DOUL //'N'
+            ); 
+            $tstatus2 = $this->db->insert('current_doul_demand', $current_doul_demand); 
+            if ($tstatus2!= 1)
+            {
+                $this->db->trans_rollback();
+                log_message("error", "#ERRICDD001, Error in insert on current_doul_demand table with query- ". json_encode($this->db->last_query()));
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #ERRICDD001'];
+            }
+            //checking if the patta already exists
+            $checkDataExistence2 = $this->db->query("select * from current_doul_demand_transactions where dist_code=? and subdiv_code=? and cir_code=?
+                and mouza_pargona_code=? and lot_no=? and vill_townprt_code=? and patta_type_code=? and patta_no=?",array($data['dist_code'],$data['subdiv_code'],
+                $data['cir_code'],$data['mouza_pargona_code'],$data['lot_no'],$data['vill_townprt_code'],$data['patta_type_code'],$data['patta_no']));
+            if($checkDataExistence2->num_rows() > 0)
+            {
+                $this->db->trans_rollback();
+                log_message("error", "#ERRICDD0785, Error in insert on current_doul_demand_transactions table with query- ". json_encode($this->db->last_query()));
+                return ['result' => 'SERVER-ERROR', 'msg' => '#ERRICDD0785 Patta Details Already exists in doul, Please check again...!!!'];
+            }
+            //insert the json into the transaction table
+            $current_doul_transactions = array(
+                "dist_code"         => $data['dist_code'],
+                "subdiv_code"       => $data['subdiv_code'],
+                "cir_code"          => $data['cir_code'], 
+                "mouza_pargona_code"=> $data['mouza_pargona_code'], 
+                "lot_no"            => $data['lot_no'], 
+                "vill_townprt_code" => $data['vill_townprt_code'], 
+                "uuid"              => $uuid, 
+                "patta_type_code"   => $data['patta_type_code'], 
+                "patta_no"          => $data['patta_no'],
+                "dag_area_b"        => $bigha,
+                "dag_area_k"        => $katha,
+                "dag_area_lc"       => $lessa,
+                "dag_area_g "       => null,
+                "dag_area_kr"       => null,
+                "dag_revenue"       => $data['dag_revenue'],
+                "dag_local_tax"     => $data['dag_local_tax'],
+                "date_of_creation"  => date('Y-m-d h:i:s'),
+                "year_no"           => doul_year_no,
+                "port_by_user"      => $this->session->all_userdata()['user_code'],
+                "port_ip"           => $this->session->all_userdata()['ip_address'], 
+                "status"            => EKHAJANA_MB2_PATTA_STATUS_IN_DOUL //'N'
+            ); 
+            $tstatus2 = $this->db->insert('current_doul_demand_transactions', $current_doul_transactions); 
+            if ($tstatus2!= 1)
+            {
+                $this->db->trans_rollback();
+                log_message("error", "#ERRICDD002, Error in insert on current_doul_demand_transactions table with query- ". json_encode($this->db->last_query()));
+                return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #ERRICDD002'];
+            }
+        }
+        //final transaction status check 
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            log_message("error", "#ERRICDD002, Transaction Status Error In Saving current_doul_demand with query- ". json_encode($this->db->last_query()));
+            return ['result' => 'SERVER-ERROR', 'msg' => 'Some error occured, Error-Code : #ERRICDD002'];
+        }else{
+            $this->db->trans_commit();
+            return ['result' => 'SUCCESS', 'msg' => 'All New Pattas Added to Current Doul Successfully'];
+        }
+         
+    }
+
+    function Total_Bigha_Katha_Lessa($total_lessa)
+    {
+        $mm = 0;
+        if($total_lessa < 0)
+        {
+            $mm = 1;
+            $total_lessa = abs($total_lessa);
+        }
+        $bigha = $total_lessa / 100;
+        $rem_lessa = fmod($total_lessa, 100);
+        $katha = $rem_lessa / 20;
+        $r_lessa = fmod($rem_lessa, 20);
+        $mesaure = array();
+        $mesaure[].=($mm==1) ? -floor($bigha): floor($bigha);
+        $mesaure[].=($mm==1) ? -floor($katha): floor($katha);
+        $mesaure[].=($mm==1) ? -($r_lessa) : $r_lessa;
+        $mesaure[].=0;
+        return $mesaure;
+    }
+
+    public function getAllVillages($dist_code,$subdiv_code,$cir_code)
+    {
+        $villages = $this->db->query("select *  from   location where dist_code =?  and  subdiv_code=? and cir_code=? and mouza_pargona_code!='00'  and lot_no!='00' and vill_townprt_code!='00000' order by vill_townprt_code",array($dist_code,$subdiv_code,$cir_code));
+        return $villages->result();
+    }
+
+    //getting patta types 
+    public function getAllPattas() {
+        $patta = $this->db->query("Select type_code,patta_type,pattatype_eng from patta_code order by type_code asc");
+        return $patta->result();
+    }
+    
+    
+}
+

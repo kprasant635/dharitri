@@ -1,0 +1,114 @@
+<style type="text/css" media="print">
+    @page 
+    {
+        size:  auto;   /* auto is the initial value */
+        margin: 0mm;  /* this affects the margin in the printer settings */
+        size: portrait; /* for page layout */
+    }
+
+    html
+    {
+        background-color: #FFFFFF; 
+        margin: 0px;  /* this affects the margin on the html before sending to printer */
+    }
+
+    body
+    {
+        border: solid 1px blue ;
+        margin: 10mm 15mm 10mm 15mm; /* margin you want for the content */
+    }
+</style>
+<div class="row login panel-form">
+    <div class="col-lg-12 center-col">
+        <div class="panel " id="printdiv">
+            <div class="panel-heading">
+                <div class="panel-title">
+                    <p class='center bold uni_text'><u>NOTICE</u></p>
+                    <p class='center bold uni_text'><u>জাননী</u></p>
+                    <p class="center bold uni_text"><?php echo $location['case_no']; ?></p>
+                </div>
+            </div>
+            <div class="panel-body form_1">
+                <table class='rasid-t'>
+                    <tr>
+                        <td>যিহেতু <span style="color:#37BC9B"><?php echo $location['cir']; ?></span> ৰাজহ চক্রৰ, <span style="color:#37BC9B"><?php echo $location['mouza']; ?></span> মৌজাৰ, <span style="color:#37BC9B"><?php echo $location['vill']; ?></span> গাঁও প্ৰতিষ্ঠিত <span style="color:#37BC9B"><?php 
+                            foreach ($ins_data as $p): 
+                            $pattadar=$p->ins_name;
+                            ?>
+                            <?php echo $pattadar.", "; ?>
+                            <?php endforeach; ?></span> ৰ দৰ্খাস্তৰপৰা জানিৱ পৰা গৈছে যে তলত উল্লেখ কৰা তফচিলৰ আবন্টন/বন্দোবস্তি বিছাৰিছে । গতিকে উক্ত প্ৰতিষ্ঠান/অনুষ্ঠান ৰ আবেদনকাৰীক <span style="color:#37BC9B"><?php echo date('d-m-Y',strtotime($location['next_date_of_hearing'])); ?></span> তাৰিখৰ দিনৰ ১০ বজাত এই আদালতত হাজিৰ হবলৈ জনোৱা হল | 
+                           
+                        </td>
+                    </tr>
+                    <tr><td>&nbsp;</td></tr>
+                    <tr>
+                        <td>এতেকে এই জাননীৰ দ্বাৰা জ্ঞাত কৰোৱা যায় যে উক্ত দৰ্খাস্তকাৰীৰ স্বাৰ্থৰ প্রকাৰ, পৰিমাণ বা অন্য কোনো বিষয়ত যদি কাৰোবাৰ আপওি থাকে তেন্তে ইং <span style="color:#37BC9B"><?php echo date('d-m-Y',strtotime($location['next_date_of_hearing'])); ?></span> তাৰিখৰ দিনৰ ১০ বজাত এই আদালতত হাজিৰ হৈ লিখিত আপওি দাখিল কৰিব । তেতিয়া যথাবিহিত অনুসন্ধান কৰি আৱশ্যকীয় হুকুম দিয়া যাব ।</td>
+                    </tr>
+                   
+                    <tr><td>অন্যথা বিষয়তো এক পক্ষ ভাবে উক্ত গোচৰ নিস্পট্টি কৰা হব। &nbsp;</td></tr>
+                    <tr><td>&nbsp;</td></tr>
+                    <tr>
+                        <td>আজি ইং <span style="color:#37BC9B"><?php echo date('d-m-Y'); ?></span> তাৰিখে মোৰ চহী আৰু আদালতৰ মোহৰ মাৰি দিয়া হ'ল ।</td>
+                    </tr>
+                </table>
+                
+                <table class="table table-bordered rasid unicode">
+                    <tr style="color:#0000cc;">
+                        <td><label class="control-label" >মৌজা আৰু গাঁওৰ বিবৰণ</label></td>
+                        <td><label class="control-label" >প্ৰতিষ্ঠান/অনুষ্ঠান ৰ নাম আৰু ঠিকনা</label></td>
+                        <td><label class="control-label" >আবেদনকাৰীৰ নাম আৰু ঠিকনা</label></td>
+                        <td><label class="control-label" >স্বাৰ্থৰ বিৱৰণ <br>(পট্টা, দাগ, কালি)</label></td>
+                        <td><label class="control-label" >বাকী থকা স্বাৰ্থৰ বিৱৰণ</label></td>
+                    </tr>
+                    <tr style="color:#0000cc;">
+                        <td><label class="control-label" >১</label></td>
+                        <td><label class="control-label" >২</label></td>
+                        <td><label class="control-label" >৩</label></td>
+                        <td><label class="control-label" >৪</label></td>
+                        <td><label class="control-label" >৫</label></td>
+                    </tr>
+                    <tr>
+                        <td><label class="control-label" ><?php echo $location['cir'] . ", " . $location['mouza']; ?></label></td>
+                        <td><label class="control-label" >
+                            <?php
+                            foreach ($ins_data as $p1):
+                                $pattadar = $p1->ins_name;
+                                ?>
+                                <?php echo $pattadar . ", <br>"; ?>
+                            <?php endforeach; ?></label>
+                        </td>
+                        <td><label class="control-label" >
+                            <?php
+                            foreach ($pattadar2 as $p2):
+                                $pattadar = $p2->pdar_name;
+                                ?>
+                                <?php echo $pattadar . ", <br>"; ?>
+                            <?php endforeach; ?></label>
+                        </td>
+                        <td><label class="control-label" ><?php echo $this->lang->line('patta_no'); ?> : <?php echo $land_details['patta_no']; ?><br> <?php echo $this->lang->line('dag_no'); ?> : <?php echo $land_details['dag']; ?><br> <?php echo $land_details['m_dag_area_b'] . " বিঘা " . $land_details['m_dag_area_k'] . " কঠা " . $land_details['m_dag_area_lc'] . " লেছা " ?></label></td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+                <div class="col-sm-12" style="margin: 0 auto;float: none;margin-top: 20px;margin-bottom: 20px;">
+                    <p class="rasid" style="float: right;"><?php //echo $location['add_to']; ?><br>
+                                         চক্র বিষয়া,&nbsp;<?php echo $location['cir']; ?></p>
+                </div>
+                <div class="col-sm-12 dontshow">
+                <center>
+                    <a onclick="return myFunction()" href="<?php echo base_url();?>index.php/AsistantJuridicalMb/notice_generation_save?case_no=<?php echo $location['case_no']; ?>" class="btn btn-success uni_text" ><i class='fa fa-print'></i> ৰচিদ ছপোৱা আৰু ৰচিদ জাৰি কৰক |</a>
+                </center>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function myFunction() {
+        $(".dontshow").hide();
+	window.print();
+        $(".dontshow").show();
+            document.getElementById("mainMenu").disabled = false;
+	}
+ </script>
+
+

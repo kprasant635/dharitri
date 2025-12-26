@@ -1,0 +1,403 @@
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+define('USER_ALLOT_CODE', json_encode([
+    ['CODE' => 1, 'USER' => 'DEPT'],
+    ['CODE' => 2, 'USER' => 'DC'],
+    ['CODE' => 3, 'USER' => 'ADC'],
+    ['CODE' => 4, 'USER' => 'SDO'],
+    ['CODE' => 5, 'USER' => 'BO'],
+    ['CODE' => 6, 'USER' => 'CO'],
+    ['CODE' => 7, 'USER' => 'SK'],
+    ['CODE' => 8, 'USER' => 'AST'],
+    ['CODE' => 9, 'USER' => 'LM'],
+    ['CODE' => 10, 'USER' => 'SRO'],
+    ['CODE' => 11, 'USER' => 'MOUZADAR'],
+    ['CODE' => 12, 'USER' => 'DEO'],
+    ['CODE' => 13, 'USER' => 'TN'],
+    ['CODE' => 14, 'USER' => 'CMS'],
+]));  
+
+define('ASSIGNMENT_TYPE', json_encode([
+    ['CODE' => 1, 'NAME' => 'DIRECT'],
+    ['CODE' => 2, 'NAME' => 'ESCALATION'],
+    ['CODE' => 3, 'NAME' => 'DEESCALATION'],
+    ['CODE' => 4, 'NAME' => 'REVERT']
+]));       
+
+
+define('OMUT_TASK', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to CO'],
+    ['CODE' => 2, 'NAME' => 'CO gives first proceeding and case is assigned to LM and DA'],
+    ['CODE' => 3, 'NAME' => 'DA Gives notice'],
+    ['CODE' => 4, 'NAME' => 'LM gives report goest to Sk'],
+    ['CODE' => 5, 'NAME' => 'DA Give action taken'],
+    ['CODE' => 6, 'NAME' => 'SK Report'],
+    ['CODE' => 7, 'NAME' => 'CO order passs'],
+    ['CODE' => 8, 'NAME' => 'CO revert to LM'],
+    ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+    ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+    ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+    ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+    ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+])); 
+define('ALOT_TASK', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered automatically and assigned to CO'],
+    ['CODE' => 2, 'NAME' => 'CO gives first proceeding and case is assigned to LM'],
+    ['CODE' => 3, 'NAME' => 'LM gives first proceeding and case is assigned to SK'],
+    ['CODE' => 4, 'NAME' => 'SK gives first proceeding and case is assigned to CO'],
+    ['CODE' => 5, 'NAME' => 'CO gives first proceeding and case is assigned to DC'],
+    ['CODE' => 6, 'NAME' => 'DC gives first proceeding and case is assigned to BO'],
+    ['CODE' => 7, 'NAME' => 'BO gives first proceeding and case is assigned to DC'],
+    ['CODE' => 8, 'NAME' => 'DC gives first proceeding and case is assigned to CO'],
+    ['CODE' => 9, 'NAME' => 'Final order passed by CO'],
+    ['CODE' => 10, 'NAME' => 'Reverted from CO to LM'],
+    ['CODE' => 11, 'NAME' => 'Reverted from CO to DC'],
+    ['CODE' => 12, 'NAME' => 'Reverted from DC to CO'],
+    ['CODE' => 13, 'NAME' => 'Reject from DC'],
+    ['CODE' => 14, 'NAME' => 'DC revert to BO'],
+])); 
+
+
+define('FMUT_TASK', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to LM'],
+    ['CODE' => 2, 'NAME' => 'LM gives first proceeding and case is assigned to CO'],
+    ['CODE' => 3, 'NAME' => 'SK gives report'],
+    ['CODE' => 4, 'NAME' => 'CO Final order'],
+    ['CODE' => 5, 'NAME' => 'CO revert to LM'],
+    ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+    ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+    ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+    ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+    ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+]));
+
+define('FPART_TASK', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to LM'],
+    ['CODE' => 2, 'NAME' => 'LM gives first proceeding and case is assigned to CO'],
+    ['CODE' => 3, 'NAME' => 'SK gives report'],
+    ['CODE' => 4, 'NAME' => 'CO Final order'],
+    ['CODE' => 5, 'NAME' => 'CO revert to LM'],
+    ['CODE' => 6, 'NAME' => 'Auto escalate from LM to CO'],
+    ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+    ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+    ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+    ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+    ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+]));
+
+define('OPART_TASK', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to CO'],
+    ['CODE' => 2, 'NAME' => 'CO gives first proceeding and case is assigned to LM and DA'],
+    ['CODE' => 3, 'NAME' => 'DA Gives notice'],
+    ['CODE' => 4, 'NAME' => 'LM gives report goest to Sk'],
+    ['CODE' => 5, 'NAME' => 'DA Give action taken'],
+    ['CODE' => 6, 'NAME' => 'SK Report'],
+    ['CODE' => 7, 'NAME' => 'CO order passs'],
+    ['CODE' => 8, 'NAME' => 'CO revert to LM'],
+    ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+    ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+    ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+    ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+    ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+])); 
+
+define('RECLASS', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to LM'],
+    ['CODE' => 2, 'NAME' => 'Write Proposal for Land Reclassification by LM'],
+    ['CODE' => 3, 'NAME' => 'Forward the case to ADC by CO'],
+    ['CODE' => 4, 'NAME' => 'Verifies and Forward the case to DC/Revert back to CO for Correction'],
+    ['CODE' => 5, 'NAME' => 'Gives the final order'],
+    ['CODE' => 6, 'NAME' => 'CO Revert to LM'],
+    ['CODE' => 7, 'NAME' => 'ADC Revert to CO'],
+    ['CODE' => 8, 'NAME' => 'DC Revert to CO'],
+    ['CODE' => 9, 'NAME' => 'DC Revert to ADC'],
+    ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+    ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+    ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+    ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+    ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+]));
+
+define('ALLOT', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to CO'],
+    ['CODE' => 2, 'NAME' => 'First Order by CO and assigned to LM'],
+    ['CODE' => 3, 'NAME' => 'LM Report'],
+    ['CODE' => 4, 'NAME' => 'SK report'],
+    ['CODE' => 5, 'NAME' => 'CO second proceeding and pass the case to ADC/DC'],
+    ['CODE' => 6, 'NAME' => 'DC’s first proceeding and asks BO to submit report'],
+    ['CODE' => 7, 'NAME' => 'Submit report to DC'],
+    ['CODE' => 8, 'NAME' => 'DC Final order'],
+    ['CODE' => 9, 'NAME' => 'CO will Assign new dag new patta'],
+    ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+    ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+    ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+    ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+    ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+]));
+
+define('CONV', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to CO'],
+    ['CODE' => 2, 'NAME' => 'First proceeding By Circle officer to LM'],
+    ['CODE' => 3, 'NAME' => 'LM Report'],
+
+
+    ['CODE' => 4, 'NAME' => 'SK Report'],
+    ['CODE' => 5, 'NAME' => 'Assistant will take Action Taken report'],
+    ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+    ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+    ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+    ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+    ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+]));
+
+define('LEGACY', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to LM'],
+    ['CODE' => 2, 'NAME' => 'Forwarded to DC/ADC By Circle officer'],
+    ['CODE' => 3, 'NAME' => 'Final order by CO'],
+    ['CODE' => 4, 'NAME' => 'Final order by DC/ADC'],
+    ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+    ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+    ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+    ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+    ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+]));
+
+define('NCAN', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to CO'],
+    ['CODE' => 2, 'NAME' => 'Forwarded LM By Circle officer'],
+    ['CODE' => 3, 'NAME' => 'LM Forwarded to SK'],
+    ['CODE' => 4, 'NAME' => 'SK Report'],
+    ['CODE' => 5, 'NAME' => 'DA Notice Generated'],
+    ['CODE' => 6, 'NAME' => 'Final Order by CO'],
+    ['CODE' => 7, 'NAME' => 'CO revert to LM'],
+    ['CODE' => 8, 'NAME' => 'LM Revert Report to CO'],
+    ['CODE' => 9, 'NAME' => 'DA Action Taken'],
+    ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+    ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+    ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+    ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+    ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+]));
+
+define('ANCOR', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to CO'],
+    ['CODE' => 2, 'NAME' => 'Forwarded to CO By LM'],
+    ['CODE' => 3, 'NAME' => 'CO Final Order'],
+    ['CODE' => 4, 'NAME' => 'CO Revert to LM'],
+    ['CODE' => 5, 'NAME' => 'Lm gives revert Report'],
+    ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+    ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+    ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+    ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+    ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+]));
+define('MCOR', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to CO'],
+    ['CODE' => 2, 'NAME' => 'Final order by CO'],
+    ['CODE' => 3, 'NAME' => 'Reject order by CO'],
+    ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+    ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+    ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+    ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+    ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+]));
+
+define('ACOR', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to LM'],
+    ['CODE' => 2, 'NAME' => 'Forwarded CO By LM'],
+    ['CODE' => 3, 'NAME' => 'CO Forwarded to DC'],
+    ['CODE' => 4, 'NAME' => 'DC Final Order Report'],
+    ['CODE' => 7, 'NAME' => 'CO revert to LM'],
+    ['CODE' => 8, 'NAME' => 'LM Revert Report to CO'],
+    ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+    ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+    ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+    ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+    ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+]));
+
+
+// define('NCOR', json_encode([
+//     ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to CO'],
+//     ['CODE' => 2, 'NAME' => 'Forwarded LM By Circle officer'],
+//     ['CODE' => 3, 'NAME' => 'LM Forwarded to SK'],
+//     ['CODE' => 4, 'NAME' => 'SK Report'],
+//     ['CODE' => 5, 'NAME' => 'DA Notice Generated'],
+//     ['CODE' => 6, 'NAME' => 'Final Order by CO'],
+//     ['CODE' => 7, 'NAME' => 'CO revert to LM'],
+//     ['CODE' => 8, 'NAME' => 'LM Revert Report to CO'],
+//     ['CODE' => 9, 'NAME' => 'DA Action Taken'],
+//     ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+//     ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+//     ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+//     ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+//     ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+//     ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+//     ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+//     ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+//     ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+//     ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+// ]));
+
+define('ESCALATION_ZONE', [
+    ['CODE' => 1, 'NAME' => 'GREEN'],
+    ['CODE' => 2, 'NAME' => 'YELLOW'],
+    ['CODE' => 3, 'NAME' => 'RED'],
+    ['CODE' => 4, 'NAME' => 'OLD CASES'],
+]);
+
+define('RED_ZONE', 25);
+define('YELLOW_ZONE', 50);
+define('GREEN_ZONE', 100);
+// define('VERSION','0202222');
+define('COL_RED', 'RED');
+define('COL_YELLOW', 'YELLOW');
+define('COL_GREEN', 'GREEN');
+
+
+define('OMUT', 'OMUT');
+define('FMUT', 'FMUT');
+define('OPART', 'OPART');
+define('FPART', 'FPART');
+define('RECLASS_SERV', 'RECLASS');
+define('ALLOT_SERV', 'ACPP');
+define('CONV_SERV', 'CONV');
+define('LEGACY_SERV', 'LEGACY');
+define('NCAN_SERV', 'NCAN');
+define('ANCOR_SERV', 'ANCOR');
+define('MCOR_SERV', 'MCOR');
+
+
+
+
+define('AADHAAR_DOC_ENV','PROD');
+
+// added on 25/01/2024
+define('TASK_ID', json_encode([
+    ['CODE' => 11, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 12, 'NAME' => 'Auto escalated from SK to CO on '.date('Y-m-d')],
+    ['CODE' => 13, 'NAME' => 'Auto escalated from AST to CO on '.date('Y-m-d')],
+    ['CODE' => 14, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 15, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 16, 'NAME' => 'Reverted to SK by assigning days on '.date('Y-m-d')],
+    ['CODE' => 17, 'NAME' => 'Reverted to AST by assigning days on '.date('Y-m-d')],
+    ['CODE' => 18, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+]));
+
+define('ESCALATION_REVERT_DAYS','10');
+
+
+define('ESCALATION_ALLOW_TIME',0);
+
+define('POPUP_INTERVAL_BEFORE_ESC', '3 days');
+define('POPUP_INTERVAL_BEFORE_ESC_FOR_TIME', 3);
+define('TO_BE_AUTO_ESCALATE_POPUP', 1);
+
+define('DEESCALATE','deescalate');
+define('REVERT','revert');
+
+
+define('REVERT_TO_APPELLATE_USER', json_encode([
+    ['IF_LOGIN' => 'CO', 'REVERT_TO' => 'LM'],
+    ['IF_LOGIN' => 'CO', 'REVERT_TO' => 'AST'],
+    ['IF_LOGIN' => 'CO', 'REVERT_TO' => 'SK'],
+    ['IF_LOGIN' => 'ADC', 'REVERT_TO' => 'CO'],
+    ['IF_LOGIN' => 'DC', 'REVERT_TO' => 'CO'],
+    ['IF_LOGIN' => 'DC', 'REVERT_TO' => 'ADC'],
+])); 
+
+
+define('MIND_SERV', 'MiND');
+define('MINC_SERV', 'MiNC');
+
+define('NCOR', json_encode([
+    ['CODE' => 1, 'NAME' => 'CASE registered by DC automatically and assigned to LM'],
+    ['CODE' => 2, 'NAME' => 'Forwarded to CO By LM'],
+    ['CODE' => 3, 'NAME' => 'LM Forwarded to ADC'],
+    ['CODE' => 4, 'NAME' => 'Final Order by ADC'],
+    ['CODE' => 5, 'NAME' => 'CO revert to LM'],
+    ['CODE' => 6, 'NAME' => 'LM Revert Report to CO'],
+    ['CODE' => 7, 'NAME' => 'DA Action Taken'],
+    ['CODE' => 8, 'NAME' => 'Auto escalated from LM to CO on '.date('Y-m-d')],
+    ['CODE' => 9, 'NAME' => 'Auto escalated from CO to DC/ADC on '.date('Y-m-d')],
+    ['CODE' => 10, 'NAME' => 'Reverted to LM by assigning days on '.date('Y-m-d')],
+    ['CODE' => 11, 'NAME' => 'Reverted to CO by assigning days on '.date('Y-m-d')],
+    ['CODE' => 19, 'NAME' => 'De-escaltion process starts here, reverted by DC to concern users on '.date('Y-m-d')],
+    ['CODE' => 20, 'NAME' => 'Reverted by DC to CO on '.date('Y-m-d')],
+]));
+
+define('CONV_RURAL', 'CONVR');
+define('CONV_URBAN', 'CONVU');
+define('CONV_PERI', 'CONVP');
+
+
+define('DC_REVERT_TASK', json_encode([
+    ['CODE' => 1, 'NAME' => 'Reverted by DC to all users as percentage '.date('Y-m-d')],
+]));
+
+
+define('ESC_NORMAL','normal');
+
+?>

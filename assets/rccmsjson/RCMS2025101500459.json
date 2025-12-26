@@ -1,0 +1,200 @@
+{
+  "data": {
+    "applicationId": "RCMS2025101500459",
+    "caseDescription": "fdghjk",
+    "uploadDocument": "",
+    "declaration1": "1",
+    "declaration2": "1",
+    "declaration3": "1",
+    "representedThrough": "",
+    "additionalSection": "",
+    "officerRelated": "1",
+    "revertBackCaseComment": "",
+    "landDetails": {
+      "0": {
+        "id": "878",
+        "district": "291",
+        "districtNameEng": "KAMRUP",
+        "districtNameAs": "কামৰূপ ",
+        "circle": "10000000003854",
+        "cirNameEng": "CHAMARIA",
+        "cirNameAs": "ছমৰীয়া ",
+        "cirUniqueCode": "10000000003854",
+        "village": "302994",
+        "villNameEng": "TAMULADI ",
+        "villNameAs": "তামুলদি ",
+        "villUnique_code": "10000000003869",
+        "pattaType": "0201",
+        "pattaName": "KHARAJ MIYADI",
+        "pattaNo": "15",
+        "dagNo": "152",
+        "total_area": "5B-1K-16L",
+        "khatianNo": "",
+        "areaDisputed": "0B-0K-1L",
+        "northName": "",
+        "northDag": "",
+        "northUpin": "",
+        "southName": "",
+        "southDag": "",
+        "southUpin": "",
+        "eastName": "",
+        "eastDag": "",
+        "eastUpin": "",
+        "westName": "",
+        "westDag": "",
+        "westUpin": ""
+      },
+      "1": {
+        "id": "879",
+        "district": "291",
+        "districtNameEng": "KAMRUP",
+        "districtNameAs": "কামৰূপ ",
+        "circle": "10000000003854",
+        "cirNameEng": "CHAMARIA",
+        "cirNameAs": "ছমৰীয়া ",
+        "cirUniqueCode": "10000000003854",
+        "village": "302994",
+        "villNameEng": "TAMULADI ",
+        "villNameAs": "তামুলদি ",
+        "villUnique_code": "10000000003869",
+        "pattaType": "0201",
+        "pattaName": "KHARAJ MIYADI",
+        "pattaNo": "15",
+        "dagNo": "262",
+        "total_area": "12B-2K-19.0000L",
+        "khatianNo": "",
+        "areaDisputed": "0B-0K-1L",
+        "northName": "",
+        "northDag": "",
+        "northUpin": "",
+        "southName": "",
+        "southDag": "",
+        "southUpin": "",
+        "eastName": "",
+        "eastDag": "",
+        "eastUpin": "",
+        "westName": "",
+        "westDag": "",
+        "westUpin": ""
+      }
+    },
+    "plaintiffs": {
+      "0": {
+        "id": "1025",
+        "firstName": "হুছেইন",
+        "middleName": "",
+        "lastName": "আলী",
+        "fhName": "ঁ সমেজুদ্দিন ",
+        "emailPlaintiff": "",
+        "mobileNo": "3456789098",
+        "category": "General",
+        "gender": "Male",
+        "address": "dfghjk, esdrftgyuhij, 456789876543, BARPALAHA , UTTAR GUWAHATI, KAMRUP , Assam, 345678"
+      }
+    },
+    "defendents": {
+      "0": {
+        "caseDescription": "",
+        "declaration1": "",
+        "declaration2": "",
+        "declaration3": "",
+        "additionalSection": "",
+        "officerRelated": "",
+        "defendents": "",
+        "courtLevel": "",
+        "caseNature": "",
+        "relavantActRegulation": "",
+        "plaintiffs": "",
+        "advocates": "",
+        "landDetails": "",
+        "documentTypeStoreCitizen": "",
+        "uploadDocument": "",
+        "representedThrough": "",
+        "underSection": "",
+        "relSection": "",
+        "uploadVakalatnama": "",
+        "sewaSetuUserId": "",
+        "rtpsTransId": "",
+        "id": "1201",
+        "defendentCode": "",
+        "defendentFirstName": "",
+        "defendentMiddleName": "",
+        "defendentLastName": "",
+        "defendentfhName": "",
+        "defendentMobile": "",
+        "defendentAddress": "",
+        "officerDept": "",
+        "designation": "10000000003854",
+        "typeOfficer": "1"
+      }
+    },
+    "advocates": {},
+    "courtLevel": {
+      "courtId": "1",
+      "courtLevelName": "Appeal on Revenue Court Case: - In the Court of District Commissioner/Additional District Commissioner/Co-District Commissioner, against the order of lower revenue court",
+      "courtType": "2",
+      "active": "1",
+      "hibernateLazyInitializer": {}
+    },
+    "caseNature": {
+      "caseNatureName": "Office Partition- Appeal filed under Section 147 of ALRR 1886.",
+      "active": "1",
+      "id": "2",
+      "hibernateLazyInitializer": {}
+    },
+    "underSection": {},
+    "applicationEntryDate": "2025-10-15",
+    "caseHistory": {
+      "0": {
+        "remark": "Application created with application id RCMS2025101500459",
+        "date": "2025-10-15",
+        "id": "1983"
+      },
+      "1": {
+        "remark": "Assigned application id RCMS2025101500459 To DA",
+        "date": "2025-10-15",
+        "id": "1984"
+      }
+    },
+    "caseStatus": "PENDING",
+    "DocumentTypeStoreCitizen": {
+      "0": {
+        "id": "1183",
+        "uploadDocument": "Joining Report.docx.pdf",
+        "uploadDocumentImgPath": "file:///C:/uploads/compressed_4b6c9477-5713-4c13-8bc9-02e26bdb88e4_Joining Report.docx.pdf",
+        "uploadDocumentImg_type": "application/pdf",
+        "documentType": "Memo of Appeal/Appeal Petition*"
+      },
+      "1": {
+        "id": "1184",
+        "uploadDocument": "Joining Report.docx.pdf",
+        "uploadDocumentImgPath": "file:///C:/uploads/compressed_e90d4706-c4f1-426d-8516-a71a5bbc88b1_Joining Report.docx.pdf",
+        "uploadDocumentImg_type": "application/pdf",
+        "documentType": "Certified copy of Impugned order*"
+      }
+    },
+    "relSection": {},
+    "relavantActRegulation": "",
+    "comment": "",
+    "checkLists": "",
+    "sewaSetuUserId": "",
+    "rtpsTransId": "",
+    "id": "798",
+    "documentTypeStoreCitizen": {
+      "0": {
+        "id": "1183",
+        "uploadDocument": "Joining Report.docx.pdf",
+        "uploadDocumentImgPath": "file:///C:/uploads/compressed_4b6c9477-5713-4c13-8bc9-02e26bdb88e4_Joining Report.docx.pdf",
+        "uploadDocumentImg_type": "application/pdf",
+        "documentType": "Memo of Appeal/Appeal Petition*"
+      },
+      "1": {
+        "id": "1184",
+        "uploadDocument": "Joining Report.docx.pdf",
+        "uploadDocumentImgPath": "file:///C:/uploads/compressed_e90d4706-c4f1-426d-8516-a71a5bbc88b1_Joining Report.docx.pdf",
+        "uploadDocumentImg_type": "application/pdf",
+        "documentType": "Certified copy of Impugned order*"
+      }
+    }
+  }
+}

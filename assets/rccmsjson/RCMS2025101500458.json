@@ -1,0 +1,215 @@
+{
+  "data": {
+    "applicationId": "RCMS2025101500458",
+    "caseDescription": "ghjkl",
+    "uploadDocument": "",
+    "declaration1": "1",
+    "declaration2": "1",
+    "declaration3": "1",
+    "representedThrough": "",
+    "additionalSection": "",
+    "officerRelated": "1",
+    "revertBackCaseComment": "",
+    "landDetails": {
+      "0": {
+        "id": "876",
+        "district": "291",
+        "districtNameEng": "KAMRUP",
+        "districtNameAs": "কামৰূপ ",
+        "circle": "10000000003853",
+        "cirNameEng": "BOKO",
+        "cirNameAs": "বকো ",
+        "cirUniqueCode": "10000000003853",
+        "village": "303129",
+        "villNameEng": "MAJPARA ",
+        "villNameAs": "মাজপাৰা ",
+        "villUnique_code": "10000000004235",
+        "pattaType": "0201",
+        "pattaName": "KHARAJ MIYADI",
+        "pattaNo": "7",
+        "dagNo": "111",
+        "total_area": "1B-0K-8.0000L",
+        "khatianNo": "",
+        "areaDisputed": "1B-0K-0L",
+        "northName": "",
+        "northDag": "",
+        "northUpin": "",
+        "southName": "",
+        "southDag": "",
+        "southUpin": "",
+        "eastName": "",
+        "eastDag": "",
+        "eastUpin": "",
+        "westName": "",
+        "westDag": "",
+        "westUpin": ""
+      },
+      "1": {
+        "id": "877",
+        "district": "291",
+        "districtNameEng": "KAMRUP",
+        "districtNameAs": "কামৰূপ ",
+        "circle": "10000000003853",
+        "cirNameEng": "BOKO",
+        "cirNameAs": "বকো ",
+        "cirUniqueCode": "10000000003853",
+        "village": "303129",
+        "villNameEng": "MAJPARA ",
+        "villNameAs": "মাজপাৰা ",
+        "villUnique_code": "10000000004235",
+        "pattaType": "0201",
+        "pattaName": "KHARAJ MIYADI",
+        "pattaNo": "7",
+        "dagNo": "18",
+        "total_area": "0B-3K-13.0000L",
+        "khatianNo": "",
+        "areaDisputed": "0B-0K-1L",
+        "northName": "",
+        "northDag": "",
+        "northUpin": "",
+        "southName": "",
+        "southDag": "",
+        "southUpin": "",
+        "eastName": "",
+        "eastDag": "",
+        "eastUpin": "",
+        "westName": "",
+        "westDag": "",
+        "westUpin": ""
+      }
+    },
+    "plaintiffs": {
+      "0": {
+        "id": "1024",
+        "firstName": "চামাচৰণ",
+        "middleName": "",
+        "lastName": "দাস",
+        "fhName": "পিঃ ঁবুদুৰাম দাস ",
+        "emailPlaintiff": "",
+        "mobileNo": "3456789876",
+        "category": "General",
+        "gender": "Male",
+        "address": "ertyuik, ertyuj, ertyu, ertyhj, erty, ertyuj, Jharkhand, 456787"
+      }
+    },
+    "defendents": {
+      "0": {
+        "caseDescription": "",
+        "declaration1": "",
+        "declaration2": "",
+        "declaration3": "",
+        "additionalSection": "",
+        "officerRelated": "",
+        "defendents": "",
+        "courtLevel": "",
+        "caseNature": "",
+        "relavantActRegulation": "",
+        "plaintiffs": "",
+        "advocates": "",
+        "landDetails": "",
+        "documentTypeStoreCitizen": "",
+        "uploadDocument": "",
+        "representedThrough": "",
+        "underSection": "",
+        "relSection": "",
+        "uploadVakalatnama": "",
+        "sewaSetuUserId": "",
+        "rtpsTransId": "",
+        "id": "1200",
+        "defendentCode": "",
+        "defendentFirstName": "",
+        "defendentMiddleName": "",
+        "defendentLastName": "",
+        "defendentfhName": "",
+        "defendentMobile": "",
+        "defendentAddress": "",
+        "officerDept": "",
+        "designation": "10000000003853",
+        "typeOfficer": "1"
+      }
+    },
+    "advocates": {},
+    "courtLevel": {
+      "courtId": "1",
+      "courtLevelName": "Appeal on Revenue Court Case: - In the Court of District Commissioner/Additional District Commissioner/Co-District Commissioner, against the order of lower revenue court",
+      "courtType": "2",
+      "active": "1",
+      "hibernateLazyInitializer": {}
+    },
+    "caseNature": {
+      "caseNatureName": "Office Mutation/Miscellaneous (Mutation)Case- Appeal filed under Section 147 of ALRR 1886.",
+      "active": "1",
+      "id": "1",
+      "hibernateLazyInitializer": {}
+    },
+    "underSection": {},
+    "applicationEntryDate": "2025-10-15",
+    "caseHistory": {
+      "0": {
+        "remark": "Application created with application id RCMS2025101500458",
+        "date": "2025-10-15",
+        "id": "1981"
+      },
+      "1": {
+        "remark": "Assigned application id RCMS2025101500458 To DA",
+        "date": "2025-10-15",
+        "id": "1982"
+      },
+      "2": {
+        "remark": "Application Forwarded To PO with application id RCMS2025101500458",
+        "date": "2025-10-15",
+        "id": "1987"
+      },
+      "3": {
+        "remark": "Application Forwarded To ADC of DA with application id RCMS2025101500458",
+        "date": "2025-10-15",
+        "id": "1988"
+      },
+      "4": {
+        "remark": "Application Forwarded To PO with application id RCMS2025101500458",
+        "date": "2025-10-15",
+        "id": "1989"
+      }
+    },
+    "caseStatus": "FORWARDED",
+    "DocumentTypeStoreCitizen": {
+      "0": {
+        "id": "1181",
+        "uploadDocument": "Joining Report.docx.pdf",
+        "uploadDocumentImgPath": "file:///C:/uploads/compressed_f0949146-e044-48c1-97ef-c8d7e1c58c9d_Joining Report.docx.pdf",
+        "uploadDocumentImg_type": "application/pdf",
+        "documentType": "Memo of Appeal/Appeal Petition*"
+      },
+      "1": {
+        "id": "1182",
+        "uploadDocument": "Joining Report.docx.pdf",
+        "uploadDocumentImgPath": "file:///C:/uploads/compressed_23fc766d-6ac9-4f21-b658-762e5841f920_Joining Report.docx.pdf",
+        "uploadDocumentImg_type": "application/pdf",
+        "documentType": "Certified copy of Impugned order*"
+      }
+    },
+    "relSection": {},
+    "relavantActRegulation": "",
+    "comment": "",
+    "checkLists": "",
+    "sewaSetuUserId": "",
+    "rtpsTransId": "",
+    "id": "797",
+    "documentTypeStoreCitizen": {
+      "0": {
+        "id": "1181",
+        "uploadDocument": "Joining Report.docx.pdf",
+        "uploadDocumentImgPath": "file:///C:/uploads/compressed_f0949146-e044-48c1-97ef-c8d7e1c58c9d_Joining Report.docx.pdf",
+        "uploadDocumentImg_type": "application/pdf",
+        "documentType": "Memo of Appeal/Appeal Petition*"
+      },
+      "1": {
+        "id": "1182",
+        "uploadDocument": "Joining Report.docx.pdf",
+        "uploadDocumentImgPath": "file:///C:/uploads/compressed_23fc766d-6ac9-4f21-b658-762e5841f920_Joining Report.docx.pdf",
+        "uploadDocumentImg_type": "application/pdf",
+        "documentType": "Certified copy of Impugned order*"
+      }
+    }
+  }
+}

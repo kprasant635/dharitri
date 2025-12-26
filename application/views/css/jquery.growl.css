@@ -1,0 +1,126 @@
+/* jQuery Growl
+ * Copyright 2013 Kevin Sylvestre
+ * 1.2.4
+ */
+#growls {
+  z-index: 50000;
+  position: fixed; }
+#growls.default {
+    bottom: 10px;
+    left: 10px; }
+
+.growl {
+  opacity: 0.8;
+  filter: alpha(opacity=80);
+  position: relative;
+  //border-radius: 4px;
+  -webkit-transition: all 0.4s ease-in-out;
+  -moz-transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out; }
+.growl.growl-incoming {
+    opacity: 0;
+    filter: alpha(opacity=0); }
+.growl.growl-outgoing {
+    opacity: 0;
+    filter: alpha(opacity=0); }
+.growl.growl-small {
+    width: 200px;
+    padding: 5px;
+    margin: 5px; }
+.growl.growl-medium {
+    width: 250px;
+    padding: 10px;
+    margin: 10px; }
+.growl.growl-large {
+    width: 300px;
+    padding: 15px;
+    margin: 15px; }
+.growl.growl-default {
+    color: #FFF;
+    background: #3d7fd4; }
+.growl.growl-error {
+    color: #FFF;
+    background: #C0392B; }
+.growl.growl-notice {
+    color: #FFF;
+    background: #3d7fd4; }
+.growl.growl-warning {
+    color: #FFF;
+    background: #F39C12; }
+.growl .growl-close {
+    cursor: pointer;
+    float: right;
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: normal;
+    font-family: helvetica, verdana, sans-serif; }
+.growl .growl-title {
+    font-size: 18px;
+    line-height: 24px; }
+.growl .growl-message {
+    font-size: 14px;
+    line-height: 18px; }
+
+.growl .growl-left{
+  float: left;
+  width: 100px;
+}
+
+.growl .growl-icon{
+  float: left;
+  width: 30px;
+  margin-right: 10px;
+}
+
+
+.growl .growl-right{
+  float: left;
+  width: 210px;
+}
+
+.growl.growl-medium:after{
+  clear: both;
+  content: "";
+  display: block;
+}
+
+.growl-topNotification{
+	  z-index: -50000;
+  position: fixed;
+  text-align: left !important;
+  margin: 0 !important;
+  width: 100% !important;
+  top: 0;
+  left: 0;
+  display: block;
+  overflow: hidden;
+}
+
+.growl-topNotification > .growl-right{
+  width: 95% !important;
+  float: left !important;
+}
+
+.growl-topNotification > .growl-close{
+  float: right;
+}
+
+.onTopNotification{
+  position: relative;
+  top: 0;
+  width: 100%;
+}
+
+@media print
+{    
+    .onTopNotification, .onTopNotification *
+    {
+        display: none !important;
+    }
+	
+	.growl, .growl *
+    {
+        display: none !important;
+    }
+	
+}

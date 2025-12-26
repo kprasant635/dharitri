@@ -1,0 +1,6133 @@
+<?php
+class Basundhara extends CI_Controller {
+
+    public function __construct() {
+        parent::__construct();
+        $this->load->model('patta/pattamodel');
+        $this->load->helper(array('form', 'url'));
+        $this->load->library('form_validation');
+        $this->load->helper('file');
+        $this->load->helper('download');
+        $this->load->model('basundhara/basundharamodel');
+        $this->load->model('rtps/rtpsmodel');
+        $this->dbswitch();
+    }
+    public function dbswitch(){       
+        //$CI=&get_instance();
+        if($this->session->userdata('dist_code') == "02"){
+            $this->db=$this->load->database('dha3', TRUE);    
+         } else if($this->session->userdata('dist_code') == "05"){
+            $this->db=$this->load->database('dha1', TRUE);    
+          } else if($this->session->userdata('dist_code') == "10"){
+            $this->db=$this->load->database('dha24', TRUE);       
+         } else if($this->session->userdata('dist_code') == "13"){
+            $this->db=$this->load->database('dha2', TRUE);    
+         }  else if($this->session->userdata('dist_code') == "17"){
+            $this->db=$this->load->database('dha4', TRUE);    
+         }  else if($this->session->userdata('dist_code') == "15"){
+            $this->db=$this->load->database('dha5', TRUE);    
+         }  else if($this->session->userdata('dist_code') == "14"){
+            $this->db=$this->load->database('dha6', TRUE);    
+         }  else if($this->session->userdata('dist_code') == "07"){
+            $this->db=$this->load->database('dha7', TRUE);    
+         }  else if($this->session->userdata('dist_code') == "03"){
+            $this->db=$this->load->database('dha8', TRUE);    
+         }  else if($this->session->userdata('dist_code') == "18"){
+            $this->db=$this->load->database('dha9', TRUE);    
+         }  else if($this->session->userdata('dist_code') == "12"){
+            $this->db=$this->load->database('dha13', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "24"){
+            $this->db=$this->load->database('dha10', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "06"){
+            $this->db=$this->load->database('dha11', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "11"){
+            $this->db=$this->load->database('dha12', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "12"){
+            $this->db=$this->load->database('dha13', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "16"){
+            $this->db=$this->load->database('dha14', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "32"){
+            $this->db=$this->load->database('dha15', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "33"){
+            $this->db=$this->load->database('dha16', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "34"){
+            $this->db=$this->load->database('dha17', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "21"){
+            $this->db=$this->load->database('dha18', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "08"){
+            $this->db=$this->load->database('dha19', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "35"){
+            $this->db=$this->load->database('dha20', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "36"){
+            $this->db=$this->load->database('dha21', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "37"){
+            $this->db=$this->load->database('dha22', TRUE);   
+         }  else if($this->session->userdata('dist_code') == "25"){
+            $this->db=$this->load->database('dha23', TRUE);   
+         }
+    }
+    ///////////////////////////////////
+    function api(){
+            $dist_code=$_POST['dist_code'];
+            $subdiv_code=$_POST['subdiv_code'];
+            $cir_code=$_POST['cir_code'];
+            $mouza_code=$_POST['mouza_code'];
+            $lot_no=$_POST['lot_no'];
+            $village_code=$_POST['village_code'];
+            $dag_no=$_POST['dag_no'];
+            $application_no=$_POST['application_no'];
+            $patta_no=$_POST['patta_no'];
+            $date_submission=$_POST['date_submission'];
+            $applicant_id=$_POST['applicant_id'];
+            $data=array(
+                'dist_code'=>$dist_code,
+                'subdiv_code'=>$subdiv_code,
+                'cir_code'=>$cir_code,
+                'mouza_code'=>$mouza_code,
+                'lot_no'=>$lot_no,
+                'village_code'=>$village_code,
+                'application_no'=>$application_no,
+                'applicant_id'=>$applicant_id,
+                'dag_no'=>$dag_no,
+                'patta_no'=>$patta_no,
+                'date_submission'=>$date_submission
+            );
+            $this->db->insert('basundhara',$data);
+    }
+    ///////////////////////////////////
+    function byserviceList(){
+        $d=$this->session->userdata('dist_code');
+        $s=$this->session->userdata('subdiv_code');
+        $c=$this->session->userdata('cir_code');
+        $m=$this->session->userdata('mouza_pargona_code');
+        $l=$this->session->userdata('lot_no');
+        $u=$this->session->userdata('user_desig_code');
+        $url = API_LINK."allRecords/$d/$s/$c/$m/$l/$u" ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $district['output'] = json_decode($output);
+        $district['_view'] = 'basundhara/byservicelist';
+        $this->load->view('layouts/main',$district);
+    }
+    function request($service){
+        //var_dump($_SESSION);
+        $this->load->model('basundhara/basundharamodel');
+        $district['pending']=$this->basundharamodel->allLmRequest($service);
+        $district['_view'] = 'basundhara/request';
+        $this->load->view('layouts/main',$district);
+    }
+    //////////////////////////
+    function requestCircleOrg($service){
+        //var_dump($_SESSION);
+        $this->load->model('basundhara/basundharamodel');
+        $district['pending']=$this->basundharamodel->allCORequest($service);
+        $district['_view'] = 'basundhara/circle_total_reg_detail';
+        $this->load->view('layouts/main',$district);
+    }
+    //////////////////////////
+    function mobileUpdationBasu(){
+        $application_no = $this->input->get('app');
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output);
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);        
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['query']=$output->query;
+        if($this->session->userdata('user_desig_code')=='ADC' ){
+            $district['_view'] = 'basundhara/mobileupdation_inherit';
+        }else{
+           $district['_view'] = 'basundhara/mobileupdation'; 
+        }
+        $this->load->view('layouts/main',$district);
+    }
+    function mobileUpdationBasuCO(){
+        $application_no = $this->input->get('app');
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output);
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);        
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['query']=$output->query;
+        if($this->session->userdata('user_desig_code')=='CO'){
+            $district['_view'] = 'basundhara/mobileupdation_inherit';
+        }else{
+            $district['_view'] = 'basundhara/mobileupdation_view';
+        }
+        $this->load->view('layouts/main',$district);
+    }
+    function inheritanceBasu(){
+        $application_no = $this->input->get('app');
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output);
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);        
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['user']=$this->basundharamodel->usersForOffice($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code);
+        if($this->session->userdata('user_desig_code')=='AST'){
+            $district['_view'] = 'basundhara/inheritance_ofc';
+        }elseif($this->session->userdata('user_desig_code')=='CO' or $this->session->userdata('user_desig_code')=='ADC'){
+            $district['recordExist']=$this->basundharamodel->checkExistDharitree($application_no);
+            $district['_view'] = 'basundhara/inheritance_co_revert';
+        }else{
+            $district['_view'] = 'basundhara/inheritance';
+        }
+        $this->load->view('layouts/main',$district);
+    }
+
+  
+    function deedBasu(){
+        $application_no = $this->input->get('app');//'MB/MUTI/2021/24';//$this->input->get('applid');
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output);
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['sro']=$output->sro;
+        $district['user']=$this->basundharamodel->usersForOffice($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code);
+        $district['recordExist']=$this->basundharamodel->checkExistDharitree($application_no);
+        if($this->session->userdata('user_desig_code')=='AST'){
+            $district['_view'] = 'basundhara/deed_ofc';
+        }elseif($this->session->userdata('user_desig_code')=='LM'){
+            $district['_view'] = 'basundhara/deed';
+        }else{
+            $district['_view'] = 'basundhara/deed_revert';
+        }
+        $this->load->view('layouts/main',$district);
+    }
+    function document($doc){
+        $curl_handle = curl_init();
+        curl_setopt($curl_handle, CURLOPT_URL, RTPS_API_LINK."attachment");
+        curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query(array(
+            'name' => $doc
+        )));
+        $result = curl_exec($curl_handle);
+        $result = json_decode($result);
+        $output=$result->raw_data;
+        $content_type=$result->mime_type;
+        $check=explode("/",$content_type);
+        if($check[1]=='pdf'){
+            $output=base64_decode($output);
+            header('Content-type: application/pdf');
+            echo $output;
+        }else{
+            echo '<img src="data:'.$content_type.';base64,'.$output.'" />';
+        }
+    }
+    
+    function partitionBasu(){
+        $application_no = $this->input->get('app');
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['query']=$output->query;
+        $district['user']=$this->basundharamodel->usersForOffice($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code);
+        $district['recordExist']=$this->basundharamodel->checkExistDharitree($application_no);
+        if($this->session->userdata('user_desig_code')=='AST'){
+            $district['_view'] = 'basundhara/partition_basu_ofc';
+        }elseif($this->session->userdata('user_desig_code')=='LM'){
+           $district['_view'] = 'basundhara/partition_basu';
+        }else{
+           $district['_view'] = 'basundhara/partition_basu_revert';
+        }
+        $this->load->view('layouts/main',$district);
+    }
+    function allotmentBasu(){
+        $application_no = $this->input->get('app');
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['recordExist']=$this->basundharamodel->checkExistDharitree($application_no);
+        if($this->session->userdata('user_desig_code')=='ADC' or $this->session->userdata('user_desig_code')=='CO' or $this->session->userdata('user_desig_code')=='CO'){
+            $district['_view'] = 'basundhara/allotment_basu_revert';
+        }else{
+           $district['_view'] = 'basundhara/allotment_basu';
+        }
+        $this->load->view('layouts/main',$district);
+    }
+    function conversionBasu(){
+        $application_no = $this->input->get('app');
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['user']=$this->basundharamodel->usersForOffice($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code);
+        if(($this->session->userdata('user_desig_code')=='CO') or ($this->session->userdata('user_desig_code')=='ADC')){
+            $district['_view'] = 'basundhara/conversion_basu_revert';
+        }else{
+            $district['_view'] = 'basundhara/conversion_basu';
+        }
+        $this->load->view('layouts/main',$district);
+    }
+    /////////////Inheritance Post///////////
+    function deedPost(){
+        $application_no=$_POST['application_no'];
+        //////////////////
+        $recordExist=$this->basundharamodel->checkExistDharitree($application_no);
+        if($recordExist){
+                $data=array(
+                    'error'=>"Case have been Registered Already. Please Check"
+                );
+                echo json_encode($data);
+                exit;
+        }
+        /////////////////////
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output->application;
+        $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        
+        $data['firstParty']=$output->mutation;
+        $data['secParty']=$output->applicants;
+        //var_dump($data);
+        $this->db->trans_begin();
+        //$case_no=$this->basundharamodel->genearteCaseNo('01');
+
+        $case_name=$this->basundharamodel->genearteCaseName();
+         if(empty($case_name)){
+            $data=array(
+                'error'=>"Network Issue or Seesion Out. Please try Again"
+            );
+            echo json_encode($data);
+            exit;
+            die();
+        }
+        $case_no['petition_no']=$petition_no=$this->basundharamodel->genearteFieldPetitionNo();
+
+        $case_no['case_no']=$case_name.$petition_no."/FMUT";
+
+
+        $basic=array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'date_entry'=>date('Y-m-d'),
+            'case_no'=>$case_no['case_no'],
+            'trans_code'=>'03',
+            'dispute_yn'=>0,
+            'possession_yn'=>'y',
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'report_date'=>date('Y-m-d'),
+            'mut_type'=>'01',                    
+            'operation'=>'E',
+            'user_code'=>$this->session->userdata('user_code'),
+            'noc_no'=>$data['secParty'][0]->noc_no,
+            'noc_date'=>$data['secParty'][0]->noc_date,
+            'reg_deed_no' => $_POST['deed_no'],
+            'deed_value' => $_POST['deed_value'],
+            'reg_deed_date' => $_POST['deed_date']
+        );
+        $this->db->insert('field_mut_basic',$basic);
+        //////Buyer Insert////////////
+        $i=1;
+        foreach($data['firstParty'] as $pet){
+            $faddress=$this->address($pet->address);
+            $buyerInsert = array(
+                'dist_code'=>$data['app']->dist_code,
+                'subdiv_code'=>$data['app']->subdiv_code,
+                'cir_code'=>$data['app']->cir_code,
+                'mouza_pargona_code'=>$data['app']->mouza_code,
+                'lot_no'=>$data['app']->lot_no,
+                'vill_townprt_code'=>$data['app']->village_code,
+                'user_code'=>$this->session->userdata('user_code'),
+                'date_entry'=>date('Y-m-d'),
+                'case_no'=>$case_no['case_no'],
+                'petition_no'=>$case_no['petition_no'],
+                'year_no'=>date('Y'),
+                'operation'=>'E',
+                'pet_name' => $pet->pat_name_ass,
+                'guard_name' => $pet->pat_gurdian_name_ass,
+                'guard_rel' =>$this->utilityclass->relationRevertBasu($data['app']->dist_code,$pet->pat_gurdian_rel_id),/////////////
+                'pet_gender'=>$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$pet->pat_gender),
+                //'add1' => $pet->address,
+                'add1' => $faddress[0],
+                'add2' => $faddress[1],
+                'pet_id' => $i++,
+                'pdar_mobile'=>$pet->pat_mobile_no,
+                'new_pet_name'=>'N'
+            );
+            $this->db->insert('field_mut_petitioner', $buyerInsert);
+        }
+        ////////Seller Insert//////////
+        foreach($data['secParty'] as $pet){
+            //////////////////////////////////
+            if($pet->gurdian_name_ass == '' || $pet->gurdian_name_ass == null){
+                $pet_father_name = $this->getGuardianName($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->village_code,$data['app']->lot_no,$data['app']->dag_no,$this->input->post('patta_no'),$this->input->post('patta_type'),$pet->chitha_pdar_id);
+                if($pet_father_name->num_rows() <= 0){
+                    $this->db->trans_rollback();
+                    $data=array(
+                        'error'=>"Error in submitting.Gurdian Name is Missing. Please try Again"
+                    ); 
+                    return;   
+                }else{
+                    $pet->gurdian_name_ass = trim($pet_father_name->row()->pdar_father);
+                }
+
+            }else{
+                $pet->gurdian_name_ass=$pet->gurdian_name_ass;
+            }
+            ///////////////////////////
+            $sellerInsert = array(
+                'dist_code'=>$data['app']->dist_code,
+                'subdiv_code'=>$data['app']->subdiv_code,
+                'cir_code'=>$data['app']->cir_code,
+                'mouza_pargona_code'=>$data['app']->mouza_code,
+                'lot_no'=>$data['app']->lot_no,
+                'vill_townprt_code'=>$data['app']->village_code,
+                'user_code'=>$this->session->userdata('user_code'),
+                'date_entry'=>date('Y-m-d'),
+                'case_no'=>$case_no['case_no'],
+                'petition_no'=>$case_no['petition_no'],
+                'year_no'=>date('Y'),
+                'operation'=>'E',
+                'dag_no'=>$data['app']->dag_no,
+                'patta_no'=>$this->input->post('patta_no') ,
+                'patta_type_code'  => $this->input->post('patta_type') ,
+                'pdar_id' => $pet->chitha_pdar_id,
+                'pdar_cron_no' => $pet->chitha_pdar_id,
+                'pdar_name' => $pet->name_ass,
+                'pdar_guardian'=>$pet->gurdian_name_ass,
+                'striked_out' =>$_POST[$pet->chitha_pdar_id],/////for inheritance//////
+                'pdar_rel_guar' =>'u',//$this->utilityclass->relationRevertBasu($data['app']->dist_code,$pet->gurdian_relation_id),/////////////
+                'pdar_gender'=>'m',//$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$pet->gender),
+            );
+            //var_dump($sellerInsert);
+            $this->db->insert('field_mut_pattadar', $sellerInsert);
+        }
+        $dagDetails=array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'date_entry'=>date('Y-m-d'),
+            'case_no'=>$case_no['case_no'],
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'operation'=>'E',
+            'dag_no'=>$data['app']->dag_no,
+            'patta_no'=>$this->input->post('patta_no') ,
+            'patta_type_code'  => $this->input->post('patta_type') ,
+            'm_dag_area_b'=>$_POST['mut_area_b'],
+            'm_dag_area_k' =>$_POST['mut_area_k'],
+            'm_dag_area_lc' =>$_POST['mut_area_l'],
+            'm_dag_area_g' =>0,
+            'm_dag_area_kr' =>0,
+            'dag_area_b' =>$data['pattaNo']->dag_area_b,
+            'dag_area_k' =>$data['pattaNo']->dag_area_k,
+            'dag_area_lc' =>$data['pattaNo']->dag_area_lc,  
+            'dag_area_g' =>0,  
+            'dag_area_kr' =>0 ,
+            'remark' =>addslashes(trim($_POST['remark'])),
+            'deed_reg_no'=>$_POST['deed_no'],
+            'deed_date'=>$_POST['deed_date'],
+            'deed_value'=>$_POST['deed_value'],
+            );
+        $this->db->insert('field_mut_dag_details',$dagDetails);
+        $basundhara=array(
+            'dharitree'=>$case_no['case_no'],
+            'basundhara'=>$application_no,
+            'date_reg'=>date('Y-m-d'),
+            'reg_by'=>$this->session->userdata('user_code'),
+            'app_status'=>'P',
+            'pending_with'=>'CO'
+        );
+        $this->db->insert('basundhar_application',$basundhara);
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            $data=array(
+                'error'=>"Error in submitting. Please try Again"
+            );
+        }else
+        {
+            //////////////POST To basundhara/////////////////////
+            $curl_handle = curl_init();
+            curl_setopt($curl_handle, CURLOPT_URL, API_LINK."applicationStatusUpdate");
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query(array(
+                'application' => $application_no,
+                'dharitree' => $case_no['case_no'],
+                'rmk' => 'all ok',
+                'status' => 'M',
+                'task' => 'LM',
+                'pen'=>'CO'
+            )));
+            $result = curl_exec($curl_handle);
+            $this->db->trans_commit();
+            $this->DashboardPartitionField($case_no['case_no']);
+            $this->session->set_flashdata('message',"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no] ");
+            //////////////////////////////////
+            $data=array(
+                'success'=>"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no]",
+                'redirect_url'=>base_url().'index.php/home'
+            );
+        }
+        echo json_encode($data);
+    }
+    ///////////end//////////
+    /////////////Inheritance Post///////////
+    function inheritancePost(){
+        $application_no=$_POST['application_no'];
+        //////////////////
+        $recordExist=$this->basundharamodel->checkExistDharitree($application_no);
+        if($recordExist){
+                $data=array(
+                    'error'=>"Case have been Registered Already. Please Check"
+                );
+                echo json_encode($data);
+                exit;
+        }
+        /////////////////////
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output->application;
+        $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        
+        $data['firstParty']=$output->mutation;
+        $data['secParty']=$output->applicants;
+        $this->db->trans_begin();
+       // $case_no=$this->basundharamodel->genearteCaseNo('01');
+
+        $case_name=$this->basundharamodel->genearteCaseName();
+         if(empty($case_name)){
+            $data=array(
+                'error'=>"Network Issue or Seesion Out. Please try Again"
+            );
+            echo json_encode($data);
+            exit;
+            die();
+        }
+        $case_no['petition_no']=$petition_no=$this->basundharamodel->genearteFieldPetitionNo();
+
+        $case_no['case_no']=$case_name.$petition_no."/FMUT";
+        $basic=array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'date_entry'=>date('Y-m-d'),
+            'case_no'=>$case_no['case_no'],
+            'trans_code'=>'01',
+            'dispute_yn'=>0,
+            'possession_yn'=>$this->input->post('possession'),
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'report_date'=>date('Y-m-d'),
+            'mut_type'=>'01',                    
+            'operation'=>'E',
+            'user_code'=>$this->session->userdata('user_code')
+        );
+        $this->db->insert('field_mut_basic',$basic);
+        //////Buyer Insert////////////
+        $i=1;
+        foreach($data['firstParty'] as $pet){
+            $faddress=$this->address($pet->address);
+            $buyerInsert = array(
+                'dist_code'=>$data['app']->dist_code,
+                'subdiv_code'=>$data['app']->subdiv_code,
+                'cir_code'=>$data['app']->cir_code,
+                'mouza_pargona_code'=>$data['app']->mouza_code,
+                'lot_no'=>$data['app']->lot_no,
+                'vill_townprt_code'=>$data['app']->village_code,
+                'user_code'=>$this->session->userdata('user_code'),
+                'date_entry'=>date('Y-m-d'),
+                'case_no'=>$case_no['case_no'],
+                'petition_no'=>$case_no['petition_no'],
+                'year_no'=>date('Y'),
+                'operation'=>'E',
+                'pet_name' => $pet->pat_name_ass,
+                'guard_name' => $pet->pat_gurdian_name_ass,
+                'guard_rel' =>$this->utilityclass->relationRevertBasu($data['app']->dist_code,$pet->pat_gurdian_rel_id),/////////////
+                'pet_gender'=>$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$pet->pat_gender),
+                //'add1' => $pet->address,
+                'add1' => $faddress[0],
+                'add2' => $faddress[1],
+                'pet_id' => $i++,
+                'pdar_mobile'=>$pet->pat_mobile_no,
+                'new_pet_name'=>'N'
+            );
+            $this->db->insert('field_mut_petitioner', $buyerInsert);
+        }
+        ////////Seller Insert//////////
+        foreach($data['secParty'] as $pet){
+            //////////////////////////////////
+            if($pet->gurdian_name_ass == '' || $pet->gurdian_name_ass == null){
+                $pet_father_name = $this->getGuardianName($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->village_code,$data['app']->lot_no,$data['app']->dag_no,$this->input->post('patta_no'),$this->input->post('patta_type'),$pet->chitha_pdar_id);
+                if($pet_father_name->num_rows() <= 0){
+                    $this->db->trans_rollback();
+                    $data=array(
+                        'error'=>"Error in submitting.Gurdian Name is Missing. Please try Again"
+                    ); 
+                    return;   
+                }else{
+                    $pet->gurdian_name_ass = trim($pet_father_name->row()->pdar_father);
+                }
+
+            }else{
+                $pet->gurdian_name_ass=$pet->gurdian_name_ass;
+            }
+            ///////////////////////////
+            $sellerInsert = array(
+                'dist_code'=>$data['app']->dist_code,
+                'subdiv_code'=>$data['app']->subdiv_code,
+                'cir_code'=>$data['app']->cir_code,
+                'mouza_pargona_code'=>$data['app']->mouza_code,
+                'lot_no'=>$data['app']->lot_no,
+                'vill_townprt_code'=>$data['app']->village_code,
+                'user_code'=>$this->session->userdata('user_code'),
+                'date_entry'=>date('Y-m-d'),
+                'case_no'=>$case_no['case_no'],
+                'petition_no'=>$case_no['petition_no'],
+                'year_no'=>date('Y'),
+                'operation'=>'E',
+                'dag_no'=>$data['app']->dag_no,
+                'patta_no'=>$this->input->post('patta_no') ,
+                'patta_type_code'  => $this->input->post('patta_type') ,
+                'pdar_id' => $pet->chitha_pdar_id,
+                'pdar_cron_no' => $pet->chitha_pdar_id,
+                'pdar_name' => $pet->name_ass,
+                'pdar_guardian'=>$pet->gurdian_name_ass,
+                'pdar_rel_guar' =>'u',//$this->utilityclass->relationRevertBasu($data['app']->dist_code,$pet->gurdian_relation_id),/////////////
+                'pdar_gender'=>'m',//$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$pet->gender),
+                'striked_out' =>1,/////for inheritance//////
+            );
+            //var_dump($sellerInsert);
+            $this->db->insert('field_mut_pattadar', $sellerInsert);
+        }
+        $dagDetails=array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'date_entry'=>date('Y-m-d'),
+            'case_no'=>$case_no['case_no'],
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'operation'=>'E',
+            'dag_no'=>$data['app']->dag_no,
+            'patta_no'=>$this->input->post('patta_no') ,
+            'patta_type_code'  => $this->input->post('patta_type') ,
+            'm_dag_area_b'=>$_POST['mut_area_b'],
+            'm_dag_area_k' =>$_POST['mut_area_k'],
+            'm_dag_area_lc' =>$_POST['mut_area_l'],
+            'm_dag_area_g' =>0,
+            'm_dag_area_kr' =>0,
+            'dag_area_b' =>$data['pattaNo']->dag_area_b,
+            'dag_area_k' =>$data['pattaNo']->dag_area_k,
+            'dag_area_lc' =>$data['pattaNo']->dag_area_lc,  
+            'dag_area_g' =>0,  
+            'dag_area_kr' =>0 ,
+            'remark' =>addslashes(trim($_POST['remark']))
+            );
+        $this->db->insert('field_mut_dag_details',$dagDetails);
+        $basundhara=array(
+            'dharitree'=>$case_no['case_no'],
+            'basundhara'=>$application_no,
+            'date_reg'=>date('Y-m-d'),
+            'reg_by'=>$this->session->userdata('user_code'),
+            'app_status'=>'P',
+            'pending_with'=>'CO'
+        );
+        $this->db->insert('basundhar_application',$basundhara);
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            $data=array(
+                'error'=>"Error in submitting. Please try Again"
+            );
+        }else
+        {
+            //////////////POST To basundhara/////////////////////
+            $curl_handle = curl_init();
+            curl_setopt($curl_handle, CURLOPT_URL, API_LINK."applicationStatusUpdate");
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+            curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query(array(
+                'application' => $application_no,
+                'dharitree' => $case_no['case_no'],
+                'rmk' => 'all ok',
+                'status' => 'M',
+                'task' => 'LM',
+                'pen'=>'CO'
+            )));
+            
+            $this->db->trans_commit();
+            $result = curl_exec($curl_handle);            
+            $this->DashboardPartitionField($case_no['case_no']);
+            $this->session->set_flashdata('message',"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no] ");
+            //////////////////////////////////
+            $data=array(
+                'success'=>"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no]",
+                'redirect_url'=>base_url().'index.php/home'
+            );
+        }
+        echo json_encode($data);
+    }
+    ///////////end//////////
+    ///////////////Partitin Post//////////////////
+    function partitionPost(){
+        $application_no=$_POST['application_no'];
+        //////////////////
+        $recordExist=$this->basundharamodel->checkExistDharitree($application_no);
+        if($recordExist){
+                $data=array(
+                    'error'=>"Case have been Registered Already. Please Check"
+                );
+                echo json_encode($data);
+                exit;
+        }
+        /////////////////////
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output->application;
+        $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        
+        $data['firstParty']=$output->mutation;
+        $this->db->trans_begin();
+        //$case_no=$this->basundharamodel->genearteCaseNo('02');
+
+        $case_name=$this->basundharamodel->genearteCaseName();
+         if(empty($case_name)){
+            $data=array(
+                'error'=>"Network Issue or Seesion Out. Please try Again"
+            );
+            echo json_encode($data);
+            exit;
+            die();
+        }
+        $case_no['petition_no']=$petition_no=$this->basundharamodel->genearteFieldPetitionNo();
+
+        $case_no['case_no']=$case_name.$petition_no."/FPART";
+        $basic=array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'date_entry'=>date('Y-m-d'),
+            'case_no'=>$case_no['case_no'],
+            'trans_code'=>'01',
+            'dispute_yn'=>0,
+            'possession_yn'=>'y',
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'report_date'=>date('Y-m-d'),
+            'mut_type'=>'02',                    
+            'operation'=>'E',
+        );
+        $this->db->insert('field_mut_basic', $basic);
+        $fmd=array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'date_entry'=>date('Y-m-d'),
+            'case_no'=>$case_no['case_no'],
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'operation'=>'E',
+        );
+        $fmd['dag_no']=$data['app']->dag_no;
+        $fmd['patta_no']=$data['pattaNo']->patta_no;
+        $fmd['patta_type_code']=$data['pattaNo']->patta_type_code;
+        $fmd['m_dag_area_b']=$_POST['mut_area_b'];
+        $fmd['m_dag_area_k']=$_POST['mut_area_k'];
+        $fmd['m_dag_area_lc']=$_POST['mut_area_l'];
+        $fmd['dag_area_b']=$data['pattaNo']->dag_area_b;
+        $fmd['dag_area_k']=$data['pattaNo']->dag_area_k;
+        $fmd['dag_area_lc']=$data['pattaNo']->dag_area_lc;
+        $fmd['m_dag_area_g']='0.00';
+        $fmd['m_dag_area_kr']='0';
+        $fmd['dag_area_g']='0';
+        $fmd['dag_area_kr']='0';
+        $fmd['remark'] =addslashes(trim($_POST['remark']));
+        $this->db->insert('field_mut_dag_details',$fmd);
+        $i=1;
+        foreach($data['firstParty'] as $part){
+                    $petitioner=array(
+                            'dist_code'=>$data['app']->dist_code,
+                            'subdiv_code'=>$data['app']->subdiv_code,
+                            'cir_code'=>$data['app']->cir_code,
+                            'mouza_pargona_code'=>$data['app']->mouza_code,
+                            'lot_no'=>$data['app']->lot_no,
+                            'vill_townprt_code'=>$data['app']->village_code,
+                            'user_code'=>$this->session->userdata('user_code'),
+                            'date_entry'=>date('Y-m-d'),
+                            'case_no'=>$case_no['case_no'],
+                            'petition_no'=>$case_no['petition_no'],
+                            'operation'=>'E',
+                            'dag_no' =>$data['app']->dag_no,
+                            'patta_no' =>$data['pattaNo']->patta_no,
+                            'patta_type_code'=>$data['pattaNo']->patta_type_code,
+                            'year_no'=>date('Y'),
+                            'operation'=>'E',
+                            'date_entry'=>date('Y-m-d'),
+                            'pdar_id' =>$part->chitha_pdar_id,
+                            'pdar_cron_no'=>$i++,
+                            'pdar_name' =>$part->name_ass,
+                            'pdar_guardian' =>$part->gurdian_name_ass,
+                            // 'pdar_rel_guar' =>'f',
+                            // 'pdar_gender'=>'m',
+                            'pdar_rel_guar' =>$this->utilityclass->relationRevertBasu($data['app']->dist_code,$part->gurdian_relation_id),/////////////
+                            'pdar_gender'=>$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$part->gender),
+                            'pdar_dag_por_b' =>$part->area_b,
+                            'pdar_dag_por_k' =>$part->area_k,
+                            'pdar_dag_por_lc' =>$part->area_l
+                        );
+            $this->db->insert('field_part_petitioner',$petitioner);
+        }
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            $data=array(
+                'error'=>"Error in submitting. Please try Again"
+            );
+        }else
+        {
+            $basundhara=array(
+            'dharitree'=>$case_no['case_no'],
+            'basundhara'=>$application_no,
+            'date_reg'=>date('Y-m-d'),
+            'reg_by'=>$this->session->userdata('user_code'),
+            'app_status'=>'P',
+            'pending_with'=>'CO'
+            );
+            $this->db->insert('basundhar_application',$basundhara);
+            //////////////POST To basundhara/////////////////////
+            $curl_handle = curl_init();
+            curl_setopt($curl_handle, CURLOPT_URL, API_LINK."applicationStatusUpdate");
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query(array(
+                'application' => $application_no,
+                'dharitree' => $case_no['case_no'],
+                'rmk' => 'all ok',
+                'status' => 'M',
+                'task' => 'LM',
+                'pen'=>'CO'
+            )));
+            $result = curl_exec($curl_handle);
+            $this->db->trans_commit();
+
+            $this->DashboardPartitionField($case_no['case_no']);
+
+            $this->session->set_flashdata('message',"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no] ");
+            //////////////////////////////////
+            $data=array(
+                'success'=>"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no]",
+                'redirect_url'=>base_url().'index.php/home'
+            );
+        }
+        echo json_encode($data);
+    }
+    ///////////end partition post//////////////////
+
+    /////////////////Office Inheritance Mutation/////////////////////////
+    // function inheritanceOfcPost(){
+    //     $application_no=$_POST['application_no'];
+    //     //////////////////
+    //     $recordExist=$this->basundharamodel->checkExistDharitree($application_no);
+    //     if($recordExist){
+    //             $data=array(
+    //                 'error'=>"Case have been Registered Already. Please Check"
+    //             );
+    //             echo json_encode($data);
+    //             exit;
+    //     }
+    //     /////////////////////
+    //     $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+    //     $ch = curl_init();
+    //     curl_setopt($ch, CURLOPT_URL, $url);
+    //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    //         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    //         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+    //     $output = curl_exec($ch);
+    //     curl_close($ch);
+    //     $output = json_decode($output);
+    //     $data['app']=$output->application;
+    //     $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        
+    //     $data['firstParty']=$output->mutation;
+    //     $data['secParty']=$output->applicants;
+    //     //var_dump($data);
+    //     $this->db->trans_begin();
+    //     //$case_no=$this->basundharamodel->genearteOfcCaseNo('03');
+    //     $case_name=$this->basundharamodel->genearteCaseName();        
+    //      if(empty($case_name)){
+    //         $data=array(
+    //             'error'=>"Network Issue or Seesion Out. Please try Again"
+    //         );
+    //         echo json_encode($data);
+    //         exit;
+    //         die();
+    //     }
+    //     $case_no['petition_no']=$petition_no=$this->basundharamodel->genearteOfficePetitionNo();
+    //     $case_no['case_no']=$case_name.$petition_no."/OMUT";
+    //     $basic=array(
+    //         'dist_code'=>$data['app']->dist_code,
+    //         'subdiv_code'=>$data['app']->subdiv_code,
+    //         'cir_code'=>$data['app']->cir_code,
+    //         'mouza_pargona_code'=>$data['app']->mouza_code,
+    //         'lot_no'=>$data['app']->lot_no,
+    //         'vill_townprt_code'=>$data['app']->village_code,
+    //         'user_code'=>$this->session->userdata('user_code'),
+    //         'date_entry'=>date('Y-m-d'),
+    //         'case_no'=>$case_no['case_no'],
+    //         'mut_type'=>'03', /////mut type
+    //         'trans_code'=>'01',/////////for inheritance
+    //         'petition_no'=>$case_no['petition_no'],
+    //         'year_no'=>date('Y'),
+    //         'date_entry' => date('Y-m-d G:i:s'),                 
+    //         'operation'=>'E',
+    //         'user_code'=>$this->session->userdata('user_code'),
+    //         'submission_date' => date('Y-m-d G:i:s'),
+    //         'add_off_name' => $_POST['add_of_name'],
+    //         ///////// 
+    //     );
+    //     $this->db->insert('petition_basic',$basic);
+    //     //////Buyer Insert////////////
+    //     $i=1;
+    //     foreach($data['firstParty'] as $pet){
+    //         $faddress=$this->address($pet->address);
+    //         $buyerInsert = array(
+    //             'dist_code'=>$data['app']->dist_code,
+    //             'subdiv_code'=>$data['app']->subdiv_code,
+    //             'cir_code'=>$data['app']->cir_code,
+    //             'mouza_pargona_code'=>$data['app']->mouza_code,
+    //             'lot_no'=>$data['app']->lot_no,
+    //             'vill_townprt_code'=>$data['app']->village_code,
+    //             'petition_no'=>$case_no['petition_no'],
+    //             'year_no'=>date('Y'),
+    //             'operation'=>'E',
+    //             'pet_name' => $pet->pat_name_ass,
+    //             'guard_name' => $pet->pat_gurdian_name_ass,
+    //             // 'guard_rel' => 'f', //////////////////////to be update
+    //             // 'pet_gender'=>$pet->pat_gender,
+    //             'guard_rel' =>$this->utilityclass->relationRevertBasu($data['app']->dist_code,$pet->pat_gurdian_rel_id),/////////////
+    //             'pet_gender'=>$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$pet->pat_gender),
+    //             'pet_id' => $i++,
+    //             //'add1' => $pet->address,
+    //             'add1' => $faddress[0],
+    //             'add2' => $faddress[1],
+    //             'user_code' => $this->session->userdata('user_code'),
+    //             'date_entry' => date('Y-m-d G:i:s'),
+    //             'operation' => 'E',
+    //             'new_pattadar' => 'N',
+    //             'pet_minor_dob' => date('Y-m-d G:i:s',strtotime($pet->dob)),
+    //             'pdar_mobile' => $pet->pat_mobile_no,
+    //             'applied_b' =>0,
+    //             'applied_k' => 0,
+    //             'applied_lc' => 0
+    //         );
+    //         $this->db->insert('petitioner', $buyerInsert);
+    //     }
+    //     $cron_no=1;
+    //     foreach($data['secParty'] as $pet){
+    //         //////////////////////////////////
+    //         if($pet->gurdian_name_ass == '' || $pet->gurdian_name_ass == null){
+    //             $pet_father_name = $this->getGuardianName($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->village_code,$data['app']->lot_no,$data['app']->dag_no,$this->input->post('patta_no'),$this->input->post('patta_type'),$pet->chitha_pdar_id);
+    //             if($pet_father_name->num_rows() <= 0){
+    //                 $this->db->trans_rollback();
+    //                 $data=array(
+    //                     'error'=>"Error in submitting.Gurdian Name is Missing. Please try Again"
+    //                 ); 
+    //                 return;   
+    //             }else{
+    //                 $pet->gurdian_name_ass = trim($pet_father_name->row()->pdar_father);
+    //             }
+
+    //         }else{
+    //             $pet->gurdian_name_ass=$pet->gurdian_name_ass;
+    //         }
+    //         ///////////////////////////
+    //         $sellerInsert = array(
+    //             'dist_code'=>$data['app']->dist_code,
+    //             'subdiv_code'=>$data['app']->subdiv_code,
+    //             'cir_code'=>$data['app']->cir_code,
+    //             'mouza_pargona_code'=>$data['app']->mouza_code,
+    //             'lot_no'=>$data['app']->lot_no,
+    //             'vill_townprt_code'=>$data['app']->village_code,
+    //             'user_code'=>$this->session->userdata('user_code'),
+    //             'petition_no'=>$case_no['petition_no'],
+    //             'year_no'=>date('Y'),
+    //             'operation'=>'E',
+    //             'dag_no'=>$data['app']->dag_no,
+    //             'patta_no'=>$this->input->post('patta_no') ,
+    //             'patta_type_code'  => $this->input->post('patta_type') ,
+    //             'pdar_id' => $pet->chitha_pdar_id,
+    //             'pdar_cron_no' => $pet->chitha_pdar_id,
+    //             'pdar_name' => $pet->name_ass,
+    //             'pdar_guardian'=>$pet->gurdian_name_ass,
+    //             'pdar_rel_guar' => 'f',
+    //             'striked_out' =>1,/////for inheritance//////
+    //             'dag_no' =>$data['app']->dag_no,
+    //             'patta_no' => $_POST['patta_no'],
+    //             'patta_type_code' => $_POST['patta_type'],
+    //             'pdar_id' =>  $pet->chitha_pdar_id,
+    //             'pdar_cron_no' => $cron_no++,
+    //             'pdar_name' => $pet->name_ass,
+    //             'pdar_guardian' => $pet->gurdian_name_ass,
+    //             //'pdar_gender' => 'm',
+    //             //'pdar_rel_guar' => 'f',
+    //             'pdar_rel_guar' =>'u',//$this->utilityclass->relationRevertBasu($data['app']->dist_code,$pet->gurdian_relation_id),/////////////
+    //             // 'pet_gender'=>$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$pet->gender),
+    //             'date_entry' => date('Y-m-d G:i:s'),
+    //             'operation' => 'E'
+    //         );
+    //        $this->db->insert('petition_pattadar', $sellerInsert);
+    //     }
+    //     $dagDetails=array(
+    //         'dist_code'=>$data['app']->dist_code,
+    //         'subdiv_code'=>$data['app']->subdiv_code,
+    //         'cir_code'=>$data['app']->cir_code,
+    //         'mouza_pargona_code'=>$data['app']->mouza_code,
+    //         'lot_no'=>$data['app']->lot_no,
+    //         'vill_townprt_code'=>$data['app']->village_code,
+    //         'user_code'=>$this->session->userdata('user_code'),
+    //         'date_entry'=>date('Y-m-d'),
+    //         'petition_no'=>$case_no['petition_no'],
+    //         'year_no'=>date('Y'),
+    //         'operation'=>'E',
+    //         'dag_no'=>$data['app']->dag_no,
+    //         'patta_no'=>$this->input->post('patta_no') ,
+    //         'patta_type_code'  => $this->input->post('patta_type') ,
+    //         'm_dag_area_b'=>$_POST['mut_area_b'],
+    //         'm_dag_area_k' =>$_POST['mut_area_k'],
+    //         'm_dag_area_lc' =>$_POST['mut_area_l'],
+    //         'm_dag_area_g' =>0,
+    //         'm_dag_area_kr' =>0,
+    //         'dag_area_b' =>$data['pattaNo']->dag_area_b,
+    //         'dag_area_k' =>$data['pattaNo']->dag_area_k,
+    //         'dag_area_lc' =>$data['pattaNo']->dag_area_lc,  
+    //         'dag_area_g' =>0,  
+    //         'dag_area_kr' =>0
+    //         );
+    //        $this->db->insert('petition_dag_details',$dagDetails);
+    //        $basundhara=array(
+    //             'dharitree'=>$case_no['case_no'],
+    //             'basundhara'=>$application_no,
+    //             'date_reg'=>date('Y-m-d'),
+    //             'reg_by'=>$this->session->userdata('user_code'),
+    //             'app_status'=>'P',
+    //             'pending_with'=>'CO'
+    //         );
+    //         $this->db->insert('basundhar_application',$basundhara);
+    //         if($this->db->trans_status()==FALSE){
+    //             $this->db->trans_rollback();
+    //             $data=array(
+    //                 'error'=>"Error in submitting. Please try Again"
+    //             );
+    //         }else
+    //         {
+    //         //////////////POST To basundhara/////////////////////
+    //         $rmk='Forwarded to CO';
+    //         $status='M';
+    //         $task='AST';
+    //         $pen='CO';
+    //         $case=$case_no['case_no'];
+    //         $this->basundharamodel->postApiBasundhara($application_no,$case,$rmk,$status,$task,$pen);
+    //         //////////////////
+            
+    //         $this->db->trans_commit();
+    //         $this->DashboardInheritance($case_no['case_no']);
+
+    //         $this->session->set_flashdata('message',"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no] ");
+    //         //////////////////////////////////
+    //         $data=array(
+    //             'success'=>"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no]",
+    //             'redirect_url'=>base_url().'index.php/home'
+    //         );
+    //     }
+    //     echo json_encode($data);
+    // }
+    function inheritanceOfcPost(){
+    //*****************payload-validation********************//
+    $om_register = [
+        [
+            'field' => 'mut_area_b',
+            'label' => 'Muted Area Bigha',
+            'rules' => 'required|integer|less_than_equal_to[32,766]|greater_than_equal_to[0]'
+        ],
+        [
+            'field' => 'mut_area_k',
+            'label' => 'Muted Area Katha',
+            'rules' => 'required|integer|less_than_equal_to[32,766]|greater_than_equal_to[0]'
+        ],
+        [
+            'field' => 'mut_area_l',
+            'label' => 'Muted Area Lessa',
+            'rules' => 'required|numeric||greater_than_equal_to[0]|less_than_equal_to[131,000]'
+        ],
+        [
+            'field' => 'application_no',
+            'label' => 'Application No',
+            'rules' => 'required|callback_check_script|trim|xss_clean'
+        ],
+        [
+            'field' => 'patta_type',
+            'label' => 'patta type',
+            'rules' => 'required|callback_check_script|max_length[4]|trim|xss_clean'
+        ],
+        [
+            'field' => 'patta_no',
+            'label' => 'patta no',
+            'rules' => 'required|callback_check_script|max_length[20]|trim|xss_clean'
+        ],
+        [
+            'field' => 'add_of_name',
+            'label' => 'add_of_name',
+            'rules' => 'required|callback_check_script|max_length[100]|trim|xss_clean'
+        ],
+    ];
+    $this->form_validation->set_message('check_script','Please Fill The %s Correctly!');
+    $this->form_validation->set_rules($om_register);
+    if ($this->form_validation->run() == FALSE)
+    {
+        $error_msg = array();
+        foreach($om_register as $rule){
+            if (form_error($rule['field'])) {
+                array_push($error_msg, form_error($rule['field']));
+            }
+        }
+        $data=array(
+            'error'=>$error_msg
+        );
+        echo json_encode($data);
+        exit;
+    }
+    //***********************************************************************//
+    $application_no=$_POST['application_no'];
+    //////////////////
+    $recordExist=$this->rtpsmodel->checkExistDharitree($application_no);
+    if($recordExist){
+        $data=array(
+            'error'=>"Case have been Registered Already. Please Check"
+        );
+        echo json_encode($data);
+        exit;
+    }
+    /////////////////////
+    $url = RTPS_API_LINK."serviceResponse?application_no=" . $application_no ;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+    $output = curl_exec($ch);
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    if($httpcode != 200){
+        $data=array(
+            'error'=>"Network-Issue. Please try Again, Error-Code : #OMAF_002"
+        );
+        echo json_encode($data);
+        log_message("error", "#OMAF_002, Curl-Error in '".RTPS_API_LINK."ServiceResponse?application_no=' With Application-Id : ".$application_no);
+        exit;
+    }
+    $output = json_decode($output);
+    $data['app']=$output->application;
+    $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+    $data['firstParty']=$output->mutation;
+    $data['secParty']=$output->applicants;
+    //var_dump($data);
+    $this->db->trans_begin();
+    //$case_no=$this->rtpsmodel->genearteOfcCaseNo('03');
+    $case_name=$this->rtpsmodel->genearteCaseName();
+    $case_no['petition_no']=$petition_no=$this->rtpsmodel->genearteOfficePetitionNo();
+    if(empty($case_name)){
+        $data=array(
+            'error'=>"Network Issue or Seesion Out. Please try Again, Error-Code : #OMAF_001"
+        );
+        log_message("error", "#OMAF_001, Case-No Not Generated With Application-Id : ".$application_no);
+        echo json_encode($data);
+        exit;
+    }
+    $case_no['petition_no']=$petition_no=$this->basundharamodel->genearteOfficePetitionNo();
+    if(empty($petition_no)){
+        $data=array(
+            'error'=>"Some Error Occured. Please try Again, Error-Code : #OMAF_003"
+        );
+        log_message("error", "#OMAF_003, Petition-No Not Generated With Application-Id : ".$application_no);
+        echo json_encode($data);
+        exit;
+    }
+    $case_no['case_no']=$case_name.$petition_no."/OMUT";
+    $basic=array(
+        'dist_code'=>$data['app']->dist_code,
+        'subdiv_code'=>$data['app']->subdiv_code,
+        'cir_code'=>$data['app']->cir_code,
+        'mouza_pargona_code'=>$data['app']->mouza_code,
+        'lot_no'=>$data['app']->lot_no,
+        'vill_townprt_code'=>$data['app']->village_code,
+        'user_code'=>$this->session->userdata('user_code'),
+        'date_entry'=>date('Y-m-d'),
+        'case_no'=>$case_no['case_no'],
+        'mut_type'=>'03', /////mut type
+        'trans_code'=>'01',/////////for inheritance
+        'petition_no'=>$case_no['petition_no'],
+        'year_no'=>date('Y'),
+        'date_entry' => date('Y-m-d G:i:s'),
+        'operation'=>'E',
+        'user_code'=>$this->session->userdata('user_code'),
+        'submission_date' => date('Y-m-d G:i:s'),
+        'add_off_name' => $_POST['add_of_name'],
+        /////////
+    );
+    $insPetBasic = $this->db->insert('petition_basic',$basic);
+    if($insPetBasic != 1)
+    {
+        $this->db->trans_rollback();
+        log_message('error', '#ERROMUTI001: Insertion failed in petition_basic RTPS Case No '.$application_no);
+        $data = array(
+            'error'=>"#ERROMUTI001: Registration of Office Mutation by Inheritance failed for case no : ".$application_no
+        );
+        echo json_encode($data);
+        return false;
+    }
+    //////Buyer Insert////////////
+    $i=1;
+    foreach($data['firstParty'] as $pet){
+        $faddress=$this->address($pet->address);
+        $buyerInsert = array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'operation'=>'E',
+            'pet_name' => $pet->pat_name_ass,
+            'guard_name' => $pet->pat_gurdian_name_ass,
+            // 'guard_rel' => 'f', //////////////////////to be update
+            // 'pet_gender'=>$pet->pat_gender,
+            'guard_rel' =>$this->utilityclass->relationRevertBasu($data['app']->dist_code,$pet->pat_gurdian_rel_id),/////////////
+            'pet_gender'=>$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$pet->pat_gender),
+            'pet_id' => $i++,
+            //'add1' => $pet->address,
+            'add1' => $faddress[0],
+            'add2' => $faddress[1],
+            'user_code' => $this->session->userdata('user_code'),
+            'date_entry' => date('Y-m-d G:i:s'),
+            'operation' => 'E',
+            'new_pattadar' => 'N',
+            'pet_minor_dob' => date('Y-m-d G:i:s',strtotime($pet->dob)),
+            'pdar_mobile' => $pet->pat_mobile_no,
+            'applied_b' =>0,
+            'applied_k' => 0,
+            'applied_lc' => 0
+        );
+        $insPetitioner = $this->db->insert('petitioner', $buyerInsert);
+        if($insPetitioner != 1)
+        {
+            $this->db->trans_rollback();
+            log_message('error', '#ERROMUTI002: Insertion failed in petitioner for RTPS Case No '.$application_no);
+            $data = array(
+                'error'=>"#ERROMUTI002: Registration of Office Mutation by Inheritance failed for case no : ".$application_no
+            );
+            echo json_encode($data);
+            return false;
+        }
+    }
+    $cron_no=1;
+    foreach($data['secParty'] as $pet){
+        $sellerInsert = array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'operation'=>'E',
+            'dag_no'=>$data['app']->dag_no,
+            'patta_no'=>$this->input->post('patta_no') ,
+            'patta_type_code' => $this->input->post('patta_type') ,
+            'pdar_id' => $pet->chitha_pdar_id,
+            'pdar_cron_no' => $pet->chitha_pdar_id,
+            'pdar_name' => $pet->name_ass,
+            'pdar_guardian'=>$pet->gurdian_name_ass,
+            'pdar_rel_guar' => 'f',
+            'striked_out' =>1,/////for inheritance//////
+            'dag_no' =>$data['app']->dag_no,
+            'patta_no' => $_POST['patta_no'],
+            'patta_type_code' => $_POST['patta_type'],
+            'pdar_id' => $pet->chitha_pdar_id,
+            'pdar_cron_no' => $cron_no++,
+            'pdar_name' => $pet->name_ass,
+            'pdar_guardian' => $pet->gurdian_name_ass,
+            //'pdar_gender' => 'm',
+            //'pdar_rel_guar' => 'f',
+            'pdar_rel_guar' =>'u',//$this->utilityclass->relationRevertBasu($data['app']->dist_code,$pet->gurdian_relation_id),/////////////
+            // 'pet_gender'=>$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$pet->gender),
+            'date_entry' => date('Y-m-d G:i:s'),
+            'operation' => 'E'
+        );
+        $insPetPattadar = $this->db->insert('petition_pattadar', $sellerInsert);
+        if($insPetPattadar != 1)
+        {
+            $this->db->trans_rollback();
+            log_message('error', '#ERROMUTI003: Insertion failed in petition_pattadar for RTPS Case No '.$application_no);
+            $data = array(
+                'error'=>"#ERROMUTI003: Registration of Office Mutation by Inheritance failed for case no : ".$application_no
+            );
+            echo json_encode($data);
+            return false;
+        }
+    }
+    $dagDetails=array(
+        'dist_code'=>$data['app']->dist_code,
+        'subdiv_code'=>$data['app']->subdiv_code,
+        'cir_code'=>$data['app']->cir_code,
+        'mouza_pargona_code'=>$data['app']->mouza_code,
+        'lot_no'=>$data['app']->lot_no,
+        'vill_townprt_code'=>$data['app']->village_code,
+        'user_code'=>$this->session->userdata('user_code'),
+        'date_entry'=>date('Y-m-d'),
+        'petition_no'=>$case_no['petition_no'],
+        'year_no'=>date('Y'),
+        'operation'=>'E',
+        'dag_no'=>$data['app']->dag_no,
+        'patta_no'=>$this->input->post('patta_no') ,
+        'patta_type_code' => $this->input->post('patta_type') ,
+        'm_dag_area_b'=>$_POST['mut_area_b'],
+        'm_dag_area_k' =>$_POST['mut_area_k'],
+        'm_dag_area_lc' =>$_POST['mut_area_l'],
+        'm_dag_area_g' =>0,
+        'm_dag_area_kr' =>0,
+        'dag_area_b' =>$data['pattaNo']->dag_area_b,
+        'dag_area_k' =>$data['pattaNo']->dag_area_k,
+        'dag_area_lc' =>$data['pattaNo']->dag_area_lc,
+        'dag_area_g' =>0,
+        'dag_area_kr' =>0
+    );
+    $insPetDag = $this->db->insert('petition_dag_details',$dagDetails);
+    if($insPetDag != 1)
+    {
+        $this->db->trans_rollback();
+        log_message('error', '#ERROMUTI004: Insertion failed in petition_dag_details for RTPS Case No '.$application_no);
+        $data = array(
+            'error'=>"#ERROMUTI004: Registration of Office Mutation by Inheritance failed for case no : ".$application_no
+        );
+        echo json_encode($data);
+        return false;
+    }
+    $basundhara=array(
+        'dharitree'=>$case_no['case_no'],
+        'basundhara'=>$application_no,
+        'date_reg'=>date('Y-m-d'),
+        'reg_by'=>$this->session->userdata('user_code'),
+        'app_status'=>'P',
+        'pending_with'=>'CO'
+    );
+    $insBasu = $this->db->insert('basundhar_application',$basundhara);
+    if($insBasu != 1)
+    {
+        $this->db->trans_rollback();
+        log_message('error', '#ERROMUTI005: Insertion failed in basundhar_application for RTPS Case No '.$application_no);
+        $data = array(
+            'error'=>"#ERROMUTI005: Registration of Office Mutation by Inheritance failed for case no : ".$application_no
+        );
+        echo json_encode($data);
+        return false;
+    }
+
+    if($this->db->trans_status()==FALSE){
+        $this->db->trans_rollback();
+        $data=array(
+            'error'=>"Error in submitting. Please try Again"
+        );
+    }
+    else
+    {
+        $this->db->trans_commit();
+        //////////////POST To rtps/////////////////////
+        $rmk='Forwarded to CO';
+        $status='M';
+        $task='AST';
+        $pen='CO';
+        $case=$case_no['case_no'];
+        $this->rtpsmodel->postApiBasundhara($application_no,$case,$rmk,$status,$task,$pen);
+        //////////////////
+
+        $this->DashboardInheritance($case_no['case_no']);
+
+        $this->session->set_flashdata('message',"Application Forwarded to Circle Officer Successfully with case no ".$case_no['case_no']);
+        //////////////////////////////////
+        $data=array(
+            'success'=>"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no]",
+            'redirect_url'=>base_url().'index.php/home'
+        );
+    }
+    echo json_encode($data);
+}
+    function deedofcPost(){
+        $application_no=$_POST['application_no'];
+        //////////////////
+        $recordExist=$this->basundharamodel->checkExistDharitree($application_no);
+        if($recordExist){
+                $data=array(
+                    'error'=>"Case have been Registered Already. Please Check"
+                );
+                echo json_encode($data);
+                exit;
+        }
+        /////////////////////
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output->application;
+        $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        
+        $data['firstParty']=$output->mutation;
+        $data['secParty']=$output->applicants;
+        //var_dump($data);
+        $this->db->trans_begin();
+        //$case_no=$this->basundharamodel->genearteOfcCaseNo('03');
+
+        $case_name=$this->basundharamodel->genearteCaseName();
+         if(empty($case_name)){
+            $data=array(
+                'error'=>"Network Issue or Seesion Out. Please try Again"
+            );
+            echo json_encode($data);
+            exit;
+            die();
+        }
+        $case_no['petition_no']=$petition_no=$this->basundharamodel->genearteOfficePetitionNo();
+
+        $case_no['case_no']=$case_name.$petition_no."/OMUT";
+        $basic=array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'date_entry'=>date('Y-m-d'),
+            'case_no'=>$case_no['case_no'],
+            'mut_type'=>'03', /////mut type
+            'trans_code'=>'03',//////sale deed
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'date_entry' => date('Y-m-d G:i:s'),                 
+            'operation'=>'E',
+            'user_code'=>$this->session->userdata('user_code'),
+            'submission_date' => date('Y-m-d G:i:s'),
+            'add_off_name' => $_POST['add_of_name'],
+            'noc_no'=>$data['secParty'][0]->noc_no,
+            'noc_date'=>$data['secParty'][0]->noc_date,
+            'deed_no' => $_POST['deed_no'],
+            'deed_value' => $_POST['deed_value'],
+            'deed_date' => $_POST['deed_date']
+        );
+        $this->db->insert('petition_basic',$basic);
+
+        //////Buyer Insert////////////
+        $i=1;
+        foreach($data['firstParty'] as $pet){
+            $faddress=$this->address($pet->address);
+            $buyerInsert = array(
+                'dist_code'=>$data['app']->dist_code,
+                'subdiv_code'=>$data['app']->subdiv_code,
+                'cir_code'=>$data['app']->cir_code,
+                'mouza_pargona_code'=>$data['app']->mouza_code,
+                'lot_no'=>$data['app']->lot_no,
+                'vill_townprt_code'=>$data['app']->village_code,
+                'petition_no'=>$case_no['petition_no'],
+                'year_no'=>date('Y'),
+                'operation'=>'E',
+                'pet_name' => $pet->pat_name_ass,
+                'guard_name' => $pet->pat_gurdian_name_ass,
+                // 'guard_rel' => 'f', //////////////////////to be update
+                // 'pet_gender'=>$pet->pat_gender,
+                'guard_rel' =>$this->utilityclass->relationRevertBasu($data['app']->dist_code,$pet->pat_gurdian_rel_id),/////////////
+                'pet_gender'=>$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$pet->pat_gender),
+                'pet_id' => $i++,
+                //'add1' => $pet->address,
+                'add1' => $faddress[0],
+                'add2' => $faddress[1],
+                'user_code' => $this->session->userdata('user_code'),
+                'date_entry' => date('Y-m-d G:i:s'),
+                'operation' => 'E',
+                'new_pattadar' => 'N',
+                'pet_minor_dob' => date('Y-m-d G:i:s',strtotime($pet->dob)),
+                'pdar_mobile' => $pet->pat_mobile_no,
+                'applied_b' =>0,
+                'applied_k' => 0,
+                'applied_lc' => 0
+            );
+            $this->db->insert('petitioner', $buyerInsert);
+        }
+        $cron_no=1;
+        foreach($data['secParty'] as $pet){
+            //////////////////////////////////
+            if($pet->gurdian_name_ass == '' || $pet->gurdian_name_ass == null){
+                $pet_father_name = $this->getGuardianName($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->village_code,$data['app']->lot_no,$data['app']->dag_no,$this->input->post('patta_no'),$this->input->post('patta_type'),$pet->chitha_pdar_id);
+                if($pet_father_name->num_rows() <= 0){
+                    $this->db->trans_rollback();
+                    $data=array(
+                        'error'=>"Error in submitting.Gurdian Name is Missing. Please try Again"
+                    ); 
+                    return;   
+                }else{
+                    $pet->gurdian_name_ass = trim($pet_father_name->row()->pdar_father);
+                }
+
+            }else{
+                $pet->gurdian_name_ass=$pet->gurdian_name_ass;
+            }
+            ///////////////////////////
+            $sellerInsert = array(
+                'dist_code'=>$data['app']->dist_code,
+                'subdiv_code'=>$data['app']->subdiv_code,
+                'cir_code'=>$data['app']->cir_code,
+                'mouza_pargona_code'=>$data['app']->mouza_code,
+                'lot_no'=>$data['app']->lot_no,
+                'vill_townprt_code'=>$data['app']->village_code,
+                'user_code'=>$this->session->userdata('user_code'),
+                'petition_no'=>$case_no['petition_no'],
+                'year_no'=>date('Y'),
+                'operation'=>'E',
+                'dag_no'=>$data['app']->dag_no,
+                'patta_no'=>$this->input->post('patta_no') ,
+                'patta_type_code'  => $this->input->post('patta_type') ,
+                'pdar_id' => $pet->chitha_pdar_id,
+                'pdar_cron_no' => $pet->chitha_pdar_id,
+                'pdar_name' => $pet->name_ass,
+                'pdar_guardian'=>$pet->gurdian_name_ass,
+                'dag_no' =>$data['app']->dag_no,
+                'patta_no' => $_POST['patta_no'],
+                'patta_type_code' => $_POST['patta_type'],
+                'pdar_id' =>  $pet->chitha_pdar_id,
+                'pdar_cron_no' => $cron_no++,
+                'pdar_name' => $pet->name_ass,
+                'pdar_guardian' => $pet->gurdian_name_ass,
+                //'pdar_rel_guar' => 'f',
+                'pdar_rel_guar' =>'u',//$this->utilityclass->relationRevertBasu($data['app']->dist_code,$pet->gurdian_relation_id),/////////////
+                'pdar_gender'=>'m',//$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$pet->gender),
+                'date_entry' => date('Y-m-d G:i:s'),
+                'operation' => 'E'
+            );
+           $this->db->insert('petition_pattadar', $sellerInsert);
+        }
+        $dagDetails=array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'date_entry'=>date('Y-m-d'),
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'operation'=>'E',
+            'dag_no'=>$data['app']->dag_no,
+            'patta_no'=>$this->input->post('patta_no') ,
+            'patta_type_code'  => $this->input->post('patta_type') ,
+            'm_dag_area_b'=>floor($_POST['mut_area_b']),
+            'm_dag_area_k' =>$_POST['mut_area_k'],
+            'm_dag_area_lc' =>$_POST['mut_area_l'],
+            'm_dag_area_g' =>0,
+            'm_dag_area_kr' =>0,
+            'dag_area_b' =>$data['pattaNo']->dag_area_b,
+            'dag_area_k' =>$data['pattaNo']->dag_area_k,
+            'dag_area_lc' =>$data['pattaNo']->dag_area_lc,  
+            'dag_area_g' =>0,  
+            'dag_area_kr' =>0
+            );
+           $this->db->insert('petition_dag_details',$dagDetails);
+           $basundhara=array(
+                'dharitree'=>$case_no['case_no'],
+                'basundhara'=>$application_no,
+                'date_reg'=>date('Y-m-d'),
+                'reg_by'=>$this->session->userdata('user_code'),
+                'app_status'=>'P',
+                'pending_with'=>'CO'
+            );
+            $this->db->insert('basundhar_application',$basundhara);
+            if($this->db->trans_status()==FALSE){
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=>"Error in submitting. Please try Again"
+                );
+            }else
+            {
+            //////////////POST To basundhara/////////////////////
+            $rmk='Forwarded to CO';
+            $status='M';
+            $task='AST';
+            $pen='CO';
+            $case=$case_no['case_no'];
+            $this->basundharamodel->postApiBasundhara($application_no,$case,$rmk,$status,$task,$pen);
+            //////////////////
+            
+            $this->db->trans_commit();
+
+            $this->DashboardInheritance($case_no['case_no']);
+
+            $this->session->set_flashdata('message',"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no] ");
+            //////////////////////////////////
+            $data=array(
+                'success'=>"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no]",
+                'redirect_url'=>base_url().'index.php/home'
+            );
+        }
+        echo json_encode($data);
+    }
+    function partitionPostOfc(){
+        $application_no=$_POST['application_no'];
+        //////////////////
+        $recordExist=$this->basundharamodel->checkExistDharitree($application_no);
+        if($recordExist){
+                $data=array(
+                    'error'=>"Case have been Registered Already. Please Check"
+                );
+                echo json_encode($data);
+                exit;
+        }
+        /////////////////////
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output->application;
+        $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        
+        $data['firstParty']=$output->mutation;
+        $this->db->trans_begin();
+        //$case_no=$this->basundharamodel->genearteOfcCaseNo('04');
+
+        $case_name=$this->basundharamodel->genearteCaseName();
+         if(empty($case_name)){
+            $data=array(
+                'error'=>"Network Issue or Seesion Out. Please try Again"
+            );
+            echo json_encode($data);
+            exit;
+            die();
+        }
+        $case_no['petition_no']=$petition_no=$this->basundharamodel->genearteOfficePetitionNo();
+
+        $case_no['case_no']=$case_name.$petition_no."/OPART";
+        $basic=array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'date_entry'=>date('Y-m-d'),
+            'case_no'=>$case_no['case_no'],
+            'mut_type'=>'04',                    
+            'operation'=>'E',
+            'submission_date' => date('Y-m-d G:i:s'),
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'add_off_name' => $_POST['add_of_name'],
+            'add_off_desig' => 'CO',
+            'co_user_code' => $_POST['add_of_name'],
+            'complete_partition_yn' => 'Y',
+        );
+
+        $this->db->insert('petition_basic', $basic);
+
+        $fmd=array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'date_entry'=>date('Y-m-d'),
+            'case_no'=>$case_no['case_no'],
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'operation'=>'E',
+        );
+        $fmd['dag_no']=$data['app']->dag_no;
+        $fmd['patta_no']=$data['pattaNo']->patta_no;
+        $fmd['patta_type_code']=$data['pattaNo']->patta_type_code;
+        $fmd['m_dag_area_b']=$_POST['mut_area_b'];
+        $fmd['m_dag_area_k']=$_POST['mut_area_k'];
+        $fmd['m_dag_area_lc']=$_POST['mut_area_l'];
+        $fmd['dag_area_b']=$data['pattaNo']->dag_area_b;
+        $fmd['dag_area_k']=$data['pattaNo']->dag_area_k;
+        $fmd['dag_area_lc']=$data['pattaNo']->dag_area_lc;
+        $fmd['m_dag_area_g']='0.00';
+        $fmd['m_dag_area_kr']='0';
+        $fmd['dag_area_g']='0';
+        $fmd['dag_area_kr']='0';
+        $this->db->insert('petition_dag_details',$fmd);
+        $i=1;
+        foreach($data['firstParty'] as $part){
+        $petitioner=array(
+                'dist_code'=>$data['app']->dist_code,
+                'subdiv_code'=>$data['app']->subdiv_code,
+                'cir_code'=>$data['app']->cir_code,
+                'mouza_pargona_code'=>$data['app']->mouza_code,
+                'lot_no'=>$data['app']->lot_no,
+                'vill_townprt_code'=>$data['app']->village_code,
+                'user_code'=>$this->session->userdata('user_code'),
+                'date_entry'=>date('Y-m-d'),
+                'case_no'=>$case_no['case_no'],
+                'petition_no'=>$case_no['petition_no'],
+                'operation'=>'E',
+                'dag_no' =>$data['app']->dag_no,
+                'patta_no' =>$data['pattaNo']->patta_no,
+                'patta_type_code'=>$data['pattaNo']->patta_type_code,
+                'year_no'=>date('Y'),
+                'date_entry'=>date('Y-m-d'),
+
+                'pdar_id' =>$part->chitha_pdar_id,
+                'pdar_cron_no'=>$i++,
+                'pdar_name' =>$part->name_ass,
+                'pdar_guardian' =>$part->gurdian_name_ass,
+                //'pdar_rel_guar' =>'f',/////////////
+                //'pdar_gender'=>$part->gender,
+                'pdar_rel_guar' =>$this->utilityclass->relationRevertBasu($data['app']->dist_code,$part->gender),/////////////
+                'pdar_gender'=>$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$part->gurdian_relation_id),
+                //'pdar_add1' => $part->address,
+                // 'pdar_add1' => substr($part->address,0,90),
+                // 'pdar_add2' => substr($part->address,90,150),
+                'pdar_strike' => 'N',
+                'is_converted_pattadar' => 'N',
+                'pdar_mobile' => $part->mobile,
+            );
+            $this->db->insert('petitioner_part',$petitioner);
+            }
+            if($this->db->trans_status()==FALSE){
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=>"Error in submitting. Please try Again"
+                );
+            }else
+            {
+            $basundhara=array(
+            'dharitree'=>$case_no['case_no'],
+            'basundhara'=>$application_no,
+            'date_reg'=>date('Y-m-d'),
+            'reg_by'=>$this->session->userdata('user_code'),
+            'app_status'=>'P',
+            'pending_with'=>'CO'
+            );
+
+            $this->db->insert('basundhar_application',$basundhara);
+            $this->db->trans_commit();
+
+            $this->DashboardPartitionofc($case_no['case_no']);
+            //////////////POST To basundhara/////////////////////
+            $rmk='Forwarded to CO';
+            $status='M';
+            $task='AST';
+            $pen='CO';
+            $case=$case_no['case_no'];
+            $this->basundharamodel->postApiBasundhara($application_no,$case,$rmk,$status,$task,$pen);
+            //////////////////
+            $this->session->set_flashdata('message',"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no] ");
+            //////////////////////////////////
+            $data=array(
+                'success'=>"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no]",
+                'redirect_url'=>base_url().'index.php/home'
+            );
+        }
+        echo json_encode($data);
+    }
+    //////Allotment Post////////
+    function allotmentPost(){
+        $application_no=$_POST['application_no'];
+        //////////////////
+        $recordExist=$this->basundharamodel->checkExistDharitree($application_no);
+        if($recordExist){
+                $data=array(
+                    'error'=>"Case have been Registered Already. Please Check"
+                );
+                echo json_encode($data);
+                exit;
+        }
+        /////////////////////
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output->application;
+        $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        $data['firstParty']=$output->mutation;
+        $this->db->trans_begin();
+        //$case_no=$this->basundharamodel->generateAllomentcase('04');
+
+        $case_name=$this->basundharamodel->genearteCaseName();
+         if(empty($case_name)){
+            $data=array(
+                'error'=>"Network Issue or Seesion Out. Please try Again"
+            );
+            echo json_encode($data);
+            exit;
+            die();
+        }
+        $case_no['petition_no']=$petition_no=$this->basundharamodel->genearteAlotPetitionNo();
+
+        $case_no['case_no']=$case_name.$petition_no."/ACPP";
+
+        $allotment_basic = array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'circle_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'year_no'=>date('Y'),
+            'date_entry'=>date('Y-m-d'),
+            'case_no'=>$case_no['case_no'],
+            'allotment_under' => $data['firstParty'][0]->scheme_id,
+            'petition_no' => $case_no['petition_no'],
+            'original_alotee' => $data['firstParty'][0]->is_original,
+            'name_of_allote' => $data['firstParty'][0]->allotee_name,
+            'type_govt_land' => $data['firstParty'][0]->land_type,
+        );
+        $this->db->insert('allotment_cert_basic', $allotment_basic);
+        $alotid = 1;
+        foreach ($data['firstParty'] as $mp) {
+            $allotment_petitioner = array(
+                'dist_code'=>$data['app']->dist_code,
+                'subdiv_code'=>$data['app']->subdiv_code,
+                'circle_code'=>$data['app']->cir_code,
+                'mouza_pargona_code'=>$data['app']->mouza_code,
+                'lot_no'=>$data['app']->lot_no,
+                'vill_townprt_code'=>$data['app']->village_code,
+                'case_no'=>$case_no['case_no'],
+                'year_no'=>date('Y'),
+                'alotee_id' => $alotid,
+                'alotee_name' => $mp->name_ass,
+                //'alotee_gender' => $mp->gender,
+                //'alotee_reln' => $mp->gurdian_relation_id,
+                'alotee_reln' =>$this->utilityclass->relationRevertBasu($data['app']->dist_code,$mp->gender),/////////////
+                'alotee_gender'=>$mp->gurdian_relation_id,//$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$mp->gurdian_relation_id),
+                'alotee_gurdian' => $mp->gurdian_name_ass,
+                'alotee_mobile' => $mp->mobile,
+                'date_entry' => date('Y-m-d'),
+            );
+            $this->db->insert('allotment_petitioner', $allotment_petitioner);
+            $alotid = $alotid + 1;
+        }
+        $allotment_dag = array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'circle_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'case_no'=>$case_no['case_no'],
+            'year_no'=>date('Y'),
+            'dag_no' =>$data['app']->dag_no,
+            'patta_no' =>$data['pattaNo']->patta_no,
+            'patta_type_code'=>$data['pattaNo']->patta_type_code,
+            'alot_area_b' => $_POST['mut_area_b'],
+            'alot_area_k' =>$_POST['mut_area_k'],
+            'alot_area_lc' => $_POST['mut_area_l'],
+            'tot_area_b' => $data['pattaNo']->dag_area_b,
+            'tot_area_k' => $data['pattaNo']->dag_area_k,
+            'tot_area_lc' => $data['pattaNo']->dag_area_lc,
+            'date_entry' => date('Y-m-d')
+        );
+        $this->db->insert('allotment_pet_dag', $allotment_dag);
+        $allotment_doc_details = array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'circle_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'case_no'=>$case_no['case_no'],
+            'year_no'=>date('Y'),
+            'certficate_no' => $data['firstParty'][0]->order_no,
+            'date_of_issue' => $data['firstParty'][0]->order_date, //$cert_date,
+            'name_of_certificate' => 'Basundhara Allotment',
+            'date_of_entry' => date('Y-m-d H:i:s'),
+            //'file_name' => $escaped
+        );
+        $this->db->insert('allotment_doc_details', $allotment_doc_details);
+        if($this->db->trans_status()==FALSE){
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=>"Error in submitting. Please try Again"
+                );
+        }else
+        {
+        $basundhara=array(
+            'dharitree'=>$case_no['case_no'],
+            'basundhara'=>$application_no,
+            'date_reg'=>date('Y-m-d'),
+            'reg_by'=>$this->session->userdata('user_code'),
+            'app_status'=>'P',
+            'pending_with'=>'CO'
+            );
+        $this->db->insert('basundhar_application',$basundhara);
+        $this->db->trans_commit();
+
+         $this->DashboardAllot($case_no['case_no']);
+        //////////////POST To basundhara/////////////////////
+        $rmk='Forwarded to CO';
+        $status='M';
+        $task='AST';
+        $pen='CO';
+        $case=$case_no['case_no'];
+        $this->basundharamodel->postApiBasundhara($application_no,$case,$rmk,$status,$task,$pen);
+        //////////////////
+        $this->session->set_flashdata('message',"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no] ");
+        //////////////////////////////////
+        $data=array(
+            'success'=>"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no]",
+            'redirect_url'=>base_url().'index.php/home'
+        );
+        }
+        echo json_encode($data);
+    }
+    /////////////////
+    function conversionPost(){
+        $application_no=$_POST['application_no'];
+        //////////////////
+        $recordExist=$this->basundharamodel->checkExistDharitree($application_no);
+        if($recordExist){
+                $data=array(
+                    'error'=>"Case have been Registered Already. Please Check"
+                );
+                echo json_encode($data);
+                exit;
+        }
+        /////////////////////
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output->application;
+        $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        
+        $data['firstParty']=$output->mutation;
+        $data['secParty']=$output->applicants;
+        //var_dump($data);
+        $this->db->trans_begin();
+        //$case_no=$this->basundharamodel->genearteOfcCaseNo('01');
+
+        $case_name=$this->basundharamodel->genearteCaseName();
+         if(empty($case_name)){
+            $data=array(
+                'error'=>"Network Issue or Seesion Out. Please try Again"
+            );
+            echo json_encode($data);
+            exit;
+            die();
+        }
+        $case_no['petition_no']=$petition_no=$this->basundharamodel->genearteOfficePetitionNo();
+
+        $case_no['case_no']=$case_name.$petition_no."/CONV";
+        $basic=array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'date_entry'=>date('Y-m-d'),
+            'case_no'=>$case_no['case_no'],
+            'mut_type'=>'01', /////mut type
+            'trans_code'=>'F',/////////full
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'date_entry' => date('Y-m-d G:i:s'),                 
+            'operation'=>'E',
+            'user_code'=>$this->session->userdata('user_code'),
+            'submission_date' => date('Y-m-d G:i:s'),
+            'add_off_name' => $_POST['add_of_name'],
+            'add_off_desig' =>'CO',
+            'supported_doc' => 'Y',
+            'operation' => 'E',
+            'co_user_code' =>$_POST['add_of_name']
+            ///////// 
+        );
+        $this->db->insert('petition_basic',$basic);
+        $fmd=array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'user_code'=>$this->session->userdata('user_code'),
+            'date_entry'=>date('Y-m-d'),
+            'case_no'=>$case_no['case_no'],
+            'petition_no'=>$case_no['petition_no'],
+            'year_no'=>date('Y'),
+            'operation'=>'E',
+        );
+        $fmd['dag_no']=$data['app']->dag_no;
+        $fmd['patta_no']=$data['pattaNo']->patta_no;
+        $fmd['patta_type_code']=$data['pattaNo']->patta_type_code;
+        $fmd['m_dag_area_b']=$data['pattaNo']->dag_area_b;
+        $fmd['m_dag_area_k']=$data['pattaNo']->dag_area_k;
+        $fmd['m_dag_area_lc']=$data['pattaNo']->dag_area_lc;
+        $fmd['dag_area_b']=$data['pattaNo']->dag_area_b;
+        $fmd['dag_area_k']=$data['pattaNo']->dag_area_k;
+        $fmd['dag_area_lc']=$data['pattaNo']->dag_area_lc;
+        $fmd['m_dag_area_g']='0.00';
+        $fmd['m_dag_area_kr']='0';
+        $fmd['dag_area_g']='0';
+        $fmd['dag_area_kr']='0';
+        $fmd['revenue']=0;
+        $this->db->insert('petition_dag_details',$fmd);
+        $i=1;
+        foreach($data['firstParty'] as $part){
+        $faddress=$this->address($part->address);   
+        $petitioner=array(
+                'dist_code'=>$data['app']->dist_code,
+                'subdiv_code'=>$data['app']->subdiv_code,
+                'cir_code'=>$data['app']->cir_code,
+                'mouza_pargona_code'=>$data['app']->mouza_code,
+                'lot_no'=>$data['app']->lot_no,
+                'vill_townprt_code'=>$data['app']->village_code,
+                'user_code'=>$this->session->userdata('user_code'),
+                'date_entry'=>date('Y-m-d'),
+                'case_no'=>$case_no['case_no'],
+                'petition_no'=>$case_no['petition_no'],
+                'operation'=>'E',
+                'dag_no' =>$data['app']->dag_no,
+                'patta_no' =>$data['pattaNo']->patta_no,
+                'patta_type_code'=>$data['pattaNo']->patta_type_code,
+                'year_no'=>date('Y'),
+                'date_entry'=>date('Y-m-d'),
+
+                'pdar_id' =>$part->chitha_pdar_id,
+                'pdar_cron_no'=>$i++,
+                'pdar_name' =>$part->name_ass,
+                'pdar_guardian' =>$part->gurdian_name_ass,
+                'pdar_rel_guar' =>$this->utilityclass->relationRevertBasu($data['app']->dist_code,$part->gurdian_relation_id),/////////////
+                'pdar_gender'=>$this->utilityclass->gnderRevertBasu($data['app']->dist_code,$part->gender),
+                //'pdar_add1' => $part->address,
+                'pdar_add1' => $faddress[0],
+                'pdar_add2' => $faddress[1],
+                'pdar_mobile' => $part->mobile,
+            );
+            $this->db->insert('petitioner_part',$petitioner);
+        }
+            if($this->db->trans_status()==FALSE){
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=>"Error in submitting. Please try Again"
+                );
+            }else
+            {
+                $basundhara=array(
+                    'dharitree'=>$case_no['case_no'],
+                    'basundhara'=>$application_no,
+                    'date_reg'=>date('Y-m-d'),
+                    'reg_by'=>$this->session->userdata('user_code'),
+                    'app_status'=>'P',
+                    'pending_with'=>'CO'
+                );
+                $this->db->insert('basundhar_application',$basundhara);
+
+                $this->db->trans_commit();
+            //////////////POST To basundhara/////////////////////
+            $rmk='Forwarded to CO';
+            $status='M';
+            $task='AST';
+            $pen='CO';
+            $case=$case_no['case_no'];
+            $this->basundharamodel->postApiBasundhara($application_no,$case,$rmk,$status,$task,$pen);
+            //////////////////
+            $this->DashboardInheritance($case_no['case_no']);
+            //////
+            $this->session->set_flashdata('message',"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no] ");
+            //////////////////////////////////
+            $data=array(
+                'success'=>"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no]",
+                'redirect_url'=>base_url().'index.php/home'
+            );
+        }
+        echo json_encode($data);
+    }
+    function mbileUpdatePost(){
+        $application_no=$_POST['application_no'];
+        //////////////////
+        $recordExist=$this->basundharamodel->checkExistDharitree($application_no);
+        if($recordExist){
+                $data=array(
+                    'error'=>"Case have been Registered Already. Please Check"
+                );
+                echo json_encode($data);
+                exit;
+        }
+        /////////////////////
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output->application;
+        $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        $data['firstParty']=$output->mutation;
+        $this->db->trans_begin();
+        $UpdateWhere=array(
+            'dist_code'=>$data['app']->dist_code,
+            'subdiv_code'=>$data['app']->subdiv_code,
+            'cir_code'=>$data['app']->cir_code,
+            'mouza_pargona_code'=>$data['app']->mouza_code,
+            'lot_no'=>$data['app']->lot_no,
+            'vill_townprt_code'=>$data['app']->village_code,
+            'patta_no'=>$data['pattaNo']->patta_no,
+			'patta_type_code'=>$data['pattaNo']->patta_type_code,
+            'pdar_id'=>$data['firstParty'][0]->chitha_pdar_id 
+        );
+        $updateMobile= array('pdar_mobile' => $data['firstParty'][0]->new_mobile );
+        // $this->db->update('chitha_pattadar', $updateMobile, $UpdateWhere);
+        $result = $this->Chitha_basic_model->update_table('chitha_pattadar', $updateMobile, $UpdateWhere);
+        $this->db->update('jama_pattadar', $updateMobile, $UpdateWhere);
+        if($this->db->trans_status()==FALSE){
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=>"Error in submitting. Please try Again"
+                );
+                return $data;
+                exit;
+        }else
+        {
+        $basundhara=array(
+            'dharitree'=>"DHAR/".$application_no,
+            'basundhara'=>$application_no,
+            'date_reg'=>date('Y-m-d'),
+            'reg_by'=>$this->session->userdata('user_code'),
+            'app_status'=>'F',
+            'pending_with'=>'NA'
+        );
+        $this->db->insert('basundhar_application',$basundhara);
+        $this->db->trans_commit();
+            //////////////POST To basundhara/////////////////////
+        $rmk='Forwarded to CO';
+        $status='F';
+        $task='CO';
+        $pen='NA';
+        $case="DHAR/".$application_no;
+        $this->basundharamodel->postApiBasundhara($application_no,$case,$rmk,$status,$task,$pen);
+        //////////////////
+        $this->session->set_flashdata('message',"Records Updated Successfully ");
+        //////////////////////////////////
+        $data=array(
+            'success'=>"Records Updated Successfully",
+            'redirect_url'=>base_url().'index.php/home'
+        );
+    }
+    echo json_encode($data);
+    }
+    /////////////////////////////////////
+    // function RejectOrder(){
+    //         $order=$_POST['order'];
+    //         $application_no=$_POST['application_no'];
+    //         $curl_handle = curl_init();
+    //         curl_setopt($curl_handle, CURLOPT_URL, API_LINK."applicationStatusUpdate");
+    //         curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+    //         curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+    //         curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+    //         curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query(array(
+    //             'application' => $application_no,
+    //             'dharitree' => 'NA',
+    //             'rmk' => $order,
+    //             'status' => 'R',
+    //             'task' => $this->session->userdata('user_desig_code'),
+    //             'pen'=>'NA'
+    //         )));
+    //         $result = curl_exec($curl_handle);
+    //         $this->db->trans_commit();
+    //         $this->session->set_flashdata('message',"Application Rejected by Mondal $application_no ");
+    //         redirect('/home');
+    // }
+    /////////////////////////
+    function Apiswitch($rtps){
+        if($rtps=='RTPS'){
+            $apilink=RTPS_API_LINK;
+        }
+        elseif($rtps=='MB'){
+            $apilink=API_LINK;
+        }
+        else
+        {
+            $apilink='';
+        } 
+        return $apilink;
+    }
+    function queryRequest(){
+            $order=$this->input->post('query');
+            $application_no=$this->input->post('application_no');
+            $d=$this->session->userdata('dist_code');
+            $s=$this->session->userdata('subdiv_code');
+            $c=$this->session->userdata('cir_code');
+            $m=$this->session->userdata('mouza_pargona_code');
+            $l=$this->session->userdata('lot_no');
+            $code=$this->session->userdata('user_code');
+            $desigcode=$this->session->userdata('user_desig_code');
+
+            $errorMessages = [];
+
+            $applicationNoValidate = applicationNumberValidation($application_no);
+            if(count($applicationNoValidate)){
+                array_push($errorMessages, $applicationNoValidate['message']);
+            }
+
+            $response = isValidQuery($application_no);
+            if($response['status'] == 'n'){
+                array_push($errorMessages, 'Application number has MALECIOUS QUERY');
+            }
+
+            if($order != ''){
+                $response = specialCharacterCheckingInInput($order, ['.', ',', '|', '-',':','?','\'','/'], 'Query');
+                if($response['status'] == 'n'){
+                    array_push($errorMessages, $response['message']);
+                }
+
+                $response = isValidQuery($order);
+                if($response['status'] == 'n'){
+                    array_push($errorMessages, 'Query has MALECIOUS QUERY');
+                }
+            }else{
+                array_push($errorMessages, 'Query Field is required');
+            }
+
+            if(count($errorMessages)){
+                $error_messages = convertArrayToHtmlUlLi($errorMessages);
+                $this->session->set_flashdata('query_mdl_message', $error_messages);
+                return redirect($_SERVER['HTTP_REFERER']);
+            }
+
+            if($desigcode=='LM'){
+                $lm=$this->utilityclass->getDefinedMondalsName($d,$s,$c,$m,$l,$code);
+                $user_nm=$lm->lm_name;
+            }else{
+                $lm=$this->utilityclass->getSelectedASOName($d,$s,$c,$code);
+                $user_nm=$lm->username;
+            }
+            //ESCALATION START FOR QUERY=========
+            if(ESCALATION_ENABLE == 1 && ESCALATION_BLOCK_AFTER_QUERY == 1)
+            {   
+                $this->load->model('Escalationmodel');             
+                $basundhara = $this->rtpsmodel->getcaseno($application_no);
+                if($basundhara)
+                {
+                    $esData = $this->Escalationmodel->getEscalatedRowDetailsCaseNo($basundhara);
+                    log_message('error','#ERRORESC00920===='.json_encode($esData));
+                    if($esData && !empty($esData))
+                    {
+                        $response = $this->Escalationmodel->blockEscalationForQueryCase($esData->case_no);
+                        log_message('error','#ERRORESC00921===='.json_encode($response));
+                        if($response['responseType'] == 1)
+                        {
+                            $this->session->set_flashdata('message',"#ERRORESC00921 : Error in query for Application No  $application_no ");
+                            redirect('/home');
+                        }
+                    }
+                }
+            }
+            //END 
+            
+            $data['rtps']=$rtps=$this->rtpsmodel->checkRtpsService($application_no);
+            $apilink=$this->ApiSwitch($rtps);
+            $curl_handle = curl_init();
+            curl_setopt($curl_handle, CURLOPT_URL, $apilink."queryInsert");
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+            curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 10); // setting 10 seconds 
+            curl_setopt($curl_handle, CURLOPT_TIMEOUT, 30); // setting 30 seconds
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query(array(
+                'application' => $application_no,
+                'query' =>  $order,
+                'type' => '0',
+                'query_from_officer'=>$desigcode,
+                'query_from_office'=>'Circle Office'
+            )));
+            $result = curl_exec($curl_handle);
+            $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+            $data= json_decode($result);
+            if($httpcode!=200 || $data==null){
+                $this->session->set_flashdata('message',"Error in query for Application No  $application_no ");
+                redirect('/home');
+            }            
+            if($result===true || $result=='true' || $result==1 || json_decode($result)=='true'|| json_decode($result)==true || json_decode($result)=='y' || $result=='y'){
+                $this->session->set_flashdata('message',"Your Query has been sent to the user against application no $application_no ");
+                redirect('/home');
+            }else{
+                $this->session->set_flashdata('message',"Error in query for Application No  $application_no ");
+                redirect('/home');
+            }
+            
+    }
+
+    ////////////////Added by Pallabi/////////////////////
+
+    
+
+    function reclassBasu(){
+        //$application_no = 'MB/RECLASS/2021/308';//'MB/MUTI/2021/24';//$this->input->get('applid');
+        $application_no = $_GET['app'];
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output->application);
+        $data['appNo']=$application_no;
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+
+        $user_code=$this->session->userdata('user_code');
+
+
+        $district['lm'] = $this->utilityclass->getDefinedMondalsName($district['app']->dist_code,$district['app']->subdiv_code, $district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$user_code );
+        //var_dump($district['lm']);
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['recordExist']=$this->basundharamodel->checkExistDharitree($application_no);
+        if($this->session->userdata('user_desig_code')=='ADC' or $this->session->userdata('user_desig_code')=='CO'){
+            $district['_view'] = 'basundhara/reclass_basu_inherit';
+        }else{
+            $district['_view'] = 'basundhara/reclass_basu';
+        }
+        $this->load->view('layouts/main',$district);
+    }
+
+    
+
+    function reclassPost(){
+        $application_no=$_POST['application_no'];
+        //////////////////
+        $recordExist=$this->basundharamodel->checkExistDharitree($application_no);
+        if($recordExist){
+                $data=array(
+                    'error'=>"Case have been Registered Already. Please Check"
+                );
+                echo json_encode($data);
+                exit;
+        }
+        /////////////////////
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output->application;
+        $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        
+        $data['firstParty']=$output->mutation;
+        $data['secParty']=$output->applicants;
+
+        $year_no = year_no;
+
+        $co_report1 = $this->input->POST('co_report');
+        $co_report_suffix = $this->input->POST('co_report_suffix');
+        $co_report = $co_report1." - ".$co_report_suffix;
+
+        //var_dump($data);
+        $this->db->trans_begin();
+       // $case_no=$this->basundharamodel->genearteCaseNo('04');
+
+        $case_name=$this->basundharamodel->genearteCaseName();
+         if(empty($case_name)){
+            $data=array(
+                'error'=>"Network Issue or Seesion Out. Please try Again"
+            );
+            echo json_encode($data);
+            exit;
+            die();
+        }
+        $case_no['petition_no']=$petition_no=$this->basundharamodel->genearteReclassPetitionNo();
+
+        $case_no['case_no']=$case_name.$petition_no."/RECLASS";
+
+
+        $basic = array(
+            'dist_code' => $data['app']->dist_code,
+            'subdiv_code' => $data['app']->subdiv_code,
+            'cir_code' => $data['app']->cir_code,
+            'mouza_pargona_code' => $data['app']->mouza_code,
+            'lot_no' => $data['app']->lot_no,
+            'vill_townprt_code' => $data['app']->village_code,
+            'proposal_no' => $case_no['petition_no'],
+            'dag_no' => $data['app']->dag_no,
+            'patta_no' => $this->input->post('patta_no') ,
+            'patta_type_code' => $this->input->post('patta_type'),
+            'present_land_class' => $data['firstParty'][0]->old_classification,
+            'present_land_revenue' => $this->input->post('dag_revenue')==null?"0":$this->input->post('dag_revenue'), //$this->input->post('dag_revenue'),
+            'present_land_localtax' =>$this->input->post('dag_local_tax')==null?"0":$this->input->post('dag_local_tax'),// $this->input->post('dag_local_tax'),
+            'present_total_revenue' => $this->input->post('sum')==null?"0":$this->input->post('sum'),//$this->input->post('sum'),
+            'new_landuse_year' => $data['firstParty'][0]->year_of_use,
+            'dag_area_b' => $data['app']->area_b,
+            'dag_area_k' => $data['app']->area_k,
+            'dag_area_lc' => $data['app']->area_l,
+            'dag_area_g' => 0,
+            'dag_area_kr' => 0,
+            'proposed_land_class' => $data['firstParty'][0]->new_classification,
+            'proposed_land_revenue' => $this->input->post('P_land_rev'),
+            'proposed_land_localtax' => $this->input->post('p_local_tax'),
+            'revenue_diff' => $this->input->post('Rev_diff'),
+            'lm_code' => $this->session->userdata('user_code'),
+            'lm_yn' => 'Y',
+            'lm_date' => date('Y-m-d G:i:s'),
+            'case_no' => $case_no['case_no'],
+            'year_no' => $year_no
+        );
+
+        $this->db->insert('t_reclassification',$basic);
+       
+        $basundhara=array(
+            'dharitree'=>$case_no['case_no'],
+            'basundhara'=>$application_no,
+            'date_reg'=>date('Y-m-d'),
+            'reg_by'=>$this->session->userdata('user_code'),
+            'app_status'=>'P',
+            'pending_with'=>'CO'
+        );
+        $this->db->insert('basundhar_application',$basundhara);
+
+
+         ///////////////For Proceeding///////////////////
+      
+        // $co = $this->utilityclass->getDefinedMondalsName($data['app']->dist_code,$data['app']->subdiv_code, $data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no, $this->session->userdata('user_code'));
+        
+        // $data['location'] = array(
+        //     'dist' => $dist_code,
+        //     'sub' => $subdiv_code,
+        //     'cir' => $cir_code,
+        //     'mouza' => $mouza_pargona_code,
+        //     'lot' => $lot_no,
+        //     'vill' => $vill_townprt_code,
+        //     'co_name' => $co->username
+        // ); 
+
+        $proID=$this->basundharamodel->maxProceedingID($case_no['case_no']);
+        $pro_array=array(
+            'dist_code' => $data['app']->dist_code,
+            'subdiv_code' => $data['app']->subdiv_code,
+            'cir_code' => $data['app']->cir_code,
+            'case_no'=>$case_no['case_no'],
+            'proceeding_id'=>$proID,
+            'status'=>'pending',
+            'date_of_hearing'=>date('Y-m-d'),
+            'co_order'=>$co_report,
+            'user_code'=>$this->session->userdata('user_code'),
+            'date_entry'=>date('Y-m-d G:i:s'),
+            'operation'=>'E'
+            );
+        $this->db->insert('petition_proceeding_dc_adc',$pro_array);
+        //////////////////////////////////
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            $data=array(
+                'error'=>"Error in submitting. Please try Again"
+            );
+        }else
+        {
+            //////////////POST To basundhara/////////////////////
+            $curl_handle = curl_init();
+            curl_setopt($curl_handle, CURLOPT_URL, API_LINK."applicationStatusUpdate");
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query(array(
+                'application' => $application_no,
+                'dharitree' => $case_no['case_no'],
+                'rmk' => 'Registered Successfully',
+                'status' => 'M',
+                'task' => 'LM',
+                'pen'=>'CO',
+                'penat'=>'Circle office'
+            )));
+            $result = curl_exec($curl_handle);
+            $this->db->trans_commit();
+
+            $this->DashboardReclass($case_no['case_no']);
+            $this->session->set_flashdata('message',"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no] ");
+            //////////////////////////////////
+            $data=array(
+                'success'=>"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no]",
+                'redirect_url'=>base_url().'index.php/home'
+            );
+        }
+        echo json_encode($data);
+    }
+
+    function areaCorrectionbasu(){
+
+        $application_no = $_GET['app'];
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output->application);
+        $data['appNo']=$application_no;
+        $district['app']=$output->application;
+
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+
+        $district['query']=$output->query;
+        $district['query']=$output->query;
+        $district['recordExist']=$this->basundharamodel->checkExistDharitree($application_no);
+        if($this->session->userdata('user_desig_code')=='ADC' or $this->session->userdata('user_desig_code')=='CO'){
+            $district['_view'] = 'basundhara/areacorrection_inherit';
+        }else{
+            $district['_view'] = 'basundhara/areacorrection';
+        }
+        $this->load->view('layouts/main',$district);
+    }
+
+     function areacorrectPost(){
+        $application_no=$_POST['application_no'];
+        //////////////////
+        $recordExist=$this->basundharamodel->checkExistDharitree($application_no);
+        if($recordExist){
+                $data=array(
+                    'error'=>"Case have been Registered Already. Please Check"
+                );
+                echo json_encode($data);
+                exit;
+        }
+        /////////////////////
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output->application;
+        $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        
+        $data['firstParty']=$output->mutation;
+        $data['secParty']=$output->applicants;
+        //var_dump($data);
+        $this->db->trans_begin();
+        //$case_no=$this->basundharamodel->genearteCaseNo('07');
+
+        $case_name=$this->basundharamodel->genearteCaseName();
+         if(empty($case_name)){
+            $data=array(
+                'error'=>"Network Issue or Seesion Out. Please try Again"
+            );
+            echo json_encode($data);
+            exit;
+            die();
+        }
+        $case_no['petition_no']=$petition_no=$this->basundharamodel->genearteLegacyPetitionNo();
+
+        $case_no['case_no']=$case_name.$petition_no."/LDU";
+
+
+        $basic = array(
+            'dist_code' => $data['app']->dist_code,
+            'subdiv_code' => $data['app']->subdiv_code,
+            'cir_code' => $data['app']->cir_code,
+            'mouza_pargona_code' => $data['app']->mouza_code,
+            'lot_no' => $data['app']->lot_no,
+            'vill_townprt_code' => $data['app']->village_code,
+            'proposal_no' => $case_no['petition_no'],
+            'dag_no' => $data['app']->dag_no,
+            'patta_no' => $this->input->post('patta_no') ,
+            'patta_type_code' => $this->input->post('patta_type'),
+            'present_land_class' => $this->input->post('land_class_code'),
+            'present_land_revenue' =>$this->input->post('dag_revenue')==null?"0":$this->input->post('dag_revenue'),
+            'present_land_localtax' => $this->input->post('dag_local_tax')==null?"0":$this->input->post('dag_local_tax'),
+            'dag_area_b' => $data['app']->area_b,
+            'dag_area_k' => $data['app']->area_k,
+            'dag_area_lc' => $data['app']->area_l,
+            'dag_area_g' => 0,
+            'dag_area_kr' => 0,
+            'suggested_dag_no' => '',
+            'suggested_patta_no' => '',
+            'suggested_patta_type' => '',
+            'suggested_land_class' =>'',
+            'suggested_land_rev' =>$this->input->post('P_land_rev'),
+            'suggested_loc_tax' =>$this->input->post('p_local_tax'),
+            'suggested_dag_area_b' => $data['firstParty'][0]->new_area_b,
+            'suggested_dag_area_k' => $data['firstParty'][0]->new_area_k,
+            'suggested_dag_area_lc' => $data['firstParty'][0]->new_area_l,
+            'lm_note' => $this->input->post('remark'),
+            'lm_code' => $this->session->userdata('user_code'),
+            'lm_date' => date('Y-m-d G:i:s'),
+            'case_no' => $case_no['case_no'],
+            'year_no' => date('Y'),
+            'file_upload' => '',
+            'status' => 'P',
+            'rmk_line_no' => 'N/A',
+            'suggested_pattadarstrike' => null,
+                'p_flag' => '',
+                'pdar_id'=>''
+        );
+
+        $this->db->insert('t_legacyupdation',$basic);
+
+       
+        $basundhara=array(
+            'dharitree'=>$case_no['case_no'],
+            'basundhara'=>$application_no,
+            'date_reg'=>date('Y-m-d'),
+            'reg_by'=>$this->session->userdata('user_code'),
+            'app_status'=>'P',
+            'pending_with'=>'CO'
+        );
+        $this->db->insert('basundhar_application',$basundhara);
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            $data=array(
+                'error'=>"Error in submitting. Please try Again"
+            );
+        }else
+        {
+            //////////////POST To basundhara/////////////////////
+            $curl_handle = curl_init();
+            curl_setopt($curl_handle, CURLOPT_URL, API_LINK."applicationStatusUpdate");
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query(array(
+                'application' => $application_no,
+                'dharitree' => $case_no['case_no'],
+                'rmk' => 'Registered Successfully',
+                'status' => 'M',
+                'task' => 'LM',
+                'pen'=>'CO',
+                'penat'=>'Circle office'
+            )));
+            $result = curl_exec($curl_handle);
+            $this->db->trans_commit();
+            $this->session->set_flashdata('message',"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no] ");
+            //////////////////////////////////
+            $data=array(
+                'success'=>"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no]",
+                'redirect_url'=>base_url().'index.php/home'
+            );
+        }
+        echo json_encode($data);
+    }
+
+    function nameCorrectionbasu(){
+
+        $application_no = $_GET['app'];
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output->application);
+        $data['appNo']=$application_no;
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['query']=$output->query;
+        $district['recordExist']=$this->basundharamodel->checkExistDharitree($application_no);
+        $q = $this->db->query("select * from  users where dist_code='".$district['app']->dist_code."' and subdiv_code='".$district['app']->subdiv_code."' and cir_code='".$district['app']->cir_code."' and user_desig_code='CO'");       
+        $c = $q->result();
+        //var_dump($c);
+        foreach ($c as $x) {
+            //echo $x->user_code;
+            $users = "Select user_code as user_c from  loginuser_table where user_code='" . $x->user_code . "' and dis_enb_option = 'E' and dist_code='".$district['app']->dist_code."' and subdiv_code='".$district['app']->subdiv_code."' and cir_code='".$district['app']->cir_code."' ";
+            $select = $this->db->query($users)->row();
+
+            if (@count($select) == '1') {
+                $convertions[] = array(
+                    'co_name' => $x->username,
+                    'user_desig_code' => $x->user_desig_code,
+                    'user_code' => $select->user_c
+                );
+                $district['user'] = $convertions;
+            }
+        }
+        if($this->session->userdata('user_desig_code')=='ADC' or $this->session->userdata('user_desig_code')=='CO'){
+            $district['_view'] = 'basundhara/namecorrection_revert';
+        }else{
+            $district['_view'] = 'basundhara/namecorrection';
+        }
+        $this->load->view('layouts/main',$district);
+    }
+
+     function namecorrectPost(){
+        $application_no=$_POST['application_no'];
+        //////////////////
+        $recordExist=$this->basundharamodel->checkExistDharitree($application_no);
+        if($recordExist){
+                $data=array(
+                    'error'=>"Case have been Registered Already. Please Check"
+                );
+                echo json_encode($data);
+                exit;
+        }
+        /////////////////////
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output->application;
+        $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        
+        $data['firstParty']=$output->mutation;
+        $data['secParty']=$output->applicants;
+
+        //var_dump($data['secParty']);
+        //var_dump($data);
+        $this->db->trans_begin();
+        //$case_no=$this->basundharamodel->genearteCaseNo('06');
+        
+        $case_name=$this->basundharamodel->genearteCaseName();
+         if(empty($case_name)){
+            $data=array(
+                'error'=>"Network Issue or Seesion Out. Please try Again"
+            );
+            echo json_encode($data);
+            exit;
+            die();
+        }
+        $case_no['petition_no']=$petition_no=$this->basundharamodel->genearteMiscPetitionNo();
+
+        $case_no['case_no']=$case_name.$petition_no."/MiNC";
+
+
+        $userdata = array(
+                    'dist_code' => $data['app']->dist_code,
+                    'subdiv_code' => $data['app']->subdiv_code,
+                    'cir_code' => $data['app']->cir_code,
+                    'mouza_pargona_code' => $data['app']->mouza_code,
+                    'lot_no' => $data['app']->lot_no,
+                    'vill_townprt_code' => $data['app']->village_code,
+                    'year_no' => date('Y'),
+                    'misc_case_petition_no' => $case_no['petition_no'],
+                    'misc_case_no' => $case_no['case_no'],
+                    'misc_case_type' => '06',
+                    'patta_no' => $this->input->post('patta_no') ,
+                    'patta_type_code' => $this->input->post('patta_type'),
+                    'submission_date' => date('Y-m-d G:i:s'),
+                    'supported_doc_yn' => 'Y',
+                    'supported_doc_code' => date('Y-m-d G:i:s'),
+                    'fresh_yn' => 'Y',
+                    'status' => 01,
+                    'operation' => 's',
+                    'proceeding_yn' => 'Y',
+                    'user_code' => $this->session->userdata('user_code'),
+                    'date_of_operation' => date('Y-m-d G:i:s'),
+                    'add_to_officer' => $this->input->post('official'),
+                    'dag_no' => $data['app']->dag_no
+                );
+                //var_dump($userdata);
+        //$this->session->set_userdata($userdata);
+        $this->db->insert("misc_case_basic", $userdata);
+
+        $basic = array(
+                'dist_code' => $data['app']->dist_code,
+                'subdiv_code' => $data['app']->subdiv_code,
+                'cir_code' => $data['app']->cir_code,
+                'petition_pdar_id' =>  $data['secParty'][0]->chitha_pdar_id,
+                'misc_case_no' => $case_no['case_no'],
+                'petition_pdar_name_old' => $data['secParty'][0]->name_ass,
+                'petition_pdar_name_new' => $data['firstParty'][0]->pat_name_ass,
+                'submission_date' => date('Y-m-d G:i:s'),
+                'user_code' => $this->session->userdata('user_code'),
+                'operation' => 'E',
+                'misc_case_petition_no' => $case_no['petition_no']
+            );
+            $this->db->insert("misc_case_first_party", $basic);
+
+       
+        $basundhara=array(
+            'dharitree'=>$case_no['case_no'],
+            'basundhara'=>$application_no,
+            'date_reg'=>date('Y-m-d'),
+            'reg_by'=>$this->session->userdata('user_code'),
+            'app_status'=>'P',
+            'pending_with'=>'CO'
+        );
+        $this->db->insert('basundhar_application',$basundhara);
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            $data=array(
+                'error'=>"Error in submitting. Please try Again"
+            );
+        }else
+        {
+            //////////////POST To basundhara/////////////////////
+            $curl_handle = curl_init();
+            curl_setopt($curl_handle, CURLOPT_URL, API_LINK."applicationStatusUpdate");
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query(array(
+                'application' => $application_no,
+                'dharitree' => $case_no['case_no'],
+                'rmk' => 'Registered Successfully',
+                'status' => 'M',
+                'task' => 'AST',
+                'pen'=>'CO',
+                'penat'=>'Circle office'
+            )));
+            $result = curl_exec($curl_handle);
+            $this->db->trans_commit();
+            
+            $this->DashboardNameCorrect($case_no['case_no']);
+
+            $this->session->set_flashdata('message',"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no] ");
+            //////////////////////////////////
+            $data=array(
+                'success'=>"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no]",
+                'redirect_url'=>base_url().'index.php/home'
+            );
+        }
+        echo json_encode($data);
+    }
+
+
+     function nameCancelbasu(){
+        $application_no = $_GET['app'];
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output->application);
+        $data['appNo']=$application_no;
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['query']=$output->query;
+        $district['recordExist']=$this->basundharamodel->checkExistDharitree($application_no);
+        $q = $this->db->query("select * from  users where dist_code='".$district['app']->dist_code."' and subdiv_code='".$district['app']->subdiv_code."' and cir_code='".$district['app']->cir_code."' and user_desig_code='CO'");      
+        $c = $q->result();
+        //var_dump($c);
+        foreach ($c as $x) {
+            //echo $x->user_code;
+            $users = "Select user_code as user_c from  loginuser_table where user_code='" . $x->user_code . "' and dis_enb_option = 'E' and dist_code='".$district['app']->dist_code."' and subdiv_code='".$district['app']->subdiv_code."' and cir_code='".$district['app']->cir_code."' ";
+            $select = $this->db->query($users)->row();
+
+            if (@count($select) == '1') {
+                $convertions[] = array(
+                    'co_name' => $x->username,
+                    'user_desig_code' => $x->user_desig_code,
+                    'user_code' => $select->user_c
+                );
+                $district['user'] = $convertions;
+            }
+        }
+        $this->form_validation->set_rules('official', 'Select Officer Name', 'required');
+        if($this->session->userdata('user_desig_code')=='ADC' or $this->session->userdata('user_desig_code')=='CO'){
+            $district['_view'] = 'basundhara/namecancel_revert';
+        }else{
+            $district['_view'] = 'basundhara/namecancel';
+        }
+        $this->load->view('layouts/main',$district);
+    }
+
+    function namecancelPost(){
+        $application_no=$_POST['application_no'];
+        //////////////////
+        $recordExist=$this->basundharamodel->checkExistDharitree($application_no);
+        if($recordExist){
+                $data=array(
+                    'error'=>"Case have been Registered Already. Please Check"
+                );
+                echo json_encode($data);
+                exit;
+        }
+        /////////////////////
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output->application;
+        $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        
+        $data['firstParty']=$output->mutation;
+        $data['secParty']=$output->applicants;
+
+        $district['query']=$output->query;
+        $district['query']=$output->query;
+
+        //var_dump($data['secParty']);
+        //var_dump($data);
+        $this->db->trans_begin();
+        //$case_no=$this->basundharamodel->genearteCaseNo('08');
+        
+        $case_name=$this->basundharamodel->genearteCaseName();
+         if(empty($case_name)){
+            $data=array(
+                'error'=>"Network Issue or Seesion Out. Please try Again"
+            );
+            echo json_encode($data);
+            exit;
+            die();
+        }
+        $case_no['petition_no']=$petition_no=$this->basundharamodel->genearteMiscPetitionNo();
+
+        $case_no['case_no']=$case_name.$petition_no."/MiND";
+
+
+        $userdata = array(
+                    'dist_code' => $data['app']->dist_code,
+                    'subdiv_code' => $data['app']->subdiv_code,
+                    'cir_code' => $data['app']->cir_code,
+                    'mouza_pargona_code' => $data['app']->mouza_code,
+                    'lot_no' => $data['app']->lot_no,
+                    'vill_townprt_code' => $data['app']->village_code,
+                    'year_no' => date('Y'),
+                    'misc_case_petition_no' => $case_no['petition_no'],
+                    'misc_case_no' => $case_no['case_no'],
+                    'misc_case_type' => '07',
+                    'patta_no' => $this->input->post('patta_no') ,
+                    'patta_type_code' => $this->input->post('patta_type'),
+                    'submission_date' => date('Y-m-d G:i:s'),
+                    'supported_doc_yn' => 'Y',
+                    'supported_doc_code' => date('Y-m-d G:i:s'),
+                    'fresh_yn' => 'Y',
+                    'status' => '01',
+                    'operation' => 'E',
+                    'proceeding_yn' => 'Y',
+                    'user_code' => $this->session->userdata('user_code'),
+                    'date_of_operation' => date('Y-m-d G:i:s'),
+                    'add_to_officer' => $this->input->post('official'),
+                    'dag_no' => $data['app']->dag_no
+                );
+                //var_dump($userdata);
+        //$this->session->set_userdata($userdata);
+        $this->db->insert("misc_case_basic", $userdata);
+
+        $basic = array(
+                'dist_code' => $data['app']->dist_code,
+                'subdiv_code' => $data['app']->subdiv_code,
+                'cir_code' => $data['app']->cir_code,
+                'petition_pdar_id' =>  $data['firstParty'][0]->chitha_pdar_id,
+                'misc_case_no' => $case_no['case_no'],
+                'petition_pdar_name_old' => $data['firstParty'][0]->pat_name_ass,
+                'submission_date' => date('Y-m-d G:i:s'),
+                'user_code' => $this->session->userdata('user_code'),
+                'operation' => 'E',
+                'misc_case_petition_no' => $case_no['petition_no']
+            );
+            $this->db->insert("misc_case_first_party", $basic);
+
+
+        foreach($data['secParty'] as $pet){
+        $secondparty = array(
+                'dist_code' => $data['app']->dist_code,
+                'subdiv_code' =>$data['app']->subdiv_code,
+                'cir_code' => $data['app']->cir_code,
+                'opp_pdar_id' => $pet->chitha_pdar_id,
+                'misc_case_no' => $case_no['case_no'],
+                'opp_comment' => $this->input->post('remark'),
+                'submission_date' => date('Y-m-d G:i:s'),
+                'user_code' => $this->session->userdata('user_code'),
+                'operation' => 'E'
+            );
+        $this->db->insert("misc_case_scnd_party", $secondparty);
+        }
+
+       
+        $basundhara=array(
+            'dharitree'=>$case_no['case_no'],
+            'basundhara'=>$application_no,
+            'date_reg'=>date('Y-m-d'),
+            'reg_by'=>$this->session->userdata('user_code'),
+            'app_status'=>'P',
+            'pending_with'=>'CO'
+        );
+
+        $this->db->insert('basundhar_application',$basundhara);
+        if($this->db->trans_status()==FALSE){
+            $this->db->trans_rollback();
+            $data=array(
+                'error'=>"Error in submitting. Please try Again"
+            );
+        }else
+        {
+            //////////////POST To basundhara/////////////////////
+            $curl_handle = curl_init();
+            curl_setopt($curl_handle, CURLOPT_URL, API_LINK."applicationStatusUpdate");
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query(array(
+                'application' => $application_no,
+                'dharitree' => $case_no['case_no'],
+                'rmk' => 'Registered Successfully',
+                'status' => 'M',
+                'task' => 'AST',
+                'pen'=>'CO',
+                'penat'=>'Circle office'
+            )));
+            $result = curl_exec($curl_handle);
+            $this->db->trans_commit();
+
+            $this->DashboardNameCancel($case_no['case_no']);
+
+            $this->session->set_flashdata('message',"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no] ");
+            //////////////////////////////////
+            $data=array(
+                'success'=>"Application Forwarded to Circle Officer Successfully with case no $case_no[case_no]",
+                'redirect_url'=>base_url().'index.php/home'
+            );
+        }
+        echo json_encode($data);
+    }
+
+
+
+    ////////////////////////
+    // function RejectOrder(){
+    //         $order=$_POST['order'];
+    //         $application_no=$_POST['application_no'];
+    //         $curl_handle = curl_init();
+    //         curl_setopt($curl_handle, CURLOPT_URL, API_LINK."applicationStatusUpdate");
+    //         curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+    //         curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+    //         curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+    //         curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+    //         curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query(array(
+    //             'application' => $application_no,
+    //             'dharitree' => 'NA',
+    //             'rmk' => $order,
+    //             'status' => 'R',
+    //             'task' => $this->session->userdata('user_desig_code'),
+    //             'pen'=>'NA'
+    //         )));
+    //         $result = curl_exec($curl_handle);
+    //         $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+    //         $data=json_encode($result);
+    //         if($httpcode!=200 || $data==null || $data=='false' || $data==false ){
+    //                 $this->session->set_flashdata('message',"Error in API Calling ");
+    //                 redirect('/home');
+    //                 return;
+    //         }else {
+    //             $this->session->set_flashdata('message',"Application Rejected : $application_no ");
+    //             redirect('/home');
+    //         }
+    //         //$this->db->trans_commit();  
+    // }
+    function circlewiseReport(){
+       
+        $d=$this->session->userdata('dist_code');
+        $s=$this->session->userdata('subdiv_code');
+        $c=$this->session->userdata('cir_code');
+         $this->session->unset_userdata('searchKeyword');
+        $url = API_LINK."cicleWiseRegisterCase/$d/$s/$c" ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $district['output'] = json_decode($output);
+        $district['_view'] = 'basundhara/circle_total_reg';
+        $this->load->view('layouts/main',$district);
+    }
+
+    
+    function apicheck(){
+        $application_no='MB/MCOR/2021/24567';
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output->application;
+        $data['pattaNo']=$this->utilityclass->getPattaTypeNo($data['app']->dist_code,$data['app']->subdiv_code,$data['app']->cir_code,$data['app']->mouza_code,$data['app']->lot_no,$data['app']->village_code,$data['app']->dag_no);
+        $data['firstParty']=$output->mutation;
+        //var_dump($data);
+    }
+    function mobileManual(){
+        ini_set('max_execution_time', '0');
+        $url = API_LINK."mobileCheck" ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $data['app']=$output;
+        foreach($output as $app){
+            $data['pattaNo']=$this->utilityclass->getPattaTypeNo($app->dist_code,$app->subdiv_code,$app->cir_code,$app->mouza_code,$app->lot_no,$app->village_code,$app->dag_no);
+            $UpdateWhere=array(
+                'dist_code'=>$app->dist_code,
+                'subdiv_code'=>$app->subdiv_code,
+                'cir_code'=>$app->cir_code,
+                'mouza_pargona_code'=>$app->mouza_code,
+                'lot_no'=>$app->lot_no,
+                'vill_townprt_code'=>$app->village_code,
+                'patta_no'=>$data['pattaNo']->patta_no,
+                'patta_type_code'=>$data['pattaNo']->patta_type_code,
+                'pdar_id'=>$app->chitha_pdar_id 
+            );
+            $updateMobile= array('pdar_mobile' => $app->new_mobile );
+            $this->session->set_userdata('dist_code',$app->dist_code);
+            $this->dbswitch();
+            // $this->db->update('chitha_pattadar', $updateMobile, $UpdateWhere);
+            $result = $this->Chitha_basic_model->update_table('chitha_pattadar', $updateMobile, $UpdateWhere);
+            $this->db->update('jama_pattadar', $updateMobile, $UpdateWhere);
+        } 
+    }
+
+    function deedBasuCO(){
+        $application_no = $this->input->get('app');//'MB/MUTI/2021/24';//$this->input->get('applid');
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output);
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['user']=$this->basundharamodel->usersForOffice($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code);
+        if($this->session->userdata('user_desig_code')=='AST'){
+            $district['_view'] = 'basundhara/deed_ofc_co';
+        }else{
+            $district['_view'] = 'basundhara/deed_co';
+        }
+        $this->load->view('layouts/main',$district);
+    }
+
+
+    function inheritanceBasuCO() 
+      {
+        $application_no = $this->input->get('app');
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output);
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);        
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['query']=$output->query;
+        $district['user']=$this->basundharamodel->usersForOffice($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code);
+        if($this->session->userdata('user_desig_code')=='AST'){
+            $district['_view'] = 'basundhara/inheritance_ofc_co';
+        }elseif($this->session->userdata('user_desig_code')=='LM'){
+            $district['_view'] = 'basundhara/inheritance_co';
+        }elseif($this->session->userdata('user_desig_code')=='ADC'){
+            if($district['app']->allow_reapply!=null){
+                $district['_view'] = 'basundhara/inheritance_co';
+            }else{
+                $district['_view'] = 'basundhara/inheritance_co_revert';
+            }
+        }
+        else{
+            $district['_view'] = 'basundhara/inheritance_co';
+        }
+        $this->load->view('layouts/main',$district);
+    }
+
+    function partitionBasuCO(){
+        $application_no = $this->input->get('app');
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['query']=$output->query;
+        $district['user']=$this->basundharamodel->usersForOffice($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code);
+        if($this->session->userdata('user_desig_code')=='AST'){
+            $district['_view'] = 'basundhara/partition_basu_ofc_co';
+        }else{
+           $district['_view'] = 'basundhara/partition_basu_co';
+        }
+        $this->load->view('layouts/main',$district);
+    }
+
+    function allotmentBasuCO(){
+        $application_no = $this->input->get('app');
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['_view'] = 'basundhara/allotment_basu_co';
+        $this->load->view('layouts/main',$district);
+    }
+
+    function conversionBasuCO(){
+        $application_no = $this->input->get('app');
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['user']=$this->basundharamodel->usersForOffice($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code);
+        $district['_view'] = 'basundhara/conversion_basu_co';
+        $this->load->view('layouts/main',$district);
+    }
+
+
+    function reclassBasuCO(){
+        //$application_no = 'MB/RECLASS/2021/308';//'MB/MUTI/2021/24';//$this->input->get('applid');
+        $application_no = $_GET['app'];
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output->application);
+        $data['appNo']=$application_no;
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['query']=$output->query;
+
+        $district['_view'] = 'basundhara/reclass_basu_co';
+        $this->load->view('layouts/main',$district);
+    }
+
+    function nameCorrectionbasuCO(){
+
+        $application_no = $_GET['app'];
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output->application);
+        $data['appNo']=$application_no;
+        $district['app']=$output->application;
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+        $district['query']=$output->query;
+        $district['query']=$output->query;
+        $q = $this->db->query("select * from  users where dist_code='".$district['app']->dist_code."' and subdiv_code='".$district['app']->subdiv_code."' and cir_code='".$district['app']->cir_code."' and user_desig_code='CO'");
+       
+        $c = $q->result();
+        //var_dump($c);
+        foreach ($c as $x) {
+            //echo $x->user_code;
+            $users = "Select user_code as user_c from  loginuser_table where user_code='" . $x->user_code . "' and dis_enb_option = 'E' and dist_code='".$district['app']->dist_code."' and subdiv_code='".$district['app']->subdiv_code."' and cir_code='".$district['app']->cir_code."' ";
+            $select = $this->db->query($users)->row();
+
+            if (@count($select) == '1') {
+                $convertions[] = array(
+                    'co_name' => $x->username,
+                    'user_desig_code' => $x->user_desig_code,
+                    'user_code' => $select->user_c
+                );
+                $district['user'] = $convertions;
+            }
+            //array_push($pattadar_d, $data2);
+            //$convertion['user'] = $convertions;
+        }
+        $district['_view'] = 'basundhara/namecorrection_co';
+        $this->load->view('layouts/main',$district);
+    }
+
+    function areaCorrectionbasuCO(){
+
+        $application_no = $_GET['app'];
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output->application);
+        $data['appNo']=$application_no;
+        $district['app']=$output->application;
+
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+
+        $district['query']=$output->query;
+        $district['query']=$output->query;
+
+        $district['_view'] = 'basundhara/areacorrection_co';
+        $this->load->view('layouts/main',$district);
+    }
+
+
+    function nameCancelbasuCO(){
+
+        $application_no = $_GET['app'];
+        $url = API_LINK."serviceResponse?application_no=" . $application_no ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output);
+        //var_dump($output->application);
+        $data['appNo']=$application_no;
+        $district['app']=$output->application;
+
+
+        $district['pattaNo']=$this->utilityclass->getPattaTypeNo($district['app']->dist_code,$district['app']->subdiv_code,$district['app']->cir_code,$district['app']->mouza_code,$district['app']->lot_no,$district['app']->village_code,$district['app']->dag_no);
+        //var_dump($district['pattaNo']);
+        $district['firstParty']=$output->mutation;
+        $district['secParty']=$output->applicants;
+        $district['document']=$output->documents;
+
+        $district['query']=$output->query;
+        $district['query']=$output->query;
+
+        $q = $this->db->query("select * from  users where dist_code='".$district['app']->dist_code."' and subdiv_code='".$district['app']->subdiv_code."' and cir_code='".$district['app']->cir_code."' and user_desig_code='CO'");
+       
+        $c = $q->result();
+        //var_dump($c);
+        foreach ($c as $x) {
+            //echo $x->user_code;
+            $users = "Select user_code as user_c from  loginuser_table where user_code='" . $x->user_code . "' and dis_enb_option = 'E' and dist_code='".$district['app']->dist_code."' and subdiv_code='".$district['app']->subdiv_code."' and cir_code='".$district['app']->cir_code."' ";
+            $select = $this->db->query($users)->row();
+
+            if (@count($select) == '1') {
+                $convertions[] = array(
+                    'co_name' => $x->username,
+                    'user_desig_code' => $x->user_desig_code,
+                    'user_code' => $select->user_c
+                );
+                $district['user'] = $convertions;
+            }
+            //array_push($pattadar_d, $data2);
+            //$convertion['user'] = $convertions;
+        }
+
+         $this->form_validation->set_rules('official', 'Select Officer Name', 'required');
+
+        $district['_view'] = 'basundhara/namecancel_co';
+        $this->load->view('layouts/main',$district);
+    }
+
+    function DashboardInheritance($case_no){
+        $this->dbb = $this->load->database('dash', TRUE);
+        $sql="Select pb.*,pd.dag_no,pd.patta_no,pd.patta_type_code from petition_basic pb join petition_dag_details pd on pb.dist_code=pd.dist_code and pb.subdiv_code=pd.subdiv_code and pb.cir_code=pd.cir_code and pb.mouza_pargona_code=pd.mouza_pargona_code and pb.lot_no=pd.lot_no and pb.vill_townprt_code=pd.vill_townprt_code and pb.year_no=pd.year_no and pb.petition_no=pd.petition_no 
+            where  pb.case_no='$case_no' ";
+        $data=$this->db->query($sql)->row_array();
+        if($data['mut_type']=='03'){
+            $type='OM';
+        }elseif ($data['mut_type']=='01'){
+             $type='CV';
+        }
+        elseif ($data['mut_type']=='04'){
+             $type='OP';
+        }
+        $base= array(
+              'dist_code'=> $data['dist_code'],
+              'subdiv_code' =>$data['subdiv_code'],
+              'cir_code'=>$data['cir_code'],
+              'mouza_pargona_code'=>$data['mouza_pargona_code'],
+              'lot_no'=>$data['lot_no'],
+              'vill_townprt_code'=>$data['vill_townprt_code'],
+              'case_no'=>$data['case_no'],
+              'date_of_reg'=>$data['date_entry'],
+              'dag_no'=>$data['dag_no'],
+              'patta_type_code' =>$data['patta_type_code'],
+              'patta_no' =>$data['patta_no'],
+              'status' =>'P',
+              'pending_with_user' =>'CO',
+              'case_type' =>$type,
+            );
+        $this->dbb->insert('dashboard_data',$base);
+
+
+            unset($base['dag_no']);
+            unset($base['patta_type_code']);
+            unset($base['patta_no']);
+
+        $this->db->insert('dashboard_data',$base);
+
+        
+    }
+
+    function DashboardPartitionofc($case_no){
+        $this->dbb = $this->load->database('dash', TRUE);
+        $sql="Select pb.*,pd.dag_no,pd.patta_no,pd.patta_type_code from petition_basic pb join petition_dag_details pd on pb.dist_code=pd.dist_code and pb.subdiv_code=pd.subdiv_code and pb.cir_code=pd.cir_code and pb.mouza_pargona_code=pd.mouza_pargona_code and pb.lot_no=pd.lot_no and pb.vill_townprt_code=pd.vill_townprt_code and pb.year_no=pd.year_no and pb.petition_no=pd.petition_no 
+            where  pb.case_no='$case_no' ";
+        $data=$this->db->query($sql)->row_array();
+        if($data['mut_type']=='04'){
+            $type='OP';
+        }else{
+            
+        }
+        $base= array(
+              'dist_code'=> $data['dist_code'],
+              'subdiv_code' =>$data['subdiv_code'],
+              'cir_code'=>$data['cir_code'],
+              'mouza_pargona_code'=>$data['mouza_pargona_code'],
+              'lot_no'=>$data['lot_no'],
+              'vill_townprt_code'=>$data['vill_townprt_code'],
+              'case_no'=>$data['case_no'],
+              'date_of_reg'=>$data['date_entry'],
+              'dag_no'=>$data['dag_no'],
+              'patta_type_code' =>$data['patta_type_code'],
+              'patta_no' =>$data['patta_no'],
+              'status' =>'P',
+              'pending_with_user' =>'CO',
+              'case_type' =>$type,
+            );
+        $this->dbb->insert('dashboard_data',$base);
+
+
+            unset($base['dag_no']);
+            unset($base['patta_type_code']);
+            unset($base['patta_no']);
+
+        $this->db->insert('dashboard_data',$base);        
+    }
+
+    function DashboardPartitionField($case_no){
+        $this->dbb = $this->load->database('dash', TRUE);
+        $sql="Select * from field_mut_basic fmb left join field_mut_dag_details fmd on fmb.case_no=fmd.case_no where fmb.case_no='$case_no' ";
+        $data=$this->db->query($sql)->row_array();
+        if($data['mut_type']=='01'){
+            $type='FM';
+        }else{
+            $type='FP';
+        }
+        $base= array(
+              'dist_code'=> $data['dist_code'],
+              'subdiv_code' =>$data['subdiv_code'],
+              'cir_code'=>$data['cir_code'],
+              'mouza_pargona_code'=>$data['mouza_pargona_code'],
+              'lot_no'=>$data['lot_no'],
+              'vill_townprt_code'=>$data['vill_townprt_code'],
+              'case_no'=>$data['case_no'],
+              'date_of_reg'=>$data['date_entry'],
+              'dag_no'=>$data['dag_no'],
+              'patta_type_code' =>$data['patta_type_code'],
+              'patta_no' =>$data['patta_no'],
+              'status' =>'P',
+              'pending_with_user' =>'SK',
+              'case_type' =>$type,
+            );
+        
+			unset($base['dag_no']);
+            unset($base['patta_type_code']);
+            unset($base['patta_no']);
+            $this->db->insert('dashboard_data',$base);
+            $this->dbb->insert('dashboard_data',$base);
+            
+    }
+    /////////
+    function DashboardAllot($case_no){
+        $this->dbb = $this->load->database('dash', TRUE);
+        $sql="Select pb.*,pd.patta_no,pd.patta_type_code,
+        pd.dag_no from allotment_cert_basic pb 
+        join allotment_pet_dag pd on pb.case_no=pd.case_no  where pb.settlement_typ is null and  pb.case_no='$case_no' ";
+        $data=$this->db->query($sql)->row_array();
+        $type='AC';
+        $base= array(
+              'dist_code'=> $data['dist_code'],
+              'subdiv_code' =>$data['subdiv_code'],
+              'cir_code'=>$data['circle_code'],
+              'mouza_pargona_code'=>$data['mouza_pargona_code'],
+              'lot_no'=>$data['lot_no'],
+              'vill_townprt_code'=>$data['vill_townprt_code'],
+              'case_no'=>$data['case_no'],
+              'date_of_reg'=>$data['date_entry'],
+              'dag_no'=>$data['dag_no'],
+              'patta_type_code' =>'NA',
+              'patta_no' =>'NA',
+              'status' =>'P',
+              'pending_with_user' =>'CO',
+              'case_type' =>$type,
+            );
+        $this->dbb->insert('dashboard_data',$base);
+
+        unset($base['dag_no']);
+        unset($base['patta_type_code']);
+        unset($base['patta_no']);
+
+         $this->db->insert('dashboard_data',$base);
+
+
+    }
+
+
+    function DashboardReclass($case_no)
+    {
+        //$this->dbb = $this->load->database('dash', TRUE);
+
+        $sql="select * from t_reclassification where case_no='$case_no' ";
+        
+        $type='RC';
+        $data=$this->db->query($sql)->row_array();
+        $base= array(
+                    'dist_code'=> $data['dist_code'],
+                      'subdiv_code' =>$data['subdiv_code'],
+                      'cir_code'=>$data['cir_code'],
+                      'mouza_pargona_code'=>$data['mouza_pargona_code'],
+                      'lot_no'=>$data['lot_no'],
+                      'vill_townprt_code'=>$data['vill_townprt_code'],
+                      'case_no'=>$data['case_no'],
+                      'date_of_reg'=>$data['lm_date'],
+                      'dag_no'=>$data['dag_no'],
+                      'patta_type_code' =>$data['patta_type_code'],
+                      'patta_no' =>$data['patta_no'],
+                      'status' =>'P',
+                      'pending_with_user' =>'CO',
+                      'case_type' =>$type,
+                  );
+           // $this->db->insert('dashboard_data',$base);
+
+            unset($base['dag_no']);
+            unset($base['patta_type_code']);
+            unset($base['patta_no']);
+
+        $this->db->insert('dashboard_data',$base);
+
+    }
+
+    ///////////////////////////////////
+    function DashboardNameCorrect($case_no)
+    {
+            $this->dbb = $this->load->database('dash', TRUE);
+            $sql="Select pb.dist_code,pb.subdiv_code,pb.cir_code,pb.mouza_pargona_code,pb.lot_no,pb.lot_no,pb.vill_townprt_code,pb.misc_case_no 
+                as case_no,pb.dag_no,pb.patta_no,pb.patta_type_code,pd.petition_pdar_name_old as pet_name,pb.status,pb.submission_date as date_entry,pb.user_code,pb.lm_note_yn,pb.sk_note_yn,pb.add_to_officer as co_code,pb.next_date_of_hearing from misc_case_basic pb join misc_case_first_party pd on pb.misc_case_no=pd.misc_case_no  where pb.misc_case_no='$case_no' ";
+            $data=$this->db->query($sql)->row_array();
+            $type='MC';
+            $base= array(
+                  'dist_code'=> $data['dist_code'],
+                  'subdiv_code' =>$data['subdiv_code'],
+                  'cir_code'=>$data['cir_code'],
+                  'mouza_pargona_code'=>$data['mouza_pargona_code'],
+                  'lot_no'=>$data['lot_no'],
+                  'vill_townprt_code'=>$data['vill_townprt_code'],
+                  'case_no'=>$data['case_no'],
+                  'date_of_reg'=>$data['date_entry'],
+                  'dag_no'=>$data['dag_no'],
+                  'patta_type_code' =>$data['patta_type_code'],
+                  'patta_no' =>$data['patta_no'],
+                  'status' =>'P',
+                  'pending_with_user' =>'CO',
+                  'case_type' =>$type,
+                );
+            $this->dbb->insert('dashboard_data',$base);
+
+            unset($base['dag_no']);
+            unset($base['patta_type_code']);
+            unset($base['patta_no']);
+
+            $this->db->insert('dashboard_data',$base);
+            
+            // $applicant= array(
+            //     'case_no' => $data['case_no'],
+            //     'applicant_name' => $data['pet_name'],
+            //     'guardian_name' => 'NA',
+            //     'gender' => 'NA' );
+            // $this->dbb->insert('dashboard_applicant',$applicant);
+            // $action= array(
+            //     'case_no' =>$data['case_no'],
+            //     'user_code' => $this->session->userdata('user_code'),
+            //     'date_of_action_taken' => date('Y-m-d'),
+            //     'user_designation' => $this->session->userdata('user_desig_code'),
+            //     'remark' => 'Registered By Assistant',
+            //      );
+            //  $this->dbb->insert('dashboard_action',$action);
+    }
+
+    function DashboardNameCancel($case_no)
+    {
+            $this->dbb = $this->load->database('dash', TRUE);
+            $sql="Select pb.dist_code,pb.subdiv_code,pb.cir_code,pb.mouza_pargona_code,pb.lot_no,pb.lot_no,pb.vill_townprt_code,pb.misc_case_no 
+            as case_no,pb.dag_no,pb.patta_no,pb.patta_type_code,pd.petition_pdar_name_old as pet_name,pb.status,pb.submission_date as date_entry,pb.user_code,pb.lm_note_yn,pb.sk_note_yn,pb.add_to_officer as co_code,pb.next_date_of_hearing from misc_case_basic pb join misc_case_first_party pd on pb.misc_case_no=pd.misc_case_no  where pb.misc_case_no='$case_no' ";
+            $data=$this->db->query($sql)->row_array();
+            $type='MC';
+            $base= array(
+                  'dist_code'=> $data['dist_code'],
+                  'subdiv_code' =>$data['subdiv_code'],
+                  'cir_code'=>$data['cir_code'],
+                  'mouza_pargona_code'=>$data['mouza_pargona_code'],
+                  'lot_no'=>$data['lot_no'],
+                  'vill_townprt_code'=>$data['vill_townprt_code'],
+                  'case_no'=>$data['case_no'],
+                  'date_of_reg'=>$data['date_entry'],
+                  'dag_no'=>$data['dag_no'],
+                  'patta_type_code' =>$data['patta_type_code'],
+                  'patta_no' =>$data['patta_no'],
+                  'status' =>'P',
+                  'pending_with_user' =>'CO',
+                  'case_type' =>$type,
+                );
+            $this->dbb->insert('dashboard_data',$base);
+
+            unset($base['dag_no']);
+            unset($base['patta_type_code']);
+            unset($base['patta_no']);
+
+             $this->db->insert('dashboard_data',$base);
+             
+            
+    }
+
+    ///////////////////////////
+
+    function forceUpdate(){
+        //////////////POST To basundhara/////////////////////
+
+        $data=array('MB/NCOR/2021/205520','MB/NCOR/2021/205182','MB/NCOR/2021/173375','MB/NCOR/2021/173350','MB/NCOR/2021/172741','MB/NCOR/2021/172701','MB/NCOR/2021/172656','MB/NCOR/2021/124860','MB/NCOR/2021/124847','MB/NCOR/2021/124829','MB/NCOR/2021/124570','MB/NCOR/2021/296104','MB/NCOR/2021/295984','MB/NCOR/2021/286400','MB/NCOR/2021/218554','MB/NCOR/2021/218391','MB/NCOR/2021/205658','MB/NCOR/2021/205607','MB/NCOR/2021/266432','MB/NCOR/2021/266383','MB/NCOR/2021/266238','MB/NCOR/2021/266162');
+            $rmk='Order Passed';
+            $status='F';
+            $task='CO';
+            $pen='NA';
+            $case="";
+        foreach($data as $pet){
+
+            //$application_no= "MB/NCOR/2021/".$pet;
+            $application_no=$pet;
+            $this->basundharamodel->postApiBasundhara($application_no,$case,$rmk,$status,$task,$pen);
+        }
+        
+        //////////////////
+    }
+
+
+    function duplicateUp()
+    {
+        //         $sql="ALTER TABLE basundhar_application add column duplicate integer DEFAULT 0 ";
+        //         $this->db->query($sql);
+
+        //         $sql="Select distinct(basundhara) as basu from basundhar_application where app_status='P' ";
+        //         $result=$this->db->query($sql)->result_array();
+        //         foreach($result as $r){
+        //             //echo $r['basu'];
+                    
+        //             $sql="Select dharitree from basundhar_application where basundhara='$r[basu]' and dharitree!='' ";
+        //             $loop= $this->db->query($sql)->num_rows();
+        //             $data=$this->db->query($sql)->result_array();
+        //             //echo "<br>";
+        //             if($loop>1){
+        //                 $j=1;
+        //                 // echo "<br><br>";
+        //                 // echo $r['basu']."<br>";
+        //                 // echo $loop;
+        //                 // echo "<br>";
+        //                 //echo json_encode($data);
+                        
+        //                 for($i=1;$i<$loop;$i++){
+        //                      echo $j++."--";
+        //                      $dharitree= ($data[$i]['dharitree']);
+        //                      $basundhara=$r['basu'];
+        //                      $newID="DUP_".$r['basu'];
+        //                      $sql="Update basundhar_application set basundhara='$newID',duplicate='1' where dharitree='$dharitree' and basundhara='$basundhara'  ";
+        //                      echo $this->db->query($sql);
+        //                      echo "<br>";
+        //                 }
+        //             }
+        //         }
+    }
+    function address($full_address){
+          //if less then 100
+          if (strlen($full_address)<100) 
+          {
+            $address[0]= $full_address;
+            $address[1] = null;
+            return $address;    
+          }
+          //if more then 100 containing ',' or space separator
+          $sub_address = substr($full_address,0,100);
+          $pos = strrpos($sub_address,","); 
+          if (!$pos)
+          {
+              $pos = strrpos($sub_address," "); 
+          }
+          
+          $address[1] = substr($full_address,$pos+1,strlen($full_address));
+          $address[0]= substr($full_address,0,$pos);            
+          return $address;               
+    }
+    ///////////////////////////
+    function requestCircle($service){
+        //var_dump($_SESSION);
+        $this->load->model('basundhara/basundharamodel');
+        $this->load->library('pagination');
+        $data = array();   
+        $this->perPage = 100; 
+        $service_code = $service;
+        $dist_code = $this->session->userdata('dist_code');
+        $subdiv_code = $this->session->userdata('subdiv_code');
+        $cir_code = $this->session->userdata('cir_code');
+        
+        // If search request submitted
+        if($this->input->post('submitSearch')){
+          $inputKeywords = $this->input->post('searchKeyword');
+          $searchKeyword = strip_tags($inputKeywords);
+          if(!empty($searchKeyword)){
+              $this->session->set_userdata('searchKeyword',$searchKeyword);
+              redirect(base_url().'index.php/basundhara/requestCircle/'.$service_code);
+          }else{
+              $this->session->unset_userdata('searchKeyword');
+          }
+        }elseif($this->input->post('submitSearchReset')){
+            $this->session->unset_userdata('searchKeyword');
+            redirect(base_url().'index.php/basundhara/requestCircle/'.$service_code);
+        }
+        $data['searchKeyword'] = $this->session->userdata('searchKeyword');
+        // Get rows count
+        $conditions['conditions'] = array(
+          'is_draft'=>'N',
+          'service_code' => $service_code,
+          'dist_code'=> $dist_code,
+          'subdiv_code' => $subdiv_code,
+          'cir_code'=> $cir_code
+        );
+        $conditions['searchKeyword'] = $data['searchKeyword'];        
+        $conditions['returnType']    = 'count';
+        //$rowsCount = $this->MyapplicationsModel->getRows($conditions);
+        $rowsCount = $this->basundharamodel->allCORequest1($conditions);
+        
+        // Pagination config
+        $config['base_url']    = base_url().'index.php/basundhara/requestCircle/'.$service_code;
+        $config['uri_segment'] = 4;
+        $config['total_rows']  = $rowsCount;
+        $config['per_page']    = $this->perPage;
+        $choice = $config["total_rows"] / $config["per_page"];
+        $config["num_links"] = floor($choice);
+        //config for bootstrap pagination class integration
+        $config['full_tag_open'] = '<ul class="pagination">';
+        $config['full_tag_close'] = '</ul>';
+        $config['first_link'] = false;
+        $config['last_link'] = false;
+        $config['first_tag_open'] = '<li>';
+        $config['first_tag_close'] = '</li>';
+        $config['prev_link'] = '&laquo';
+        $config['prev_tag_open'] = '<li class="prev">';
+        $config['prev_tag_close'] = '</li>';
+        $config['next_link'] = '&raquo';
+        $config['next_tag_open'] = '<li>';
+        $config['next_tag_close'] = '</li>';
+        $config['last_tag_open'] = '<li>';
+        $config['last_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="active"><a href="#">';
+        $config['cur_tag_close'] = '</a></li>';
+        $config['num_tag_open'] = '<li>';
+        $config['num_tag_close'] = '</li>';
+    
+        // Initialize pagination library
+        $this->pagination->initialize($config);
+        $page = $this->uri->segment(4);
+        $offset = !$page?0:$page;
+        $conditions[] = null;
+        $conditions['returnType'] = '';
+        $conditions['conditions'] = array(
+          'is_draft'=>'N',
+          'service_code' => $service_code,
+          'dist_code'=> $dist_code,
+          'subdiv_code' => $subdiv_code,
+          'cir_code'=> $cir_code
+        );
+        $conditions['start'] = $offset;
+        $conditions['limit'] = $this->perPage;
+        $data['pending'] =  $this->basundharamodel->allCORequest1($conditions);
+        $data['title'] = 'Application List';
+        $data['_view'] = 'basundhara/new_pagination';
+        $this->load->view('layouts/main',$data);
+        }
+        /////////////18-12-2021/////////////////////
+        function adcRejectList(){
+            //$data['case']=$this->basundharamodel->adcRejectList();
+            $curl_handle = curl_init();
+
+            //$url="https://basundhara.assam.gov.in/demo/"."rest/getrejectapp";
+            curl_setopt($curl_handle, CURLOPT_URL, API_LINK."getRejectedApplications");
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+            curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                'dist_code' => $this->session->userdata('dist_code'),
+                'service_code'=>null,
+                'required_response'=>'COUNT'
+            ]));
+            $data=curl_exec($curl_handle);
+            $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+            $data= json_decode($data);
+            if($httpcode!=200 || $data==null || empty($data->responseType)){
+                    $data=array(
+                        'error'=>"<b> Error in API Calling </b>",
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                    echo json_encode($data);
+                    return;
+            }
+            if($data->responseType==2){
+                $data->responseType;
+                $store['output']=$data->data;
+            }else{
+                $store['output']=null;
+            }
+            $store['_view'] = 'basundhara/rejectlist';
+            $this->load->view('layouts/main',$store);
+    }
+    ////////////////////For CO//////////////////////////
+    function pendingforApprove(){
+            //$data['case']=$this->basundharamodel->adcRejectList();
+            $curl_handle = curl_init();
+            //$url="https://basundhara.assam.gov.in/demo/"."rest/getrejectapp";
+            curl_setopt($curl_handle, CURLOPT_URL, API_LINK."getADCAllowedApplicationsForCircle");
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+            curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                'dist_code' => $this->session->userdata('dist_code'),
+                'subdiv_code'=>$this->session->userdata('subdiv_code'),
+                'cir_code'=>$this->session->userdata('cir_code'),
+                'service_code'=>null,
+                'allow_reapply'=>'A',
+                'required_response'=>'COUNT'
+            ]));
+            $data=curl_exec($curl_handle);
+            $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+            $data= json_decode($data);
+            if($httpcode!=200 || $data==null || empty($data->responseType)){
+                    $data=array(
+                        'error'=>"<b> Error in API Calling </b>",
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                    echo json_encode($data);
+                    return;
+            }
+            if($data->responseType==2){
+                $data->responseType;
+                $store['output']=$data->data;
+            }else{
+                $store['output']=null;
+            }
+            $store['_view'] = 'basundhara/reapprovelist';
+            $this->load->view('layouts/main',$store);
+    }
+    function coview($s){
+            $curl_handle = curl_init();
+            curl_setopt($curl_handle, CURLOPT_URL, API_LINK."getADCAllowedApplicationsForCircle");
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+            curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                'dist_code' => $this->session->userdata('dist_code'),
+                'subdiv_code'=>$this->session->userdata('subdiv_code'),
+                'cir_code'=>$this->session->userdata('cir_code'),
+                'service_code'=>$s,
+                'required_response'=>'DATA'
+            ]));
+            $data=curl_exec($curl_handle);
+            $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+            $data= json_decode($data);
+            //var_dump($data);
+            if($httpcode!=200 || $data==null || empty($data->responseType)){
+                    $data=array(
+                        'error'=>"<b> Error in API Calling </b>",
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                    echo json_encode($data);
+                    return;
+            }
+            if($data->responseType==2){
+                $data->responseType;
+                $store['pending']=$data->data;
+            }else{
+                $store['pending']=null;
+            }
+            $store['_view'] = 'basundhara/requestco';
+            $this->load->view('layouts/main',$store);
+    }
+    ///////////////////////////////////////////////////////
+    function adcview($s){
+            //$data['case']=$this->basundharamodel->adcRejectList();
+            $curl_handle = curl_init();
+            //$url="https://basundhara.assam.gov.in/demo/"."rest/getrejectapp";
+            curl_setopt($curl_handle, CURLOPT_URL, API_LINK."getRejectedApplications");
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+            curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+            curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+            'dist_code' => $this->session->userdata('dist_code'),
+            'service_code'=>$s,
+            'required_response'=>'DATA'
+            ]));
+            $data=curl_exec($curl_handle);
+            $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+            $data= json_decode($data);
+            if($httpcode!=200 || $data==null || empty($data->responseType)){
+                    $data=array(
+                        'error'=>"<b> Error in API Calling </b>",
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                    echo json_encode($data);
+                    return;
+            }
+            if($data->responseType==2){
+                $data->responseType;
+                $store['pending']=$data->data;
+            }else{
+                $store['pending']=null;
+            }
+            $store['_view'] = 'basundhara/requestadc';
+            $this->load->view('layouts/main',$store);
+    }
+    ///////////////////////
+    ///////////////////////
+    function adcApproveReject(){
+        $curl_handle = curl_init();
+        if($this->session->userdata('user_desig_code')=='CO'){
+            $allow_reapply=$_POST['allow_reapply']=='Y'?$_POST['allow_reapply']:$_POST['allow_reapply'];
+        }else{
+            $allow_reapply=$_POST['allow_reapply']=='Y'?'A':$_POST['allow_reapply'];
+        }
+        ////////////////////////////
+        if($allow_reapply == 'E' && $this->session->userdata('user_desig_code')=='CO')
+        {
+            $this->db->trans_begin();
+
+            $sql="Select dharitree from basundhar_application where basundhara=? and dharitree is not null";
+            $dharitree_result=$this->db->query($sql,array(trim($_POST['case_no'])));
+            //echo $this->db->last_query();
+            log_message('error',$this->db->last_query());
+            if($dharitree_result->num_rows() == 0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Dharitree case not found'
+                );
+                echo json_encode($data);
+                return;
+            }
+
+            $dharitree_case_no = $dharitree_result->row();
+
+            $field_mut_basic_query = $this->db->query("select * from field_mut_basic where case_no=?",array($dharitree_case_no->dharitree));
+            $omut_mut_basic_query = $this->db->query("select * from petition_basic where case_no=?",array($dharitree_case_no->dharitree));
+            if($field_mut_basic_query->num_rows() == 0 && $omut_mut_basic_query->num_rows()==0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Processing. Dharitree case not found',
+                );
+                echo json_encode($data);
+                return;
+            }
+            if($field_mut_basic_query->num_rows()!=0){
+                $field_mut_basic_data = $field_mut_basic_query->row();
+            }else if($omut_mut_basic_query->num_rows()!=0){
+                $field_mut_basic_data = $omut_mut_basic_query->row();
+            }
+            $basundhara_data_updation = array(
+                'ip'=> $this->input->ip_address(),
+                'case_no'=> $dharitree_case_no->dharitree,
+                'basundhara'=> trim($_POST['case_no']),
+                'user_code'=>$this->session->userdata('user_code'),
+                'date_entry'=>date('Y-m-d H:i:s'),
+                'changes_data' => json_encode($field_mut_basic_data),
+            );
+            $insert_basundhara_data_updation = $this->db->insert('basundhara_data_updation',$basundhara_data_updation);
+            if($insert_basundhara_data_updation == false)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Data not updated',
+                );
+                echo json_encode($data);
+                return;
+            }
+            if($field_mut_basic_query->num_rows()!=0){
+                $update = array(
+                    'order_passed'=>null,
+                    'date_of_order'=>null,
+                    'is_dispose'=> null,
+                    'if_dispose_date'=>null,
+                    'dispose_reason'=>null,
+                );
+                $this->db->where('case_no', $dharitree_case_no->dharitree);
+                $field_mut_basic_update = $this->db->update('field_mut_basic', $update);
+            }
+            ////////////For Office Case/////////////
+            if($omut_mut_basic_query->num_rows()!=0){
+                $update = array(
+                    'order_passed'=>null,
+                    'date_of_order'=>null,
+                    'status'=> 'P',
+                    'bo_note_yn'=>null,
+                    'co_order_conv_date'=>null,
+                    'lm_note_yn'=>null,
+                    'lm_note_date'=>null,
+                    'sk_comment'=>null,
+                    'co_user_code' =>$this->session->userdata('user_code')
+                );
+                $this->db->where('case_no', $dharitree_case_no->dharitree);
+                $field_mut_basic_update = $this->db->update('petition_basic', $update);
+            }
+            ////////////////////////
+            if($field_mut_basic_update == false || $this->db->affected_rows() != 1)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Final Processing.',
+                );
+                echo json_encode($data);
+                return;
+            }
+
+            if ($this->db->trans_status() == FALSE)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!!Not completed. Please try again',
+                );
+                echo json_encode($data);
+                return;
+            }
+            else
+            {
+                    //$this->db->trans_rollback();
+                    $this->db->trans_commit();
+                    //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                    curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                    curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                    curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                        'app_id' => $_POST['app_id'],
+                        'allow_reapply'=>$allow_reapply,
+                        'reapply_remark'=>$_POST['reapply_remark'],
+                        'user_code'=>$this->session->userdata('user_code')
+                    ]));
+                    $data=curl_exec($curl_handle);
+                    $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                    $data= json_decode($data);
+                    if($httpcode!=200 || $data==null || empty($data->responseType)){
+                            $data=array(
+                                'error'=>"<b> Error in API Calling </b>",
+                                'redirect_url'=>base_url().'index.php/home'
+                            );
+                            echo json_encode($data);
+                            return;
+                    }
+                    if($data==null || empty($data->responseType)){
+                        $data=array(
+                            'error'=>"<b> Application Not Found </b>",
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                        echo json_encode($data);
+                        return;
+                    }
+                    if($data->responseType==2){
+                        if($_POST['allow_reapply']=='Y'){
+                            $response="Approved. User can re-apply the Application";
+                        }else{
+                            $response="Case Should be available under Field Mutation Process";
+                        }
+                        $data=array(
+                            'success'=>$response,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else if($data->responseType==3){
+                        $data=array(
+                            'error'=>$data->error ."<b> Please reject the case </b>",
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else{
+                        $data=array(
+                            'error'=>$data->validation,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }
+                    echo json_encode($data);
+            }
+
+        }
+        else {
+                //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                    'app_id' => $_POST['app_id'],
+                    'allow_reapply'=>$allow_reapply,
+                    'reapply_remark'=>$_POST['reapply_remark'],
+                    'user_code'=>$this->session->userdata('user_code')
+                ]));
+                $data=curl_exec($curl_handle);
+                $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                $data= json_decode($data);
+                if($httpcode!=200 || $data==null || empty($data->responseType)){
+                        $data=array(
+                            'error'=>"<b> Error in API Calling </b>",
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                        echo json_encode($data);
+                        return;
+                }
+                if($data->responseType==2){
+                    if($_POST['allow_reapply']=='Y'){
+                        $response="Approved. User can re-apply the Application";
+                    }else{
+                        $response="Rejected. User cann't re-apply the Application";
+                    }
+                    $data=array(
+                        'success'=>$response,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else if($data->responseType==3){
+                    $data=array(
+                        'error'=>$data->error ."<b> Please reject the case </b>",
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else{
+                    $data=array(
+                        'error'=>$data->validation,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }
+                echo json_encode($data);
+        }
+        /////////////////////////////
+        
+    }
+    ///////////////////////////// 
+    function pushSro(){
+        $dharitree=$this->input->get('c');
+        $basundhara=$this->input->get('app');
+        $result=$this->basundharamodel->pushSro();
+        if($result==true){
+            $this->session->set_flashdata('message',"Application Sent to SRO Office");
+            redirect('/home');
+        }else{
+        $this->session->set_flashdata('message',"Found Error. Please Try again");
+            redirect('/home');  
+        }    
+    }
+    ///////////////////////
+    function adcApproveRejectOffice(){
+        $curl_handle = curl_init();
+        if($this->session->userdata('user_desig_code')=='CO'){
+            $allow_reapply=$_POST['allow_reapply']=='Y'?$_POST['allow_reapply']:$_POST['allow_reapply'];
+        }else{
+            $allow_reapply=$_POST['allow_reapply']=='Y'?'A':$_POST['allow_reapply'];
+        }
+        ////////////////////////////
+        if($allow_reapply == 'E' && $this->session->userdata('user_desig_code')=='CO')
+        {
+            $this->db->trans_begin();
+            $sql="Select dharitree from basundhar_application where basundhara=? and dharitree is not null";
+            $dharitree_result=$this->db->query($sql,array(trim($_POST['case_no'])));
+
+            if($dharitree_result->num_rows() == 0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Dharitree case not found'
+                );
+                echo json_encode($data);
+                return;
+            }
+            $dharitree_case_no = $dharitree_result->row();
+            $field_mut_basic_query = $this->db->query("select * from field_mut_basic where case_no=?",array($dharitree_case_no->dharitree));
+            $omut_mut_basic_query = $this->db->query("select * from petition_basic where case_no=?",array($dharitree_case_no->dharitree));
+            if($field_mut_basic_query->num_rows() == 0 && $omut_mut_basic_query->num_rows()==0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Processing. Dharitree case not found',
+                );
+                echo json_encode($data);
+                return;
+            }
+            if($field_mut_basic_query->num_rows()!=0){
+                $field_mut_basic_data = $field_mut_basic_query->row();
+            }else if($omut_mut_basic_query->num_rows()!=0){
+                $field_mut_basic_data = $omut_mut_basic_query->row();
+            }
+            $basundhara_data_updation = array(
+                'ip'=> $this->input->ip_address(),
+                'case_no'=> $dharitree_case_no->dharitree,
+                'basundhara'=> trim($_POST['case_no']),
+                'user_code'=>$this->session->userdata('user_code'),
+                'date_entry'=>date('Y-m-d H:i:s'),
+                'changes_data' => json_encode($field_mut_basic_data),
+            );
+            $insert_basundhara_data_updation = $this->db->insert('basundhara_data_updation',$basundhara_data_updation);
+            if($insert_basundhara_data_updation == false)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Data not updated',
+                );
+                echo json_encode($data);
+                return;
+            }
+            if($field_mut_basic_query->num_rows()!=0){
+                $update = array(
+                    'order_passed'=>null,
+                    'date_of_order'=>null,
+                    'is_dispose'=> null,
+                    'if_dispose_date'=>null,
+                    'dispose_reason'=>null,
+                );
+                $this->db->where('case_no', $dharitree_case_no->dharitree);
+                $field_mut_basic_update = $this->db->update('field_mut_basic', $update);
+            }
+            ////////////For Office Case/////////////
+            if($omut_mut_basic_query->num_rows()!=0){
+                $update = array(
+                    'order_passed'=>null,
+                    'date_of_order'=>null,
+                    'status'=> 'P',
+                    'bo_note_yn'=>null,
+                    'co_order_conv_date'=>null,
+                    'lm_note_yn'=>null,
+                    'lm_note_date'=>null,
+                    'sk_comment'=>null,
+                    'co_user_code' =>$this->session->userdata('user_code')
+                );
+                $this->db->where('case_no', $dharitree_case_no->dharitree);
+                $field_mut_basic_update = $this->db->update('petition_basic', $update);
+            }
+            ////////////////////////
+            if($field_mut_basic_update == false || $this->db->affected_rows() != 1)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Final Processing.',
+                );
+                echo json_encode($data);
+                return;
+            }
+            if($field_mut_basic_update == false || $this->db->affected_rows() != 1)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Final Processing.',
+                );
+                echo json_encode($data);
+                return;
+            }
+            if ($this->db->trans_status() == FALSE)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!!Not completed. Please try again',
+                );
+                echo json_encode($data);
+                return;
+            }
+            else
+            {
+                    $this->db->trans_commit();
+                    //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                    curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                    curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                    curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                        'app_id' => $_POST['app_id'],
+                        'allow_reapply'=>$allow_reapply,
+                        'reapply_remark'=>$_POST['reapply_remark'],
+                        'user_code'=>$this->session->userdata('user_code')
+                    ]));
+                    $data=curl_exec($curl_handle);
+                    $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                    $data= json_decode($data);
+                    if($httpcode!=200 || $data==null || empty($data->responseType)){
+                            $data=array(
+                                'error'=>"<b> Error in API Calling </b>",
+                                'redirect_url'=>base_url().'index.php/home'
+                            );
+                            echo json_encode($data);
+                            return;
+                    }
+                    if($data->responseType==2){
+                        if($_POST['allow_reapply']=='Y'){
+                            $response="Approved. User can re-apply the Application";
+                        }else{
+                            $response="Case Should be available under Office Mutation Process First Proceeding or Second Proceeding ";
+                        }
+                        $data=array(
+                            'success'=>$response,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else if($data->responseType==3){
+                        $data=array(
+                            'error'=>$data->error ."<b> Please reject the case </b>",
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else{
+                        $data=array(
+                            'error'=>$data->validation,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }
+                    echo json_encode($data);
+            }
+
+        }
+        else {
+                //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                    'app_id' => $_POST['app_id'],
+                    'allow_reapply'=>$allow_reapply,
+                    'reapply_remark'=>$_POST['reapply_remark'],
+                    'user_code'=>$this->session->userdata('user_code')
+                ]));
+                $data=curl_exec($curl_handle);
+                $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                $data= json_decode($data);
+                if($data==null || empty($data->responseType)){
+                    $data=array(
+                        'error'=>"<b> Application Not Found </b>",
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                    echo json_encode($data);
+                    return;
+                }
+                if($data->responseType==2){
+                    if($_POST['allow_reapply']=='Y'){
+                        $response="Approved. User can re-apply the Application";
+                    }else{
+                        $response="Rejected. User cann't re-apply the Application";
+                    }
+                    $data=array(
+                        'success'=>$response,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else if($data->responseType==3){
+                    $data=array(
+                        'error'=>$data->error ."<b> Application Not Found </b>",
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else{
+                    $data=array(
+                        'error'=>$data->validation,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }
+                echo json_encode($data);
+        }
+        /////////////////////////////  
+    }
+    ////////////////////////
+    function adcApproveRejectAreaCorrection(){
+        
+        $curl_handle = curl_init();
+        if($this->session->userdata('user_desig_code')=='CO'){
+            $allow_reapply=$_POST['allow_reapply']=='Y'?$_POST['allow_reapply']:$_POST['allow_reapply'];
+        }else{
+            $allow_reapply=$_POST['allow_reapply']=='Y'?'A':$_POST['allow_reapply'];
+        }
+        ////////////////////////////
+        if($allow_reapply == 'E' && $this->session->userdata('user_desig_code')=='CO')
+        {
+            $this->db->trans_begin();
+            $sql="Select dharitree from basundhar_application where basundhara=? and dharitree is not null";
+            $dharitree_result=$this->db->query($sql,array(trim($_POST['case_no'])));
+            //echo $this->db->last_query();
+            if($dharitree_result->num_rows() == 0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Dharitree case not found'
+                );
+                echo json_encode($data);
+                return;
+            }
+            $dharitree_case_no = $dharitree_result->row();
+            $t_legacyupdation = $this->db->query("select * from t_legacyupdation where case_no=?",array($dharitree_case_no->dharitree));
+            if($t_legacyupdation->num_rows() == 0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Processing. Dharitree case not found',
+                );
+                echo json_encode($data);
+                return;
+            }
+            $t_legacyupdation_data = $t_legacyupdation->row();
+            $basundhara_data_updation = array(
+                'ip'=> $this->input->ip_address(),
+                'case_no'=> $dharitree_case_no->dharitree,
+                'basundhara'=> trim($_POST['case_no']),
+                'user_code'=>$this->session->userdata('user_code'),
+                'date_entry'=>date('Y-m-d H:i:s'),
+                'changes_data' => json_encode($t_legacyupdation_data),
+            );
+            $insert_basundhara_data_updation = $this->db->insert('basundhara_data_updation',$basundhara_data_updation);
+            if($insert_basundhara_data_updation == false)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Data not updated',
+                );
+                echo json_encode($data);
+                return;
+            }
+            $update = array(
+                  'co_yn' => null,
+                  'dc_yn' => null,
+                  'status' => 'P'
+            );
+            $this->db->where('case_no', $dharitree_case_no->dharitree);
+            $allotment_cert_basic_update = $this->db->update('t_legacyupdation', $update);
+            if($allotment_cert_basic_update == false || $this->db->affected_rows() != 1)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Final Processing.',
+                );
+                echo json_encode($data);
+                return;
+            }
+            if ($this->db->trans_status() == FALSE)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!!Not completed. Please try again',
+                );
+                echo json_encode($data);
+                return;
+            }
+            else
+            {
+                    $this->db->trans_commit();
+                    //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                    curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                    curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                    curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                        'app_id' => $_POST['app_id'],
+                        'allow_reapply'=>$allow_reapply,
+                        'reapply_remark'=>$_POST['reapply_remark'],
+                        'user_code'=>$this->session->userdata('user_code')
+                    ]));
+                    $data=curl_exec($curl_handle);
+                    $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                    $data= json_decode($data);
+                    if($httpcode!=200 || $data==null || empty($data->responseType)){
+                            $data=array(
+                                'error'=>"<b> Error in API Calling </b>",
+                                'redirect_url'=>base_url().'index.php/home'
+                            );
+                            echo json_encode($data);
+                            return;
+                    }
+                    if($data->responseType==2){
+                        if($_POST['allow_reapply']=='Y'){
+                            $response="Approved. User can re-apply the Application";
+                        }else{
+                            $response="Case Should be available with CO under Pending Area Correction";
+                        }
+                        $data=array(
+                            'success'=>$response,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else if($data->responseType==3){
+                        $data=array(
+                            'error'=>$data->error ."<b> Please reject the case </b>",
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else{
+                        $data=array(
+                            'error'=>$data->validation,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }
+                    echo json_encode($data);
+            }
+
+        }
+        else {
+                //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                    'app_id' => $_POST['app_id'],
+                    'allow_reapply'=>$allow_reapply,
+                    'reapply_remark'=>$_POST['reapply_remark'],
+                    'user_code'=>$this->session->userdata('user_code')
+                ]));
+                $data=curl_exec($curl_handle);
+                $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                    $data= json_decode($data);
+                    if($httpcode!=200 || $data==null || empty($data->responseType)){
+                            $data=array(
+                                'error'=>"<b> Error in API Calling </b>",
+                                'redirect_url'=>base_url().'index.php/home'
+                            );
+                            echo json_encode($data);
+                            return;
+                    }
+                if($data->responseType==2){
+                    if($_POST['allow_reapply']=='Y'){
+                        $response="Approved. User can re-apply the Application";
+                    }else{
+                        $response="Rejected. User cann't re-apply the Application";
+                    }
+                    $data=array(
+                        'success'=>$response,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else if($data->responseType==3){
+                    $data=array(
+                        'error'=>$data->error ."<b> Please reject the case </b>",
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else{
+                    $data=array(
+                        'error'=>$data->validation,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }
+                echo json_encode($data);
+        }
+        /////////////////////////////  
+    }
+    ///////////////////////
+    function adcApproveRejectAllotment(){
+        
+
+        $curl_handle = curl_init();
+        if($this->session->userdata('user_desig_code')=='CO'){
+            $allow_reapply=$_POST['allow_reapply']=='Y'?$_POST['allow_reapply']:$_POST['allow_reapply'];
+        }else{
+            $allow_reapply=$_POST['allow_reapply']=='Y'?'A':$_POST['allow_reapply'];
+        }
+        ////////////////////////////
+        if($allow_reapply == 'E' && $this->session->userdata('user_desig_code')=='CO')
+        {
+            $this->db->trans_begin();
+            $sql="Select dharitree from basundhar_application where basundhara=? and dharitree is not null";
+            $dharitree_result=$this->db->query($sql,array(trim($_POST['case_no'])));
+
+            if($dharitree_result->num_rows() == 0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Dharitree case not found'
+                );
+                echo json_encode($data);
+                return;
+            }
+            $dharitree_case_no = $dharitree_result->row();
+            $allotment_cert_basic = $this->db->query("select * from allotment_cert_basic where case_no=?",array($dharitree_case_no->dharitree));
+            if($allotment_cert_basic->num_rows() == 0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Processing. Dharitree case not found',
+                );
+                echo json_encode($data);
+                return;
+            }
+            $allotment_cert_basic_data = $allotment_cert_basic->row();
+            $basundhara_data_updation = array(
+                'ip'=> $this->input->ip_address(),
+                'case_no'=> $dharitree_case_no->dharitree,
+                'basundhara'=> trim($_POST['case_no']),
+                'user_code'=>$this->session->userdata('user_code'),
+                'date_entry'=>date('Y-m-d H:i:s'),
+                'changes_data' => json_encode($allotment_cert_basic_data),
+            );
+            $insert_basundhara_data_updation = $this->db->insert('basundhara_data_updation',$basundhara_data_updation);
+            if($insert_basundhara_data_updation == false)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Data not updated',
+                );
+                echo json_encode($data);
+                return;
+            }
+            $update = array(
+                  'lm_code' => null,
+                  'lm_note' => null,
+                  'lm_entry_date' => null,
+                  'sk_code' => null,
+                  'sk_entry_date' => null,
+                  'sk_note' => null,
+                  'co_code' => null,
+                  'co_entry_date' => null,
+                  'co_note' => null,
+                  'bo_code' => null,
+                  'bo_date_entry' => null,
+                  'bo_note' => null,
+                  'dc_code' => null,
+                  'dc_entry_date' => null,
+                  'dc_note' => null,
+                  'status'=> null,
+                  'not_fresh'=> null,
+            );
+            $this->db->where('case_no', $dharitree_case_no->dharitree);
+            $allotment_cert_basic_update = $this->db->update('allotment_cert_basic', $update);
+            if($allotment_cert_basic_update == false || $this->db->affected_rows() != 1)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Final Processing.',
+                );
+                echo json_encode($data);
+                return;
+            }
+            if ($this->db->trans_status() == FALSE)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!!Not completed. Please try again',
+                );
+                echo json_encode($data);
+                return;
+            }
+            else
+            {
+                    $this->db->trans_commit();
+                    //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                    curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                    curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                    curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                        'app_id' => $_POST['app_id'],
+                        'allow_reapply'=>$allow_reapply,
+                        'reapply_remark'=>$_POST['reapply_remark'],
+                        'user_code'=>$this->session->userdata('user_code')
+                    ]));
+                    $data=curl_exec($curl_handle);
+                    $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                    $data= json_decode($data);
+                    if($httpcode!=200 || $data==null || empty($data->responseType)){
+                            $data=array(
+                                'error'=>"<b> Error in API Calling </b>",
+                                'redirect_url'=>base_url().'index.php/home'
+                            );
+                            echo json_encode($data);
+                            return;
+                    }
+                    if($data->responseType==2){
+                        if($_POST['allow_reapply']=='Y'){
+                            $response="Approved. User can re-apply the Application";
+                        }else{
+                            $response="Case Should be available under AC to PP Process First Proceeding ";
+                        }
+                        $data=array(
+                            'success'=>$response,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else if($data->responseType==3){
+                        $data=array(
+                            'error'=>$data->error ."<b> Please reject the case </b>",
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else{
+                        $data=array(
+                            'error'=>$data->validation,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }
+                    echo json_encode($data);
+            }
+
+        }
+        else {
+                //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                    'app_id' => $_POST['app_id'],
+                    'allow_reapply'=>$allow_reapply,
+                    'reapply_remark'=>$_POST['reapply_remark'],
+                    'user_code'=>$this->session->userdata('user_code')
+                ]));
+                $data=curl_exec($curl_handle);
+                $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                    $data= json_decode($data);
+                    if($httpcode!=200 || $data==null || empty($data->responseType)){
+                            $data=array(
+                                'error'=>"<b> Error in API Calling </b>",
+                                'redirect_url'=>base_url().'index.php/home'
+                            );
+                            echo json_encode($data);
+                            return;
+                    }
+                if($data->responseType==2){
+                    if($_POST['allow_reapply']=='Y'){
+                        $response="Approved. User can re-apply the Application";
+                    }else{
+                        $response="Rejected. User cann't re-apply the Application";
+                    }
+                    $data=array(
+                        'success'=>$response,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else if($data->responseType==3){
+                    $data=array(
+                        'error'=>$data->error ."<b> Please reject the case </b>",
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else{
+                    $data=array(
+                        'error'=>$data->validation,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }
+                echo json_encode($data);
+        }
+        /////////////////////////////  
+    }
+    
+    function adcPage($s){
+        $this->load->library('pagination');
+        $this->per_page_c=50;
+        $rowsCount = $this->basundharamodel->getRejectedApplications(array(
+              'dist_code' => $this->session->userdata('dist_code'),
+              'service_code'=>1,
+              'required_response'=>'COUNT',
+              'page_size'=>1,
+              'page_no'=>0
+            )
+        );
+        // Pagination config
+        $config['base_url']    = base_url().'index.php/basundhara/adcPage/'.$s;
+        $config['uri_segment'] = 4;
+        $config['total_rows']  = $rowsCount;
+        $config['per_page']    = $this->per_page_c;
+        $choice = $config["total_rows"] / $config["per_page"];
+        $config["num_links"] = floor($choice);
+        //config for bootstrap pagination class integration
+        $config['full_tag_open'] = '<ul class="pagination">';
+        $config['full_tag_close'] = '</ul>';
+        $config['first_link'] = false;
+        $config['last_link'] = false;
+        $config['first_tag_open'] = '<li>';
+        $config['first_tag_close'] = '</li>';
+        $config['prev_link'] = '&laquo';
+        $config['prev_tag_open'] = '<li class="prev">';
+        $config['prev_tag_close'] = '</li>';
+        $config['next_link'] = '&raquo';
+        $config['next_tag_open'] = '<li>';
+        $config['next_tag_close'] = '</li>';
+        $config['last_tag_open'] = '<li>';
+        $config['last_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="active"><a href="#">';
+        $config['cur_tag_close'] = '</a></li>';
+        $config['num_tag_open'] = '<li>';
+        $config['num_tag_close'] = '</li>';
+    
+        // Initialize pagination library
+        $this->pagination->initialize($config);
+        $page = $this->uri->segment(4);
+        $offset = !$page?0:$page;
+    
+        $data['pending'] =  $this->basundharamodel->getRejectedApplications(array(
+          'dist_code' => $this->session->userdata('dist_code'),
+          'service_code'=>$s,
+          'required_response'=>'DATA',
+          'page_size'=>$this->per_page_c,
+          'page_no'=>$offset
+        ));
+
+        ////////////////11-04-22///////////////////
+        $dist_code = $this->session->userdata('dist_code');
+        $sub = $this->session->userdata('subdiv_code');
+        $curl_handle = curl_init();
+
+        curl_setopt($curl_handle, CURLOPT_URL, API_LINK."getRejectedApplicationsForSRO");
+        curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+        curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+        curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+        curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+            "dist_code" => $dist_code,
+            "service_code" => $s,
+            "cir_code" => "ALL",
+            "subdiv_code" => $sub,
+            "status" => "ALL",
+            "page_size" => PAGE_LIMIT,
+            "page_no" => "1",
+            "required_response" => "COUNT"
+        ]));
+
+        $list = curl_exec($curl_handle);
+        $detail = json_decode($list);
+      
+        if($detail->responseType==2){
+            $detail->responseType;
+            $output = $detail->data;
+        }else{
+            $output=null;
+        }
+        $cir_code = $this->db->query("SELECT subdiv_code, cir_code, loc_name FROM 
+        location WHERE dist_code=? AND subdiv_code!=? AND cir_code!=?
+        AND mouza_pargona_code=? AND vill_townprt_code=? AND lot_no=?", 
+        array($dist_code, '00', '00', '00', '00000', '00'));
+        
+        $data['circleList'] = $cir_code->result();
+        $data['service_code'] = $s;
+        $data['output'] = $output;
+        $data['total_adc_received'] = $output[0]->total_recieved_by_adc;
+        $data['adc_pending'] = $output[0]->pending_with_adc;
+        $data['adc_rejected'] = $output[0]->rejected_by_adc;
+        $data['adc_revived'] = $output[0]->approved_by_adc;
+        ////////////////11-04-22///////////////////
+
+
+
+        $data['title'] = 'Application List';
+        //$data['_view'] = 'basundhara/new_pagination_adc';
+        $data['_view'] = 'basundhara/new_pagination_adc_filter';
+        $this->load->view('layouts/main', $data);
+    }
+
+    //get order list
+    public function getOrderList(){
+
+        $dist = $this->session->userdata('dist_code');
+        
+        $curl_handle = curl_init();
+        curl_setopt($curl_handle, CURLOPT_URL, API_LINK."getRejectedApplicationsForSRO");
+        curl_setopt($curl_handle, CURLOPT_POST, true);
+        curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+        curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+        curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+        
+        $limit = PAGE_LIMIT;
+        $arr = $this->input->post();
+        $cir = $arr['cir_code'];
+        $status = $arr['appl_status'];
+        $code = $arr['service_code'];
+        $off_set = (($arr['pOffset']==1) ? $arr['pOffset'] : $arr['pOffset']*$limit);
+
+        //get details
+        if($cir == 'All'){
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                "dist_code" => $this->session->userdata('dist_code'),
+                //"dist_code" => "15",
+                "service_code" => $code,
+                "cir_code" => "ALL",
+                //"subdiv_code" => $this->session->userdata('subdiv_code'),
+                "subdiv_code" => "01",
+                "status" => $status,
+                "page_size" => $limit,
+                "page_no" => $off_set,
+                "required_response" => "DATA"
+            ]));
+        }
+        else{
+            $sub = $arr['subdiv_code'];
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                //"dist_code" => "15",
+                "dist_code" => $this->session->userdata('dist_code'),
+                "service_code" => $code,
+                "cir_code" => $cir,
+                "subdiv_code" => $sub,
+                "status" => $status,
+                "page_size" => $limit,
+                "page_no" => $off_set,
+                "required_response" => "DATA"
+            ]));
+        }
+
+        $output = curl_exec($curl_handle);
+        $detail = json_decode($output);
+        //$button = null;
+        $tablelist = array();
+        foreach($detail->data as $row){
+            $button = null;
+            $subdivision = $row->subdiv_code;
+            $circle = $row->cir_code;
+            $allow_reapply = $row->allow_reapply;
+            $appl_no = $row->application_no;
+            $is_urban = $row->is_urban;
+            $curr_date = strtotime(date('Y-m-d'));
+            $adc_date = strtotime(ADC_REJECT_DATE); //remove action button from adc login
+            
+            if($code == '1'){ //mutation by inheritance
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/inheritanceBasuCO?app=$appl_no class='btn btn-sm btn-info' target='view'><i class='fa fa-check-square-o'></i> View</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                }
+                else {
+                    if($curr_date <= $adc_date){
+                        $button = "<a href=".base_url()."index.php/basundhara/inheritanceBasuCO?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>&nbsp;&nbsp;|&nbsp;&nbsp;";     
+                    }
+                }   
+                $button .= "<a href=".base_url()."index.php/lmmutation/fieldReport?app=$appl_no class='lmreportmut' target='_report' > Report</a>";             
+            }
+
+            if($code == '2'){ //mutation by deed
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/deedBasuCO?app=$appl_no class='btn btn-sm btn-info'  target='view'><i class='fa fa-check-square-o'></i> View</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                }
+                else { 
+                    if($curr_date <= $adc_date){
+                        $button = "<a href=".base_url()."index.php/basundhara/deedBasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                    }
+                }                
+                if($is_urban == 'N'){ 
+                    $button .= "<a href=".base_url()."index.php/lmmutation/fieldReport?app=$appl_no class='lmreportmut' target='_report' > Report</a>";
+                } else if($is_urban == 'Y') {
+                    $button .= "<a href=".base_url()."index.php/lmmutation/officeReport?app=$appl_no class='lmreportmut' target='_report'> Report</a>";
+                }
+            }
+
+            if($code == '3'){ //partition
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/partitionBasuCO?app=$appl_no class='btn btn-sm btn-info'  target='view'><i class='fa fa-check-square-o'></i> View</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                } else { 
+                    if($curr_date <= $adc_date){
+                        $button = "<a href=".base_url()."index.php/basundhara/partitionBasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                    }
+                }
+                if($is_urban == 'N') {
+                    $button .= "<a href=".base_url()."index.php/lmmutation/fieldReport?app=$appl_no class='lmreportmut' target='_report' > Report</a>";
+                } else if($is_urban=='Y'){
+                    $button .= "<a href=".base_url()."index.php/lmmutation/officeReport?app=$appl_no class='lmreportmut' target='_report'> Report</a>";
+                }
+            }
+            
+            if($code=='4'){ //reclassifiaction 
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/reclassBasuCO?app=$appl_no class='btn btn-sm btn-info'  target='view'><i class='fa fa-check-square-o'></i> View</a>";
+                }else{
+                    if($curr_date <= $adc_date){
+                        $button = "<a href=".base_url()."index.php/basundhara/reclassBasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>";
+                    }
+                    $button .= "<a href=".base_url()."index.php/lmmutation/reclassBasuReport?app=$appl_no class='lmreportmut' target='_report'> Report</a>";
+                }
+            }
+
+            if($code == '5'){ //allotment
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/allotmentBasuCO?app=$appl_no class='btn btn-sm btn-info'  target='view'><i class='fa fa-check-square-o'></i> View</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                } else {
+                    if($curr_date <= $adc_date){
+                        $button = "<a href=".base_url()."index.php/basundhara/allotmentBasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                    }
+                }
+                $button .= "<a href=".base_url()."index.php/allotment/viewproReject?app=$appl_no class='lmreportmut' target='_report'> Report</a>";
+            }
+
+            if($code == '6'){ //name correction
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/nameCorrectionbasuCO?app=$appl_no class='btn btn-sm btn-info' target='view'><i class='fa fa-check-square-o'></i> View</a>";
+                } else {
+                    if($curr_date <= $adc_date){
+                        $button = "<a href=".base_url()."index.php/basundhara/nameCorrectionbasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>";
+                    }
+                }
+            }
+
+            if($code == '7'){ //area correction
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/areaCorrectionbasuCO?app=$appl_no class='btn btn-sm btn-info' target='view'><i class='fa fa-check-square-o'></i> View</a>";
+                } else {
+                    if($curr_date <= $adc_date){
+                        $button = "<a href=".base_url()."index.php/basundhara/areaCorrectionbasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>";
+                    }
+                }
+            }
+            
+            if($code == '8'){ //name cancellation
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/nameCancelbasuCO?app=$appl_no class='btn btn-sm btn-info' target='view'><i class='fa fa-check-square-o'></i> View</a>";
+                } else {
+                    if($curr_date <= $adc_date){
+                        $button = "<a href=".base_url()."index.php/basundhara/nameCancelbasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>";
+                    }
+                }
+            }
+
+            if($code == '9'){ //conversion
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/conversionBasuCO?app=$appl_no class='btn btn-sm btn-info' target='view'><i class='fa fa-check-square-o'></i> View</a>";
+                } else {
+                    if($curr_date <= $adc_date){
+                        $button = "<a href=".base_url()."index.php/basundhara/conversionBasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>";
+                    }
+                }
+                $button .= "&nbsp;&nbsp;|&nbsp;&nbsp;<a href=".base_url()."index.php/COconversionPartha/convBasuReport?app=$appl_no class='lmreportmut' target='_report'> Report</a>";
+            }
+
+            if($code == '10'){ //mobile updation
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/mobileUpdationBasuCO?app=$appl_no class='btn btn-sm btn-info' target='view'><i class='fa fa-check-square-o'></i> View</a>";
+                } else {
+                    if($curr_date <= $adc_date){
+                        $button = "<a href=".base_url()."index.php/basundhara/mobileUpdationBasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>";
+                    }
+                }
+            }
+
+            
+            $circleName = $this->utilityclass->getCircleName($dist, $subdivision, $circle);
+            $tablelist[] =  "<tr>
+                    <td>$row->application_no</td>
+                    <td>$row->date_submission</td>
+                    <td>$circleName</td>
+                    <td>$row->query</td>
+                    <td>$button</td>
+                </tr>";
+            }
+        echo json_encode($tablelist);
+        return;
+    }
+    //////////////22-04-2022/////////////////////
+    function adcApproveRejectReclass(){
+        
+
+        $curl_handle = curl_init();
+        if($this->session->userdata('user_desig_code')=='CO'){
+            $allow_reapply=$_POST['allow_reapply']=='Y'?$_POST['allow_reapply']:$_POST['allow_reapply'];
+        }else{
+            $allow_reapply=$_POST['allow_reapply']=='Y'?'A':$_POST['allow_reapply'];
+        }
+        ////////////////////////////
+        if($allow_reapply == 'E' && $this->session->userdata('user_desig_code')=='CO')
+        {
+            $this->db->trans_begin();
+            $sql="Select dharitree from basundhar_application where basundhara=? and dharitree is not null";
+            $dharitree_result=$this->db->query($sql,array(trim($_POST['case_no'])));
+
+            if($dharitree_result->num_rows() == 0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Dharitree case not found'
+                );
+                echo json_encode($data);
+                return;
+            }
+            $dharitree_case_no = $dharitree_result->row();
+            $t_reclassification = $this->db->query("select * from t_reclassification where case_no=?",array($dharitree_case_no->dharitree));
+            if($t_reclassification->num_rows() == 0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Processing. Dharitree case not found',
+                );
+                echo json_encode($data);
+                return;
+            }
+            $t_reclassification_data = $t_reclassification->row();
+            $basundhara_data_updation = array(
+                'ip'=> $this->input->ip_address(),
+                'case_no'=> $dharitree_case_no->dharitree,
+                'basundhara'=> trim($_POST['case_no']),
+                'user_code'=>$this->session->userdata('user_code'),
+                'date_entry'=>date('Y-m-d H:i:s'),
+                'changes_data' => json_encode($t_reclassification_data),
+            );
+            $insert_basundhara_data_updation = $this->db->insert('basundhara_data_updation',$basundhara_data_updation);
+            if($insert_basundhara_data_updation == false)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Data not updated',
+                );
+                echo json_encode($data);
+                return;
+            }
+            $update = array(
+                  'co_yn' => null,
+                  'dc_yn' => null,
+                  'status' => 'C'
+            );
+            $this->db->where('case_no', $dharitree_case_no->dharitree);
+            $allotment_cert_basic_update = $this->db->update('t_reclassification', $update);
+            if($allotment_cert_basic_update == false || $this->db->affected_rows() != 1)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Final Processing.',
+                );
+                echo json_encode($data);
+                return;
+            }
+            if ($this->db->trans_status() == FALSE)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!!Not completed. Please try again',
+                );
+                echo json_encode($data);
+                return;
+            }
+            else
+            {
+                    $this->db->trans_commit();
+                    //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                    curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                    curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                    curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                        'app_id' => $_POST['app_id'],
+                        'allow_reapply'=>$allow_reapply,
+                        'reapply_remark'=>$_POST['reapply_remark'],
+                        'user_code'=>$this->session->userdata('user_code')
+                    ]));
+                    $data=curl_exec($curl_handle);
+                    $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                    $data= json_decode($data);
+                    if($httpcode!=200 || $data==null || empty($data->responseType)){
+                            $data=array(
+                                'error'=>"<b> Error in API Calling </b>",
+                                'redirect_url'=>base_url().'index.php/home'
+                            );
+                            echo json_encode($data);
+                            return;
+                    }
+                    if($data->responseType==2){
+                        if($_POST['allow_reapply']=='Y'){
+                            $response="Approved. User can re-apply the Application";
+                        }else{
+                            $response="Case Should be available with CO under reclassification ";
+                        }
+                        $data=array(
+                            'success'=>$response,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else if($data->responseType==3){
+                        $data=array(
+                            'error'=>$data->error ."<b> Please reject the case </b>",
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else{
+                        $data=array(
+                            'error'=>$data->validation,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }
+                    echo json_encode($data);
+            }
+
+        }
+        else {
+                //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                    'app_id' => $_POST['app_id'],
+                    'allow_reapply'=>$allow_reapply,
+                    'reapply_remark'=>$_POST['reapply_remark'],
+                    'user_code'=>$this->session->userdata('user_code')
+                ]));
+                $data=curl_exec($curl_handle);
+                $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                    $data= json_decode($data);
+                    if($httpcode!=200 || $data==null || empty($data->responseType)){
+                            $data=array(
+                                'error'=>"<b> Error in API Calling </b>",
+                                'redirect_url'=>base_url().'index.php/home'
+                            );
+                            echo json_encode($data);
+                            return;
+                    }
+                if($data->responseType==2){
+                    if($_POST['allow_reapply']=='Y'){
+                        $response="Approved. User can re-apply the Application";
+                    }else{
+                        $response="Rejected. User cann't re-apply the Application";
+                    }
+                    $data=array(
+                        'success'=>$response,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else if($data->responseType==3){
+                    $data=array(
+                        'error'=>$data->error ."<b> Please reject the case </b>",
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else{
+                    $data=array(
+                        'error'=>$data->validation,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }
+                echo json_encode($data);
+        }
+        /////////////////////////////  
+    }
+    function adcApproveRejectNameCorrect(){
+        
+        $curl_handle = curl_init();
+        if($this->session->userdata('user_desig_code')=='CO'){
+            $allow_reapply=$_POST['allow_reapply']=='Y'?$_POST['allow_reapply']:$_POST['allow_reapply'];
+        }else{
+            $allow_reapply=$_POST['allow_reapply']=='Y'?'A':$_POST['allow_reapply'];
+        }
+        ////////////////////////////
+        if($allow_reapply == 'E' && $this->session->userdata('user_desig_code')=='CO')
+        {
+            $this->db->trans_begin();
+            $sql="Select dharitree from basundhar_application where basundhara=? and dharitree is not null";
+            $dharitree_result=$this->db->query($sql,array(trim($_POST['case_no'])));
+
+            if($dharitree_result->num_rows() == 0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Dharitree case not found'
+                );
+                echo json_encode($data);
+                return;
+            }
+            $dharitree_case_no = $dharitree_result->row();
+            $misc_case_basic = $this->db->query("select * from misc_case_basic where misc_case_no=?",array($dharitree_case_no->dharitree));
+            if($misc_case_basic->num_rows() == 0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Processing. Dharitree case not found',
+                );
+                echo json_encode($data);
+                return;
+            }
+            $misc_case_basic_data = $misc_case_basic->row();
+            $basundhara_data_updation = array(
+                'ip'=> $this->input->ip_address(),
+                'case_no'=> $dharitree_case_no->dharitree,
+                'basundhara'=> trim($_POST['case_no']),
+                'user_code'=>$this->session->userdata('user_code'),
+                'date_entry'=>date('Y-m-d H:i:s'),
+                'changes_data' => json_encode($misc_case_basic_data),
+            );
+            $insert_basundhara_data_updation = $this->db->insert('basundhara_data_updation',$basundhara_data_updation);
+            if($insert_basundhara_data_updation == false)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Data not updated',
+                );
+                echo json_encode($data);
+                return;
+            }
+            $update = array(
+                  'lm_note_yn' => null,
+                  'sk_note_yn' => null,
+                  'notice_generated_yn' => null,
+                  'notice_generated_yn' => null,
+                  'fresh_yn' => 'Y',
+                  'status' => 01,
+                  'operation' => 's',
+                  'proceeding_yn' => 'Y',
+                  'next_date_of_hearing' => null
+            );
+            $this->db->where('misc_case_no', $dharitree_case_no->dharitree);
+            $allotment_cert_basic_update = $this->db->update('misc_case_basic', $update);
+            if($allotment_cert_basic_update == false || $this->db->affected_rows() != 1)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Final Processing.',
+                    'next_date_of_hearing'=>null
+                );
+                echo json_encode($data);
+                return;
+            }
+            if ($this->db->trans_status() == FALSE)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!!Not completed. Please try again',
+                );
+                echo json_encode($data);
+                return;
+            }
+            else
+            {
+                    $this->db->trans_commit();
+                    //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                    curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                    curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                    curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                        'app_id' => $_POST['app_id'],
+                        'allow_reapply'=>$allow_reapply,
+                        'reapply_remark'=>$_POST['reapply_remark'],
+                        'user_code'=>$this->session->userdata('user_code')
+                    ]));
+                    $data=curl_exec($curl_handle);
+                    $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                    $data= json_decode($data);
+                    if($httpcode!=200 || $data==null || empty($data->responseType)){
+                            $data=array(
+                                'error'=>"<b> Error in API Calling </b>",
+                                'redirect_url'=>base_url().'index.php/home'
+                            );
+                            echo json_encode($data);
+                            return;
+                    }
+                    if($data->responseType==2){
+                        if($_POST['allow_reapply']=='Y'){
+                            $response="Approved. User can re-apply the Application";
+                        }else{
+                            $response="Case Should be available with CO under Pending Name Cancellation ";
+                        }
+                        $data=array(
+                            'success'=>$response,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else if($data->responseType==3){
+                        $data=array(
+                            'error'=>$data->error ."<b> Please reject the case </b>",
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else{
+                        $data=array(
+                            'error'=>$data->validation,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }
+                    echo json_encode($data);
+            }
+
+        }
+        else {
+                //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                    'app_id' => $_POST['app_id'],
+                    'allow_reapply'=>$allow_reapply,
+                    'reapply_remark'=>$_POST['reapply_remark'],
+                    'user_code'=>$this->session->userdata('user_code')
+                ]));
+                $data=curl_exec($curl_handle);
+                $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                    $data= json_decode($data);
+                    if($httpcode!=200 || $data==null || empty($data->responseType)){
+                            $data=array(
+                                'error'=>"<b> Error in API Calling </b>",
+                                'redirect_url'=>base_url().'index.php/home'
+                            );
+                            echo json_encode($data);
+                            return;
+                    }
+                if($data->responseType==2){
+                    if($_POST['allow_reapply']=='Y'){
+                        $response="Approved. User can re-apply the Application";
+                    }else{
+                        $response="Rejected. User cann't re-apply the Application";
+                    }
+                    $data=array(
+                        'success'=>$response,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else if($data->responseType==3){
+                    $data=array(
+                        'error'=>$data->error ."<b> Please reject the case </b>",
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else{
+                    $data=array(
+                        'error'=>$data->validation,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }
+                echo json_encode($data);
+        }
+        /////////////////////////////  
+    }
+    function adcApproveRejectNameCancel(){
+        
+        
+        $curl_handle = curl_init();
+        if($this->session->userdata('user_desig_code')=='CO'){
+            $allow_reapply=$_POST['allow_reapply']=='Y'?$_POST['allow_reapply']:$_POST['allow_reapply'];
+        }else{
+            $allow_reapply=$_POST['allow_reapply']=='Y'?'A':$_POST['allow_reapply'];
+        }
+        ////////////////////////////
+        if($allow_reapply == 'E' && $this->session->userdata('user_desig_code')=='CO')
+        {
+            $this->db->trans_begin();
+            $sql="Select dharitree from basundhar_application where basundhara=? and dharitree is not null";
+            $dharitree_result=$this->db->query($sql,array(trim($_POST['case_no'])));
+
+            if($dharitree_result->num_rows() == 0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Dharitree case not found'
+                );
+                echo json_encode($data);
+                return;
+            }
+            $dharitree_case_no = $dharitree_result->row();
+            $misc_case_basic = $this->db->query("select * from misc_case_basic where misc_case_no=?",array($dharitree_case_no->dharitree));
+            if($misc_case_basic->num_rows() == 0)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Processing. Dharitree case not found',
+                );
+                echo json_encode($data);
+                return;
+            }
+            $misc_case_basic_data = $misc_case_basic->row();
+            $basundhara_data_updation = array(
+                'ip'=> $this->input->ip_address(),
+                'case_no'=> $dharitree_case_no->dharitree,
+                'basundhara'=> trim($_POST['case_no']),
+                'user_code'=>$this->session->userdata('user_code'),
+                'date_entry'=>date('Y-m-d H:i:s'),
+                'changes_data' => json_encode($misc_case_basic_data),
+            );
+            $insert_basundhara_data_updation = $this->db->insert('basundhara_data_updation',$basundhara_data_updation);
+            if($insert_basundhara_data_updation == false)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Data not updated',
+                );
+                echo json_encode($data);
+                return;
+            }
+            $update = array(
+                  'lm_note_yn' => null,
+                  'sk_note_yn' => null,
+                  'notice_generated_yn' => null,
+                  'notice_generated_yn' => null,
+                  'fresh_yn' => 'Y',
+                  'status' => '01',
+                  'operation' => 's',
+                  'proceeding_yn' => 'Y',
+                  'next_date_of_hearing' => null
+            );
+            $this->db->where('misc_case_no', $dharitree_case_no->dharitree);
+            $allotment_cert_basic_update = $this->db->update('misc_case_basic', $update);
+            if($allotment_cert_basic_update == false || $this->db->affected_rows() != 1)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!! Error in Final Processing.',
+                );
+                echo json_encode($data);
+                return;
+            }
+            if ($this->db->trans_status() == FALSE)
+            {
+                $this->db->trans_rollback();
+                $data=array(
+                    'error'=> 'Error !!!Not completed. Please try again',
+                );
+                echo json_encode($data);
+                return;
+            }
+            else
+            {
+                    $this->db->trans_commit();
+                    //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                    curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                    curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                    curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                    curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                        'app_id' => $_POST['app_id'],
+                        'allow_reapply'=>$allow_reapply,
+                        'reapply_remark'=>$_POST['reapply_remark'],
+                        'user_code'=>$this->session->userdata('user_code')
+                    ]));
+                    $data=curl_exec($curl_handle);
+                    $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                    $data= json_decode($data);
+                    if($httpcode!=200 || $data==null || empty($data->responseType)){
+                            $data=array(
+                                'error'=>"<b> Error in API Calling </b>",
+                                'redirect_url'=>base_url().'index.php/home'
+                            );
+                            echo json_encode($data);
+                            return;
+                    }
+                    if($data->responseType==2){
+                        if($_POST['allow_reapply']=='Y'){
+                            $response="Approved. User can re-apply the Application";
+                        }else{
+                            $response="Case Should be available with CO under Pending Name Cancellation ";
+                        }
+                        $data=array(
+                            'success'=>$response,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else if($data->responseType==3){
+                        $data=array(
+                            'error'=>$data->error ."<b> Please reject the case </b>",
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }else{
+                        $data=array(
+                            'error'=>$data->validation,
+                            'redirect_url'=>base_url().'index.php/home'
+                        );
+                    }
+                    echo json_encode($data);
+            }
+
+        }
+        else {
+                //$url="https://basundhara.assam.gov.in/demo/"."rest/updatereapply";
+                curl_setopt($curl_handle, CURLOPT_URL, API_LINK."updateAllowReapply");
+                curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+                curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+                    'app_id' => $_POST['app_id'],
+                    'allow_reapply'=>$allow_reapply,
+                    'reapply_remark'=>$_POST['reapply_remark'],
+                    'user_code'=>$this->session->userdata('user_code')
+                ]));
+                $data=curl_exec($curl_handle);
+                $httpcode = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                    $data= json_decode($data);
+                    if($httpcode!=200 || $data==null || empty($data->responseType)){
+                            $data=array(
+                                'error'=>"<b> Error in API Calling </b>",
+                                'redirect_url'=>base_url().'index.php/home'
+                            );
+                            echo json_encode($data);
+                            return;
+                    }
+                if($data->responseType==2){
+                    if($_POST['allow_reapply']=='Y'){
+                        $response="Approved. User can re-apply the Application";
+                    }else{
+                        $response="Rejected. User cann't re-apply the Application";
+                    }
+                    $data=array(
+                        'success'=>$response,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else if($data->responseType==3){
+                    $data=array(
+                        'error'=>$data->error ."<b> Please reject the case </b>",
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }else{
+                    $data=array(
+                        'error'=>$data->validation,
+                        'redirect_url'=>base_url().'index.php/home'
+                    );
+                }
+                echo json_encode($data);
+        }
+        /////////////////////////////  
+    }
+    public function getOrderListByApplication(){
+
+        $validation = null;
+        $button = null;
+        $this->form_validation->set_rules('application_no', 'Application', 'trim|required|xss_clean');
+        if ($this->form_validation->run() == FALSE) {
+            $validation['msg'] = 'Application no is required';
+            echo json_encode($validation);
+            return;
+        }
+
+        $dist = $this->session->userdata('dist_code');
+        
+        $curl_handle = curl_init();
+        curl_setopt($curl_handle, CURLOPT_URL, API_LINK."getSearchedRejectedApplications");
+        curl_setopt($curl_handle, CURLOPT_POST, true);
+        curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+        curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+        curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+        
+        $limit = PAGE_LIMIT;
+        $arr = $this->input->post();
+        $code = $arr['service_code'];
+        $appl_no = $arr['application_no'];
+
+        //get details
+        curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+            //"dist_code" => "15",
+            "dist_code" => $this->session->userdata('dist_code'),
+            "service_code" => $code,
+            "app_no" => $appl_no,
+            "page_size" => $limit,
+            "page_no" => "1",
+            "required_response" => "DATA"
+        ]));
+
+        $output = curl_exec($curl_handle);
+        $detail = json_decode($output);
+
+        $tablelist = array();
+        foreach($detail->data as $row){
+            $button = null;
+            $subdivision = $row->subdiv_code;
+            $circle = $row->cir_code;
+            $allow_reapply = $row->allow_reapply;
+            $appl_no = $row->application_no;
+            $is_urban = $row->is_urban;
+            $status = $row->status;
+
+            if($code == '1'){ //mutation by inheritance
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/inheritanceBasuCO?app=$appl_no class='btn btn-sm btn-info' target='view'><i class='fa fa-check-square-o'></i> View</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                }
+                else if($status == 'R'){
+                    $button = "<a href=".base_url()."index.php/basundhara/inheritanceBasuCO?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                }   
+                $button .= "<a href=".base_url()."index.php/lmmutation/fieldReport?app=$appl_no class='lmreportmut' target='_report' > Report</a>";             
+            }
+
+            if($code == '2'){ //mutation by deed
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/deedBasuCO?app=$appl_no class='btn btn-sm btn-info'  target='view'><i class='fa fa-check-square-o'></i> View</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                }
+                else if($status == 'R'){
+                    $button = "<a href=".base_url()."index.php/basundhara/deedBasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                }                
+                if($is_urban == 'N'){ 
+                    $button .= "<a href=".base_url()."index.php/lmmutation/fieldReport?app=$appl_no class='lmreportmut' target='_report' > Report</a>";
+                } else if($is_urban == 'Y') {
+                    $button .= "<a href=".base_url()."index.php/lmmutation/officeReport?app=$appl_no class='lmreportmut' target='_report'> Report</a>";
+                }
+            }
+
+            if($code == '3'){ //partition
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/partitionBasuCO?app=$appl_no class='btn btn-sm btn-info'  target='view'><i class='fa fa-check-square-o'></i> View</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                } else if($status == 'R'){
+                    $button = "<a href=".base_url()."index.php/basundhara/partitionBasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                }
+                if($is_urban == 'N') {
+                    $button .= "<a href=".base_url()."index.php/lmmutation/fieldReport?app=$appl_no class='lmreportmut' target='_report' > Report</a>";
+                } else if($is_urban=='Y'){
+                    $button .= "<a href=".base_url()."index.php/lmmutation/officeReport?app=$appl_no class='lmreportmut' target='_report'> Report</a>";
+                }
+            }
+            
+            if($code=='4'){ //reclassifiaction 
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/reclassBasuCO?app=$appl_no class='btn btn-sm btn-info'  target='view'><i class='fa fa-check-square-o'></i> View</a>";
+                } else if($status == 'R'){
+                    $button = "<a href=".base_url()."index.php/basundhara/reclassBasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'> Action</a>";
+                }
+            }
+
+            if($code == '5'){ //allotment
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/allotmentBasuCO?app=$appl_no class='btn btn-sm btn-info'  target='view'><i class='fa fa-check-square-o'></i> View</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                } else if($status == 'R'){
+                    $button = "<a href=".base_url()."index.php/basundhara/allotmentBasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'></i> Action</a>&nbsp;&nbsp;|&nbsp;&nbsp;";
+                }
+                $button .= "<a href=".base_url()."index.php/allotment/viewproReject?app=$appl_no class='lmreportmut' target='_report'> Report</a>";
+            }
+
+            if($code == '6'){ //name correction
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/nameCorrectionbasuCO?app=$appl_no class='btn btn-sm btn-info' target='view'><i class='fa fa-check-square-o'></i> View</a>";
+                } else if($status == 'R'){
+                    $button = "<a href=".base_url()."index.php/basundhara/nameCorrectionbasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'> Action</a>";
+                }
+            }
+
+            if($code == '7'){ //area correction
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/areaCorrectionbasuCO?app=$appl_no class='btn btn-sm btn-info' target='view'><i class='fa fa-check-square-o'></i> View</a>";
+                } else if($status == 'R'){
+                    $button = "<a href=".base_url()."index.php/basundhara/areaCorrectionbasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'> Action</a>";
+                }
+            }
+            
+            if($code == '8'){ //name cancellation
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/nameCancelbasuCO?app=$appl_no class='btn btn-sm btn-info' target='view'><i class='fa fa-check-square-o'></i> View</a>";
+                } else if($status == 'R'){
+                    $button = "<a href=".base_url()."index.php/basundhara/nameCancelbasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'> Action</a>";
+                }
+            }
+
+            if($code == '9'){ //conversion
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/conversionBasuCO?app=$appl_no class='btn btn-sm btn-info' target='view'><i class='fa fa-check-square-o'></i> View</a>";
+                } else if($status == 'R'){
+                    $button = "<a href=".base_url()."index.php/basundhara/conversionBasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'> Action</a>";
+                }
+            }
+
+            if($code == '10'){ //mobile updation
+                if(($allow_reapply=='Y') || ($allow_reapply=='A') || ($allow_reapply=='N') || ($allow_reapply=='E')){
+                    $button = "<a href=".base_url()."index.php/basundhara/mobileUpdationBasuCO?app=$appl_no class='btn btn-sm btn-info' target='view'><i class='fa fa-check-square-o'></i> View</a>";
+                } else if($status == 'R'){
+                    $button = "<a href=".base_url()."index.php/basundhara/mobileUpdationBasu?app=$appl_no class='btn btn-sm btn-primary'><i class='fa fa-check-square-o'> Action</a>";
+                }
+            }
+
+            $circleName = $this->utilityclass->getCircleName($dist, $subdivision, $circle);
+            $tablelist[] =  "<tr>
+                    <td>$row->application_no</td>
+                    <td>$row->date_submission</td>
+                    <td>$circleName</td>
+                    <td>$row->reapply_remark</td>
+                    <td>$button</td>
+                </tr>";
+            }
+        echo json_encode($tablelist);
+        return;
+    }
+    function pendingApplicationsCircleWise(){
+       
+        $d=$this->session->userdata('dist_code');
+        $s=$this->session->userdata('subdiv_code');
+        $c=$this->session->userdata('cir_code');
+         $this->session->unset_userdata('searchKeyword');
+        $url = API_LINK."pendingApplicationCountByCircle/$d/$s/$c" ;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $district['output'] = json_decode($output);
+        $district['_view'] = 'basundhara/pendingCases_circle';
+        $this->load->view('layouts/main',$district);
+    }
+
+    function pendingRequestCircleWise($service){
+        //var_dump($_SESSION);
+        $d=$this->session->userdata('dist_code');
+        $s=$this->session->userdata('subdiv_code');
+        $c=$this->session->userdata('cir_code');
+
+        $curl_handle = curl_init();
+        curl_setopt($curl_handle, CURLOPT_URL, API_LINK."pendingApplicationByCircle");
+        curl_setopt($curl_handle, CURLOPT_POST, true);
+        curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+        curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl_handle, CURLOPT_POSTFIELDS, true);
+        curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+        
+        //get details
+        curl_setopt($curl_handle, CURLOPT_POSTFIELDS,json_encode([
+            //"dist_code" => "15",
+            "dist_code" => $d,
+            "subdiv_code" => $s,
+            "cir_code" => $c,
+            "service_code" => $service
+        ]));
+
+        $output = curl_exec($curl_handle);
+        curl_close($curl_handle);
+        $district['pending'] = json_decode($output);
+        $district['service'] = $service;
+        $district['_view'] = 'basundhara/pendingCases_circle_detail';
+        $this->load->view('layouts/main',$district);
+    }
+    function getGuardianName($d,$s,$c,$m,$v,$l,$dag,$pn,$ptype,$pid)
+    {
+        $this->dbb=$this->dbswitch($d);
+        $q = $this->dbb->query("SELECT p.pdar_id, p.pdar_name, p.pdar_father 
+                FROM chitha_pattadar p JOIN chitha_dag_pattadar d ON p.dist_code = d.dist_code 
+                AND p.subdiv_code = d.subdiv_code AND p.cir_code = d.cir_code AND 
+                p.lot_no = d.lot_no AND p.vill_townprt_code = d.vill_townprt_code AND 
+                p.mouza_pargona_code = d.mouza_pargona_code AND p.pdar_id = d.pdar_id 
+                WHERE p.dist_code='$d' AND 
+                p.subdiv_code='$s' AND 
+                p.cir_code='$c' AND 
+                p.mouza_pargona_code='$m' AND
+                p.vill_townprt_code='$v' AND 
+                d.lot_no='$l' AND 
+                d.dag_no='$dag' AND 
+                TRIM(p.patta_no)='$pn' AND
+                p.patta_type_code='$ptype' AND
+                d.pdar_id='$pid' ");
+                //d.pdar_id='$pid' AND d.p_flag!='1'");
+        //echo $this->db->last_query();
+        return $q;   
+    }
+    function postApiManualPayment($case,$task){
+            $sql="Select basundhara from  basundhar_application where dharitree='$case' ";
+            $linkAvail=$this->db->query($sql)->num_rows();
+            if($linkAvail>0)
+            {                
+                $curl_handle = curl_init();
+                curl_setopt($curl_handle, CURLOPT_URL, API_LINK."manualPayStatus");
+                curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+                curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query(array(
+                    'application' => $basundhara,
+                    'query_from_officer'=>$this->session->userdata('user_code')
+                )));
+                return curl_exec($curl_handle);
+            }
+    }
+    /////////////////////////
+    function check_script($str){
+        if( strpos( trim(strtolower($str)), '<' ) !== false) {
+            return FALSE;
+        }
+
+        if( strpos( trim(strtolower($str)), '>' ) !== false) {
+            return FALSE;
+        }
+
+        if( strpos( trim(strtolower($str)), '<script>' ) !== false) {
+            return FALSE;
+        }
+        if( strpos( trim(strtolower($str)), '</script>' ) !== false) {
+            return FALSE;
+        }
+        return TRUE;
+    }
+    function reChangeStatus(){
+        $appno=$this->input->get('appno');
+        $curl_handle = curl_init();
+        curl_setopt($curl_handle, CURLOPT_URL, API_LINK."sendForRegistration");
+        curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST,  2);
+        curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query(array(
+            'application' => $appno,
+            'task'=>$this->session->userdata('user_code'),
+            'pen'=>null,
+            'rmk'=>null,
+            'dharitree'=>null
+        )));
+        return curl_exec($curl_handle);
+    }
+}

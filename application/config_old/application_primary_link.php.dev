@@ -1,0 +1,97 @@
+<?php
+// define('DHAR_SERVER_IP','10.177.0.35');
+// define('BASU_APP','https://basundhara.assam.gov.in/');
+define('DHAR_SERVER_IP','http://localhost/');
+define('BASU_APP','http://localhost/');
+define('SERVICEPLUS_SERVER_IP','http://localhost/');
+// define('LABDHUB_BASE', 'https://landhub.assam.gov.in/');
+define('LABDHUB_BASE', 'http://localhost/');
+define('SECRET_KEY', '#b$*))_++basun!!dhar_app^tree_php.create_');
+defined('ENCRYPTION_KEY') OR define('ENCRYPTION_KEY', "1234567890123456");
+define('API_KEY', 'DHARITREE_MB2');
+define('DHAR_AUTH_KEY', "1234!@#$%^&*()ABCDEFGHIJKLMNOP1234567890");
+define('ENC_KEY','dharitree20052022');
+define('DHAR_APP_PATH','D:\\xampp\\htdocs\\');
+define('BARAK_VALLEY_DIST_CODE_ARRAY', array(21));
+if(IS_PRODUCTION == '1')
+{
+   define('DHAR_APP_NAME','DharitreeSVN');   
+   define('SING_APP_NAME','singlesign');
+   define('NOC_APP_NAME','nocforimpssign');     
+   define('API_LINK',BASU_APP.'Api/');
+   define('RTPS_API_LINK',BASU_APP.'rtps/Api/');
+   define('API_LINK_MB2',BASU_APP.'rtpsmb/Api/');
+   define('EKHAJANA_API_BASE',BASU_APP.'rtpsmb/');
+   define('ILRMS_API_BASE',BASU_APP.'ilrms/');
+   define('EKHAJANA_DEMO', BASU_APP.'rtpsmb2demo/');
+   define('SMS_PROD_LINK','https://basundhara.assam.gov.in1/rtpsmb/SmsApiController/sendSms');      
+}
+else if (IS_PRODUCTION == '0')
+{
+    define('DHAR_APP_NAME','dharitree_oci');
+    define('SING_APP_NAME','single_oci');
+    define('NOC_APP_NAME','nocforimpssign');
+    define('API_LINK',BASU_APP.'demo/Api/');
+    define('RTPS_API_LINK',BASU_APP.'rtpsdemo/Api/'); 
+    define('API_LINK_MB2',BASU_APP.'rtpsmb2demo/Api/'); 
+    define('EKHAJANA_API_BASE',BASU_APP.'rtpsmb2demo/');
+    define('ILRMS_API_BASE',BASU_APP.'ilrmsdemo/');
+    define('EKHAJANA_DEMO', BASU_APP.'rtpsmb2demo/');
+    define('SMS_PROD_LINK','https://basundhara.assam.gov.in/rtpsmb1/SmsApiController/sendSms');     
+}
+else 
+{
+    show_error("Configuration error", "400", $heading = 'Configuration error');
+    exit();
+}
+///START_API_LINKS
+define('EKHAJANA_GET_PAYMENT_AMOUNT_FOR_CIRCLE',EKHAJANA_API_BASE.'EkhajanaApiController/getEkhajanaAmountReceivedForCircle');
+define('DHARITREE_LINK','http://'.DHAR_SERVER_IP.'/'.DHAR_APP_NAME.'/');
+define('BASE_JS_LINK','http://'.DHAR_SERVER_IP.'/'.DHAR_APP_NAME.'/index.php/');
+define('LINK_33','https://'.SERVICEPLUS_SERVER_IP.'/');
+define('LINK_33_800','https://'.SERVICEPLUS_SERVER_IP.':800/');
+// define('NOC_LINK','https://nocgovt.assam.gov.in/');
+define('NOC_LINK','http://'.DHAR_SERVER_IP.'/'.NOC_APP_NAME.'/');
+define('INDEX_LINK','http://'.DHAR_SERVER_IP.'/'.SING_APP_NAME.'/');
+define('BHUNAKSHA_LINK','https://basundhara.assam.gov.in/bhunaksha.php');
+//define('RTPS_LINK',LINK_33_800.'/dhar_api/');
+define('RTPS_LINK',LABDHUB_BASE.'webapi/dhar_api_land/');
+define('SRO_SERVICE',LINK_33_800.'webservices/');
+define('AADHAR_APPLICATION_API_LINK', API_LINK_MB2.'applicantAppliedForSettlementServicesByAadhaarNoNew');
+define('EKHAJANA_PENDING_LIST_COUNT_API', EKHAJANA_API_BASE.'Ekhajana/getEkhajanaPendingListCount');
+define('EKHAJANA_PENDING_LIST_API', EKHAJANA_API_BASE.'Ekhajana/getEkhajanaPendingList');
+define('EKHAJANA_PENDING_CASE_DETAILS_API', EKHAJANA_API_BASE.'Ekhajana/getEkhajanaPendingCaseDetails');
+define('EKHAJANA_LM_FORAWRDED_API', EKHAJANA_API_BASE.'Ekhajana/lmForward');
+define('EKHAJANA_CO_FORAWRDED_API', EKHAJANA_API_BASE.'Ekhajana/coForward');
+define('EKHAJANA_PAYMENT_UPDATE_API', EKHAJANA_API_BASE.'Ekhajana/updatePayment');
+define('EKHAJANA_DOWNLOAD_DOCUMENT_API',EKHAJANA_API_BASE.'Ekhajana/ekhajanaAttachment');
+define('EKHAJANA_CO_REJECTED_API',EKHAJANA_API_BASE.'Ekhajana/coReject');
+define('EKHAJANA_DOWNLOAD_DOCUMENT_API_FOR_CO', EKHAJANA_API_BASE.'Ekhajana/downloadDocumentForCo');
+define('EKHAJANA_REVERT_CASE_API', EKHAJANA_API_BASE.'Ekhajana/updateRevertDetails');
+define('EKHAJANA_PAYMENT_RE_UPDATE_BY_CO_API',EKHAJANA_API_BASE.'Ekhajana/reUpdatePayment');
+define('EKHAJANA_CHECK_PAYMENT_STATUS_BEFORE_REUPDATE', EKHAJANA_API_BASE.'Ekhajana/checkPaymentQuerybeforeUpdate');
+define('EKHAJANA_LOT_MONDOL_PENDING_LIST_COUNT_API', EKHAJANA_API_BASE.'Ekhajana/getPendingCountForlotMondol_mouzadar');
+define('EKHAJANA_PENDING_LIST_API_FOR_MOUZADARI_SYSTEM', EKHAJANA_API_BASE.'Ekhajana/getPendingListForlotMondol_mouzadar');
+define('EKHAJANA_PENDING_CASE_DETAILS_API_MOUZADRI_SYSTEM', EKHAJANA_API_BASE.'Ekhajana/getEkhajanaPendingCaseDetails');
+define('EKHAJANA_LM_FORAWRDED_API_MOUZADARI_SYSTEM', EKHAJANA_API_BASE.'Ekhajana/updateLMforwardMouzadariSystem');
+define('EKHAJANA_LM_FORAWRD_MOUZADARI_SYSTEM', EKHAJANA_API_BASE.'Ekhajana/lmForwardMouzadariSystem');
+define('EKHAJANA_DISPOSE_UPDATE_API', EKHAJANA_API_BASE.'Ekhajana/coDisposeCase');
+define('EKHAJANA_AADHAAR_PHOTO_FETCH', EKHAJANA_API_BASE.'Ekhajana/getApplicantPhoto');
+define('EKHAJANA_API_FOR_DETAIL_CASE_STATUS', EKHAJANA_API_BASE.'EkhajanaReportController/getCaseDetailsStatus');
+define('EKHAJANA_API_FOR_CO_COUNT_CIRCLE', EKHAJANA_API_BASE.'EkhajanaReportController/getCircleWiseCount');
+define('EKHAJANA_API_FOR_CO_COUNT_LOT', EKHAJANA_API_BASE.'EkhajanaReportController/getLotWiseCount');
+define('EKHAJANA_API_FOR_DETAIL_CASE', EKHAJANA_API_BASE.'EkhajanaReportController/getLotWiseCaseDetails');
+define('EKHAJANA_DOWNLOAD_MOUZADAR_ADD_API', ILRMS_API_BASE.'DepartmentApi/postDepartmentUser');
+define('SDLC_MOUZADAR_PASSWORD', ILRMS_API_BASE.'DepartmentApi/');
+define('API_FOR_UPLOAD_BASE', API_LINK_MB2.'uploadBase64File');
+define('API_FOR_FETCH_BASE', API_LINK_MB2.'getBase64FileData');
+define('API_FOR_UPLOAD_RAW', API_LINK_MB2.'uploadRawFile');
+define('API_FOR_FETCH_RAW', API_LINK_MB2.'getRawFileData');
+define('PANJEEYAN_USER',LABDHUB_BASE.'nocApi/user_form/');
+define('EKHAJANA_UPDATE_MANUAL_CASES', EKHAJANA_API_BASE.'/EkhajanaApiController/updateCases');
+define('GET_APPLICATION_DETAILS_FROM_BASUNDHARA', EKHAJANA_API_BASE.'/FindCases/getBasundharaCases');
+define('FETCH_INITIAL_PAYMENT_IN_BASUNDHARA', EKHAJANA_API_BASE.'/FindCases/fetchInitialPaymentStatus');
+define('GET_APPLICATION_DETAILS_FOR_BASUNDHARA_ONE', EKHAJANA_API_BASE.'/FindCases/getBasundharaOneCases');
+define('FETCH_INITIAL_PAYMENT_FOR_BASUNDHARA_ONE_SERVICES', EKHAJANA_API_BASE.'/FindCases/fetchInitialPaymentStatusForBasundharaOneServices');
+define('POST_SNA_DATA',ILRMS_API_BASE.'SnaApiController/postSnaUsers');
+define('NGDRS_SRO_NOTE','https://landhub.assam.gov.in/nocApi/dhar_ngdrs/');

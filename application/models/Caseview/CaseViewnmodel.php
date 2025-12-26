@@ -1,0 +1,651 @@
+<?php
+class CaseViewnmodel extends CI_Model {
+    public function __construct() {
+        parent::__construct();
+    }
+
+
+
+    public function casedetailsforFmut($case_no,$type){
+
+        $sql = "select distinct on (case_no) *,ba.basundhara from field_mut_basic fmb left join basundhar_application ba on fmb.case_no=ba.dharitree where fmb.case_no='$case_no'";
+        $data = $this->db->query($sql);
+        //return $data->row();
+
+
+        $sql2 = "select * from field_mut_dag_details where case_no='$case_no'";
+        $data2 = $this->db->query($sql2);
+
+        if($type=='FMUT'){
+        $sql3 = "select pdar_name as pattadarname,pdar_guardian as pdarguardian,pdar_add1 as add from field_mut_pattadar where case_no='$case_no'";
+        $data3 = $this->db->query($sql3);
+        $pattadar=$data3->result();
+
+
+        $sql4 = "select pet_name as appl_name,guard_name as applguardian,add1 as add,self_declaration,photo,auth_type from field_mut_petitioner where case_no='$case_no'";
+        $data4 = $this->db->query($sql4);
+
+        $sql6 = "select pet_name as appl_name,guard_name as applguardian,add1 as add,self_declaration,photo,auth_type from field_mut_petitioner where case_no='$case_no' and auth_type is not null";
+        $data6 = $this->db->query($sql6);
+
+        }
+
+        if ($type=='FPART') {
+        $pattadar=array();
+        $sql4 = "select pdar_name as appl_name,pdar_guardian as applguardian,pdar_add1 as add,self_declaration from field_part_petitioner where case_no='$case_no'";
+        $data4 = $this->db->query($sql4);
+
+        $sql6 = "select pdar_name as appl_name,pdar_guardian as applguardian,pdar_add1 as add,self_declaration,photo,auth_type from field_part_petitioner where case_no='$case_no' and auth_type is not null";
+        $data6 = $this->db->query($sql6);
+
+        }
+
+        
+
+        
+
+        $sql5="Select remark,date(date_entry) as date_entry,user_code  from (
+                Select remark,date_entry,user_code from field_mut_dag_details where case_no='$case_no' union 
+                SElect co_order as remark,date_entry,user_code from petition_proceeding  where case_no='$case_no' and user_code like 'M%' )
+                 as t order by date_entry desc";
+        $data5=$this->db->query($sql5); 
+
+        $basic=$data->row();
+       // var_dump($basic);
+        $dag=$data2->row();
+        $petitioner=$data4->result();
+        $remark=$data5->result();
+        $aadhar=$data6->row();
+       // return $ptype->result();
+
+        if(($basic->order_passed==null or $basic->order_passed=='') and ($basic->is_dispose==null or $basic->is_dispose=='') && !empty($basic->lm_note)){
+            $status='Pending';
+            $pending_with_user='CO';
+        }
+
+        // else if (($basic->order_passed!=null or $basic->order_passed!='') and ($basic->is_dispose!=null or $basic->is_dispose!=''))  {
+        //     $status='Rejected';
+        //     $pending_with_user='NA';
+        // }
+
+        else if($basic->is_dispose=='L' || empty($basic->lm_note)){
+            $status='Reverted/Pending with LRA';
+            $pending_with_user='LRA';
+        }
+        
+        else if($basic->is_dispose=='S'){
+            $status='Reverted to LRS';
+            $pending_with_user='LRS';
+        }
+
+        else if($basic->is_dispose=='Y'){
+            $status='Rejected';
+            $pending_with_user='NA';
+        }
+
+
+        else{
+        
+            $status='Final Order Passed';
+            $pending_with_user='NA';
+        }
+
+
+        return array(
+            'basic'=>$basic,
+            'dag'=>$dag,
+            'pattadar'=>$pattadar,
+            'petitioner'=>$petitioner,
+            'remark'=>$remark,
+            'status'=>$status,
+            'pending_with_user'=>$pending_with_user,
+            'aadhar'=>$aadhar
+        );
+    
+    }
+
+
+    //////office mutation-partition/////////
+    public function casedetailsforOmut($case_no,$type){
+
+        $sql = "select distinct on (case_no) *,ba.basundhara from petition_basic pb left join basundhar_application ba on pb.case_no=ba.dharitree where pb.case_no='$case_no'";
+        $data = $this->db->query($sql);
+        //return $data->row();
+
+        $basic=$data->row();
+
+        $sql2 = "select * from petition_dag_details where dist_code = '$basic->dist_code' and subdiv_code = '$basic->subdiv_code' and cir_code = '$basic->cir_code' and mouza_pargona_code = '$basic->mouza_pargona_code'"
+                . " and lot_no = '$basic->lot_no' and vill_townprt_code = '$basic->vill_townprt_code' and petition_no=$basic->petition_no";
+        $data2 = $this->db->query($sql2);
+
+        if($type=='OMUT'){
+        $sql3="select pdar_name as pattadarname,pdar_guardian as pdarguardian,pdar_add1 as add from petition_pattadar where dist_code = '$basic->dist_code' and subdiv_code = '$basic->subdiv_code' and cir_code = '$basic->cir_code' and mouza_pargona_code = '$basic->mouza_pargona_code'"
+                . " and lot_no = '$basic->lot_no' and vill_townprt_code = '$basic->vill_townprt_code' and petition_no=$basic->petition_no";
+        $data3 = $this->db->query($sql3);
+        $pattadar=$data3->result();
+
+
+        $sql4 = "select pet_name as appl_name,guard_name as applguardian,add1 as add,self_declaration from petitioner where dist_code = '$basic->dist_code' and subdiv_code = '$basic->subdiv_code' and cir_code = '$basic->cir_code' and mouza_pargona_code = '$basic->mouza_pargona_code'"
+                . " and lot_no = '$basic->lot_no' and vill_townprt_code = '$basic->vill_townprt_code' and petition_no=$basic->petition_no";
+        $data4 = $this->db->query($sql4);
+
+        $sql6 = "select pet_name as appl_name,guard_name as applguardian,add1 as add,self_declaration,photo,auth_type from petitioner where dist_code = '$basic->dist_code' and subdiv_code = '$basic->subdiv_code' and cir_code = '$basic->cir_code' and mouza_pargona_code = '$basic->mouza_pargona_code'"
+                . " and lot_no = '$basic->lot_no' and vill_townprt_code = '$basic->vill_townprt_code' and petition_no=$basic->petition_no and auth_type is not null";
+        $data6 = $this->db->query($sql6);
+
+        }
+
+        if ($type=='OPART') {
+        $pattadar=array();
+        $sql4 = "select pdar_name as appl_name,pdar_guardian as applguardian,pdar_add1 as add,self_declaration from petitioner_part where dist_code = '$basic->dist_code' and subdiv_code = '$basic->subdiv_code' and cir_code = '$basic->cir_code' and mouza_pargona_code = '$basic->mouza_pargona_code'"
+                . " and lot_no = '$basic->lot_no' and vill_townprt_code = '$basic->vill_townprt_code' and Petition_no = $basic->petition_no";
+        $data4 = $this->db->query($sql4);
+
+        $sql6 = "select pdar_name as appl_name,pdar_guardian as applguardian,pdar_add1 as add,self_declaration,photo,auth_type from petitioner_part where dist_code = '$basic->dist_code' and subdiv_code = '$basic->subdiv_code' and cir_code = '$basic->cir_code' and mouza_pargona_code = '$basic->mouza_pargona_code'"
+                . " and lot_no = '$basic->lot_no' and vill_townprt_code = '$basic->vill_townprt_code' and Petition_no = $basic->petition_no and auth_type is not null";
+        $data6 = $this->db->query($sql6);
+
+        }
+
+
+        if ($type=='CONV') {
+        $pattadar=array();
+        $sql4 = "select pdar_name as appl_name,pdar_guardian as applguardian,pdar_add1 as add,self_declaration from petitioner_part where dist_code = '$basic->dist_code' and subdiv_code = '$basic->subdiv_code' and cir_code = '$basic->cir_code' and mouza_pargona_code = '$basic->mouza_pargona_code'"
+                . " and lot_no = '$basic->lot_no' and vill_townprt_code = '$basic->vill_townprt_code' and Petition_no = $basic->petition_no";
+        $data4 = $this->db->query($sql4);
+
+        $sql6 = "select pdar_name as appl_name,pdar_guardian as applguardian,pdar_add1 as add,self_declaration,photo,auth_type from petitioner_part where dist_code = '$basic->dist_code' and subdiv_code = '$basic->subdiv_code' and cir_code = '$basic->cir_code' and mouza_pargona_code = '$basic->mouza_pargona_code'"
+                . " and lot_no = '$basic->lot_no' and vill_townprt_code = '$basic->vill_townprt_code' and Petition_no = $basic->petition_no and auth_type is not null";
+        $data6 = $this->db->query($sql6);
+
+        }
+
+        
+
+        
+
+        $sql5="select co_order as remark,note_on_order as order,user_code,date_entry from petition_proceeding where case_no='$case_no' order by id desc ";
+        $data5=$this->db->query($sql5); 
+         $sql7="Select partition_info as lm_remark, sk_note as sk_remark from petition_lm_note where  dist_code = '$basic->dist_code' and subdiv_code = '$basic->subdiv_code' and cir_code = '$basic->cir_code' and mouza_pargona_code = '$basic->mouza_pargona_code' and lot_no = '$basic->lot_no' and vill_townprt_code = '$basic->vill_townprt_code' and petition_no = $basic->petition_no";
+        $data7=$this->db->query($sql7);
+
+        $basic=$data->row();
+        $dag=$data2->row();
+        $petitioner=$data4->result();
+        $remark=$data5->result();
+        $aadhar=$data6->row();
+        //var_dump($remark);
+
+        if($type=='OMUT'){
+
+            if ($basic->status=='D')  {
+                $status='Rejected';
+                $pending_with_user='NA';
+            }
+
+            else if($basic->status=='F'){
+            
+                $status='Final Order Passed';
+                $pending_with_user='NA';
+            }
+            else if( ($basic->not_fresh == null) && ($basic->status == null) && ($basic->proceeding_yn==null) OR ($basic->order_passed == null) && ($basic->status != 'F') && ($basic->not_fresh != null) && ($basic->proceeding_yn!=null) && ($basic->lm_note_yn != null) && ($basic->sk_comment != null)){
+                $status='Pending';
+                $pending_with_user='CO';
+            }
+
+            // if( ($basic->not_fresh == null && $basic->status == null) OR ($basic->order_passed == null && $basic->status != 'F' && $basic->not_fresh == null) && ($basic->proceeding_yn!=null)){
+            //     $status='Pending';
+            //     $pending_with_user='CO';
+            // }
+
+            else if( ($basic->notice_generated_yn == null) && ($basic->not_fresh != null)){
+                $status='Pending';
+                $pending_with_user='AST for Notice Generation';
+            }
+
+            else if( ($basic->proceeding_yn == null) and ($basic->notice_served_yn != null)){
+                $status='Pending';
+                $pending_with_user='AST for Notice Serve';
+            }
+
+            else if( ($basic->lm_note_yn == null) && ($basic->not_fresh !=null)){
+                $status='Pending';
+                $pending_with_user='LM';
+            }
+
+            else if( ($basic->sk_comment == null) && ($basic->not_fresh != null)){
+                $status='Pending';
+                $pending_with_user='SK';
+            }
+            else{
+                $status='NA';
+                $pending_with_user='NA';
+            }
+        }
+
+        if($type=='OPART'){
+            if ($basic->status=='D')  {
+                $status='Rejected';
+                $pending_with_user='NA';
+            }
+
+            else if($basic->status=='F'){
+            
+                $status='Final Order Passed';
+                $pending_with_user='NA';
+            }
+            else if( ($basic->not_fresh == null) && ($basic->status == null) && ($basic->proceeding_yn==null) OR ($basic->order_passed == null) && ($basic->status != 'F') && ($basic->not_fresh != null) && ($basic->proceeding_yn!=null) && ($basic->lm_note_yn != null) && ($basic->sk_comment != null)){
+                $status='Pending';
+                $pending_with_user='CO';
+            }
+
+
+            else if( ($basic->notice_generated_yn == null) && ($basic->not_fresh != null)){
+                $status='Pending';
+                $pending_with_user='AST for Notice Generation';
+            }
+
+            else if( ($basic->not_fresh == 'Y') && ($basic->proceeding_yn==null) && ($basic->status == 'P')){
+                $status='Pending';
+                $pending_with_user='AST for Action taken report';
+            }
+
+            else if( ($basic->proceeding_yn == null) and ($basic->notice_served_yn != null)){
+                $status='Pending';
+                $pending_with_user='AST for Notice Serve';
+            }
+
+            else if( ($basic->proceeding_yn == null) and ($basic->notice_served_yn != null)){
+                $status='Pending';
+                $pending_with_user='AST for Notice Serve';
+            }
+
+            else if( ($basic->lm_note_yn == null) && ($basic->not_fresh !=null)){
+                $status='Pending';
+                $pending_with_user='LM';
+            }
+
+            else if( ($basic->sk_comment == null) && ($basic->not_fresh != null)){
+                $status='Pending';
+                $pending_with_user='SK';
+            }
+            else{
+                $status='NA';
+                $pending_with_user='NA';
+            }
+        }
+        if($type=='OMUT'){
+
+            if ($basic->status=='D')  {
+                $status='Rejected';
+                $pending_with_user='NA';
+            }
+
+            else if($basic->status=='F'){
+            
+                $status='Final Order Passed';
+                $pending_with_user='NA';
+            }
+            else if( ($basic->not_fresh == null) && ($basic->status == null) && ($basic->proceeding_yn==null) OR ($basic->order_passed == null) && ($basic->status != 'F') && ($basic->not_fresh != null) && ($basic->proceeding_yn!=null) && ($basic->lm_note_yn != null) && ($basic->sk_comment != null)){
+                $status='Pending';
+                $pending_with_user='CO';
+            }
+            else{
+                $status='NA';
+                $pending_with_user='NA';
+            }
+        }
+        return array(
+            'basic'=>$basic,
+            'dag'=>$dag,
+            'pattadar'=>$pattadar,
+            'petitioner'=>$petitioner,
+            'remark'=>$remark,
+            'status'=>$status,
+            'pending_with_user'=>$pending_with_user,
+            'aadhar'=>$aadhar,
+            'lm_sk_remark'=> $data7->row()
+        );
+    
+    }
+
+    //////////reclassification//////
+
+    public function casedetailsforReclass($case_no){
+
+        $sql = "select distinct on (case_no) *,lm_date as date_entry,ba.basundhara from t_reclassification tr left join basundhar_application ba on tr.case_no=ba.dharitree where tr.case_no='$case_no'";
+        $data = $this->db->query($sql);
+        //return $data->row();
+
+        $basic=$data->row();
+
+
+        $sql6 = "select self_declaration,photo,auth_type from t_reclassification where case_no='$case_no' and auth_type is not null";
+        $data6 = $this->db->query($sql6);
+
+
+        $sql5="select co_order as remark,date_entry from petition_proceeding_dc_adc where case_no='$case_no' ";
+        $data5=$this->db->query($sql5); 
+
+        $remark=$data5->result();
+
+        if($basic->status==null and $basic->lm_yn=='Y'){
+            $status='Pending';
+            $pending_with_user='CO';
+        }
+
+        else if ($basic->status=='C' and $basic->lm_yn=='Y')  {
+            $status='Pending(Reverted)';
+            $pending_with_user='CO';
+        }
+
+        else if ($basic->status=='A' and $basic->lm_yn=='Y')  {
+            $status='Pending';
+            $pending_with_user='ADC';
+        }
+
+        else if ($basic->status=='D' and $basic->lm_yn=='Y')  {
+            $status='Pending';
+            $pending_with_user='DC';
+        }
+
+        else if ($basic->status=='F' and $basic->rkg_chitha_updated_yn=='Y')  {
+            $status='Final Order Passed';
+            $pending_with_user='NA';
+        }
+
+        else{
+        
+            $status='NA';
+            $pending_with_user='NA';
+        }
+
+        $aadhar=$data6->row();
+
+        return array(
+            'basic'=>$basic,
+            'dag'=>null,
+            'pattadar'=>null,
+            'petitioner'=>null,
+            'remark'=>$remark,
+            'status'=>$status,
+            'pending_with_user'=>$pending_with_user,
+            'aadhar'=>$aadhar
+        );
+    
+    }
+
+
+    /////////Misc Cases///////
+
+    public function casedetailsforMisc($case_no,$type){
+
+        $sql = "select misc_case_no as case_no,dist_code,subdiv_code,cir_code,mouza_pargona_code,lot_no,vill_townprt_code,patta_no,dag_no,patta_type_code,submission_date as date_entry,status,operation,sk_note_yn,lm_note_yn,ba.basundhara from misc_case_basic mcb left join basundhar_application ba on mcb.misc_case_no=ba.dharitree where mcb.misc_case_no='$case_no'";
+        $data = $this->db->query($sql);
+        //return $data->row();
+
+
+        // $sql2 = "select * from misc_case_first_party where misc_case_no='$case_no'";
+        // $data2 = $this->db->query($sql2);
+
+
+        $sql6 = "select self_declaration,photo,auth_type from misc_case_first_party where misc_case_no='$case_no' and auth_type is not null";
+        $data6 = $this->db->query($sql6);
+
+
+        if($type=='MiNC'){
+        $$pattadar=array();
+
+
+        $sql4 = "select petition_pdar_name_old as pet_name,petition_pdar_name_new as applied_name,self_declaration from misc_case_first_party where misc_case_no='$case_no'";
+        $data4 = $this->db->query($sql4);
+
+        }
+
+        if ($type=='MiND') {
+        $pattadar=array();
+        $sql4 = "select petition_pdar_name_old as pet_name,self_declaration from misc_case_first_party where misc_case_no='$case_no'";
+        $data4 = $this->db->query($sql4);
+
+        }
+
+
+        
+
+        $sql5="select process_note as remark,note_date as date_entry from misc_case_process_reports where misc_case_no='$case_no' ";
+        $data5=$this->db->query($sql5); 
+
+        $basic=$data->row();
+       // var_dump($basic);
+       // $dag=$data2->row();
+       $petitioner=$data4->result();
+       $remark=$data5->result();
+       $aadhar=$data6->row();
+
+
+      if($type=='MiNC'){
+
+        if($basic->status=='1' and $basic->operation=='s'){
+            $status='Pending';
+            $pending_with_user='CO';
+        }
+
+        else if ($basic->status=='18' and $basic->lm_note_yn==null)  {
+            $status='Pending';
+            $pending_with_user='LM';
+        }
+
+        else if ($basic->status=='02' and $basic->sk_note_yn==null and $basic->operation=='l')  {
+            $status='Pending';
+            $pending_with_user='SK';
+        }
+
+        else if ($basic->status=='02' and $basic->sk_note_yn!=null and $basic->lm_note_yn!=null)  {
+            $status='Pending';
+            $pending_with_user='CO(Final Order)';
+        }
+
+        else if ($basic->status=='L')  {
+            $status='Pending';
+            $pending_with_user='LM(Reverted)';
+        }
+
+        else if ($basic->status=='10' and $basic->operation=='E')  {
+            $status='Final Order Passed';
+            $pending_with_user='NA';
+        }
+
+        else if ($basic->status=='F' and $basic->operation=='s')  {
+            $status='Rejected';
+            $pending_with_user='NA';
+        }
+
+        else{
+        
+            $status='NA';
+            $pending_with_user='NA';
+        }
+    }
+
+    if($type=='MiND'){
+        if($basic->status=='01' and $basic->operation=='E'){
+            $status='Pending';
+            $pending_with_user='CO';
+        }
+
+        else if ($basic->status=='18' and $basic->lm_note_yn==null)  {
+            $status='Pending';
+            $pending_with_user='LM';
+        }
+
+        else if ($basic->status=='02' and $basic->sk_note_yn==null and $basic->operation=='l')  {
+            $status='Pending';
+            $pending_with_user='SK';
+        }
+
+        else if ($basic->status=='02' and $basic->sk_note_yn!=null and $basic->lm_note_yn!=null)  {
+            $status='Pending';
+            $pending_with_user='CO(Final Order)';
+        }
+
+        else if ($basic->status=='L')  {
+            $status='Pending';
+            $pending_with_user='LM(Reverted)';
+        }
+
+        else if ($basic->status=='10' and $basic->operation=='E')  {
+            $status='Final Order Passed';
+            $pending_with_user='NA';
+        }
+
+        else if ($basic->status=='F' and $basic->operation=='s')  {
+            $status='Rejected';
+            $pending_with_user='NA';
+        }
+
+        else{
+        
+            $status='NA';
+            $pending_with_user='NA';
+        }
+    }
+
+
+        return array(
+            'basic'=>$basic,
+            'dag'=>null,
+            'pattadar'=>null,
+            'petitioner'=>$petitioner,
+            'remark'=>$remark,
+            'status'=>$status,
+            'pending_with_user'=>$pending_with_user,
+            'aadhar'=>$aadhar
+        );
+    
+    }
+
+
+    //////////Area Correction//////
+
+    public function casedetailsforLDU($case_no){
+
+        $sql = "select case_no,dist_code,subdiv_code,cir_code,mouza_pargona_code,lot_no,vill_townprt_code,patta_no,dag_no,patta_type_code,lm_date as date_entry,dag_area_b,dag_area_k,dag_area_lc,dag_area_g,suggested_dag_area_b,suggested_dag_area_k,suggested_dag_area_lc,suggested_dag_area_g,ba.basundhara,lm_note,co_note,status,co_orddate,dc_adc_note,dc_adc_orddate from t_legacyupdation tr left join basundhar_application ba on tr.case_no=ba.dharitree where tr.case_no='$case_no'";
+        $data = $this->db->query($sql);
+        //return $data->row();
+
+        $basic=$data->row();
+
+
+        $sql6 = "select self_declaration,photo,auth_type from t_legacyupdation where case_no='$case_no' and auth_type is not null";
+        $data6 = $this->db->query($sql6);
+
+
+        // $sql5="select co_order as remark from petition_proceeding_dc_adc where case_no='$case_no' ";
+        // $data5=$this->db->query($sql5); 
+
+        // $remark=$data5->result();
+
+        if($basic->status=='P' and $basic->lm_note!=null and $basic->co_note==null){
+            $status='Pending';
+            $pending_with_user='CO';
+        }
+
+        else if ($basic->status=='P' and $basic->lm_note!=null and $basic->co_note!=null)  {
+            $status='Pending';
+            $pending_with_user='ADC';
+        }
+
+
+        else if ($basic->status=='F')  {
+            $status='Final Order Passed';
+            $pending_with_user='NA';
+        }
+
+        else if ($basic->status=='R')  {
+            $status='Rejected';
+            $pending_with_user='NA';
+        }
+
+        else{
+        
+            $status='NA';
+            $pending_with_user='NA';
+        }
+
+        $aadhar=$data6->row();
+
+        return array(
+            'basic'=>$basic,
+            'dag'=>null,
+            'pattadar'=>null,
+            'petitioner'=>null,
+            'remark'=>null,
+            'status'=>$status,
+            'pending_with_user'=>$pending_with_user,
+            'aadhar'=>$aadhar
+        );
+    
+    }
+
+    //////////Area Correction//////
+
+    public function casedetailsforACPP($case_no){
+
+        $sql = "select case_no,dist_code,subdiv_code,circle_code as cir_code,mouza_pargona_code,lot_no,vill_townprt_code,status,date_entry,ba.basundhara from allotment_cert_basic fmb left join basundhar_application ba on fmb.case_no=ba.dharitree where fmb.case_no='$case_no'";
+        $data = $this->db->query($sql);
+        //return $data->row();
+
+
+        $sql2 = "select * from allotment_pet_dag where case_no='$case_no'";
+        $data2 = $this->db->query($sql2);
+
+        $sql3 = "select alotee_name as pattadarname,alotee_gurdian as pdarguardian from allotment_petitioner where case_no='$case_no'";
+        $data3 = $this->db->query($sql3);
+        $pattadar=$data3->result();
+
+        $sql6 = "select alotee_name as appl_name,alotee_gurdian as applguardian,self_declaration,photo,auth_type from allotment_petitioner where case_no='$case_no' and auth_type is not null";
+        $data6 = $this->db->query($sql6);
+        
+
+        $sql5="Select co_order as remark,date_entry,user_code from petition_proceeding_dc_adc  where case_no='$case_no' order by date_entry desc";
+        $data5=$this->db->query($sql5); 
+
+        $basic=$data->row();
+       // var_dump($basic);
+        $dag=$data2->row();
+        $petitioner=$data6->result();
+        $remark=$data5->result();
+        $aadhar=$data6->row();
+       // return $ptype->result();
+
+        if($basic->status=='F'){
+            $status='Final Order Passed';
+            $pending_with_user='NA';
+        }
+
+        else if($basic->status=='D'){
+            $status='Rejected';
+            $pending_with_user='NA';
+        }
+
+        else{
+        
+            $status='Pending';
+            $pending_with_user='';
+        }
+
+
+        return array(
+            'basic'=>$basic,
+            'dag'=>$dag,
+            'pattadar'=>$pattadar,
+            'petitioner'=>$petitioner,
+            'remark'=>$remark,
+            'status'=>$status,
+            'pending_with_user'=>$pending_with_user,
+            'aadhar'=>$aadhar
+        );
+    
+    }
+  
+}

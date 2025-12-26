@@ -1,0 +1,2 @@
+<!-- <center><p class="bg bg-warning text-white" style="padding:3px">Last date of <span style="font-weight: bold;color:#ffeb5a">MISSION BASUNDHARA 2.0</span> is 30 Nov 2023. Time left: <span style='color: #000;font-weight: bold;' id='time_left'></span> </p>
+</center> -->

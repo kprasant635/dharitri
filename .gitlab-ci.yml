@@ -1,0 +1,22 @@
+stages:
+  - deploy_main
+  - deploy_stage
+
+
+deploy_main:
+  stage: deploy_main
+  script:    
+    - echo "Deploying to dev server..!!"
+    - ssh -v opc@172.16.11.120 'sudo chown -R opc:opc /var/www/html/dharitree/dharitree_dev && cd /var/www/html/dharitree/dharitree_dev && git checkout main && git reset --hard origin/main && git pull origin main && sudo chown -R apache:apache /var/www/html/dharitree/dharitree_dev'
+    - ssh -v opc@172.16.11.211 'sudo chown -R opc:opc /var/www/html/dharitree/dharitree_dev && cd /var/www/html/dharitree/dharitree_dev && git checkout main && git reset --hard origin/main && git pull origin main && sudo chown -R apache:apache /var/www/html/dharitree/dharitree_dev'
+    - echo "Deployment successful for MAIN!!!!!"
+  only:
+    - main
+
+
+deploy_stage:
+  stage: deploy_stage
+  script:    
+    - echo "Deployment successful for STAGE!!!!!!!"
+  only:
+    - stage

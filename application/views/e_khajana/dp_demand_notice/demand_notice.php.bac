@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Notice of Demand</title>
+    <style>
+        body { font-family: Arial; margin: 0; }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .notice { 
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #000;
+            background-color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 5px;
+            text-align: left;
+        }
+        .text-center { text-align: center; }
+        .mb-20 { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="notice">
+            <!-- Fix malformed paragraph tag -->
+            <p class="mb-20">Assam Schedule XXIV (Part-1) Form No. 10</p>
+            <h3 class="text-center">NOTICE OF DEMAND</h3>
+            <p><strong>District</strong> <?= $this->utilityclass->getDistrictName($dist_code) ?> <strong>Mouza</strong> <?= $this->utilityclass->getMouzaName($dist_code, $subdiv_code, $cir_code, $mouza_pargona_code) ?></p>
+                <p><strong>To</strong> ______ <strong>Resident Of</strong> ______</p>
+                <p>Whereas as the arrear due on the undermentioned Estates on account of Land Revenue and Local Rate have not yet been paid by you. 
+                    This is to inform you that unless the same demands be paid within _______ days from the date of the notice you will be treated as a Defaulter and proceeded against according to the law.</p>
+                
+                
+                <table>
+                    <tr>
+                        <th rowspan="2" style="width: 5%;">SL. No.</th>
+                        <th rowspan="2" style="width: 25%;">Name of Settlement holders to whom their notice as issued</th>
+                        <th colspan="5" style="width: 70%;">Arrears due</th>
+                    </tr>
+                    <tr>
+                        <th style="width: 15%;">Land Revenue</th>
+                        <th style="width: 15%;">Local Rate</th>
+                        <th style="width: 10%;">Costs</th>
+                        <th style="width: 15%;">Total</th>
+                        <th style="width: 15%;">Remarks</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>__________________</td>
+                        <td>__________________</td>
+                        <td>__________________</td>
+                        <td>__________________</td>
+                        <td>__________________</td>
+                        <td>__________________</td>
+                    </tr>
+                </table>
+                
+                <p><strong>Signature:</strong> ______________________</p>
+                <p>"Where the name of the Estate is the same as that of the settlement holder it will be sufficient to get the number only of the estate in this column as on the Tauzi (Assam Revenue Form No. 83) or on the register of revenue paying estates.</p>
+                <p>* In the column of remarks enter the instalments and year on account of which the arrears due.</p>
+        </div>
+    </div>
+    <?php if (!isset($for_pdf) || !$for_pdf): ?>
+    <div style="text-align: center; margin: 20px;">
+        <a href="<?= site_url('EkhajanaDemandNoticeController/downloadNotice') ?>" class="download-btn">Download Notice</a>
+    </div>
+    <?php endif; ?>
+
+    <style>
+        .download-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</body>
+</html>

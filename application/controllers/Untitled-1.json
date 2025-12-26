@@ -1,0 +1,169 @@
+{
+  "status": "success",
+  "message": "Application Details Fetched Successfully",
+  "data": {
+    "applicationId": "RCMS2025020300001",
+    "caseDescription": "উঃ দঃ নামজাৰী কৰ্ত্তন কৰি ৰেজিষ্টাৰ দলিল নামজাৰী বাবে আবেদন",
+    "uploadDocument": null,
+    "declaration1": false,
+    "declaration2": false,
+    "declaration3": true,
+    "representedThrough": false,
+    "additionalSection": false,
+    "officerRelated": true,
+    "revertBackCaseComment": null,
+    "landDetails": [
+      {
+        "id": 380,
+        "district": "283",
+        "districtNameEng": "DARRANG",
+        "districtNameAs": "দৰং  ",
+        "circle": "10000000005111",
+        "cirNameEng": "MANGALDAI",
+        "cirNameAs": "মঙ্গলদৈ ",
+        "cirUniqueCode": 10000000005111,
+        "village": "305007",
+        "villNameEng": "GARIAPARA   ",
+        "villNameAs": "গৰিয়াপাৰা  ",
+        "villUnique_code": null,
+        "pattaType": "0201",
+        "pattaName": null,
+        "pattaNo": 286,
+        "dagNo": "136",
+        "total_area": "0B-1K-10.0000L-0.0000G-0Kr",
+        "khatianNo": null,
+        "areaDisputed": "0B-1K-10L",
+        "northName": "BABUR ALI",
+        "northDag": null,
+        "northUpin": "",
+        "southName": "BAGO SEIKH",
+        "southDag": null,
+        "southUpin": "",
+        "eastName": "GOVT ROAD",
+        "eastDag": null,
+        "eastUpin": "",
+        "westName": "LAUPATI KOCH",
+        "westDag": null,
+        "westUpin": ""
+      }
+    ],
+    "plaintiffs": [
+      {
+        "id": 376,
+        "firstName": "BAGO ",
+        "middleName": "",
+        "lastName": "SEIKH",
+        "fhName": "AFTABUDDIN",
+        "emailPlaintiff": "",
+        "mobileNo": 8888888888,
+        "category": "General",
+        "gender": "Male",
+        "address": "GARIAPARA"
+      },
+      {
+        "id": 377,
+        "firstName": "KHAIRULLA ",
+        "middleName": "",
+        "lastName": "ALI",
+        "fhName": "EYAKUB ALI",
+        "emailPlaintiff": "",
+        "mobileNo": 8888888888,
+        "category": "General",
+        "gender": "Male",
+        "address": "GARIAPARA"
+      }
+    ],
+    "defendents": [
+      {
+        "caseDescription": null,
+        "declaration1": null,
+        "declaration2": null,
+        "declaration3": null,
+        "additionalSection": null,
+        "officerRelated": null,
+        "defendents": null,
+        "courtLevel": null,
+        "caseNature": null,
+        "relavantActRegulation": null,
+        "plaintiffs": null,
+        "advocates": null,
+        "landDetails": null,
+        "documentTypeStoreCitizen": null,
+        "uploadDocument": null,
+        "representedThrough": null,
+        "underSection": null,
+        "relSection": null,
+        "uploadVakalatnama": null,
+        "sewaSetuUserId": null,
+        "rtpsTransId": null,
+        "id": 369,
+        "defendentCode": null,
+        "defendentFirstName": null,
+        "defendentMiddleName": null,
+        "defendentLastName": null,
+        "defendentfhName": null,
+        "defendentMobile": null,
+        "defendentAddress": null,
+        "officerDept": "Circle office",
+        "designation": "Circle Officer",
+        "typeOfficer": true
+      }
+    ],
+    "advocates": [],
+    "courtLevel": {
+      "courtId": 2,
+      "courtLevelName": "Original (Trial) Revenue Court Case: - In the Court of the Revenue Circle Officer",
+      "courtType": "3",
+      "active": true,
+      "hibernateLazyInitializer": {}
+    },
+    "caseNature": {
+      "caseNatureName": "Miscellaneous case against field mutation (within 3 years) filed under Section 53 A (2) of ALRR 1886.",
+      "active": true,
+      "id": 5,
+      "hibernateLazyInitializer": {}
+    },
+    "underSection": [],
+    "applicationEntryDate": "2025-02-03",
+    "caseHistory": [
+      {
+        "remark": "Application created with application id RCMS2025020300001",
+        "date": "2025-02-03",
+        "id": 897
+      },
+      {
+        "remark": "Assigned application id RCMS2025020300001 To DA",
+        "date": "2025-02-03",
+        "id": 898
+      }
+    ],
+    "caseStatus": "PENDING",
+    "DocumentTypeStoreCitizen": [
+      {
+        "id": 41,
+        "uploadDocument": "A.pdf",
+        "uploadDocumentImgPath": "file:////home/opc/uploads/compressed_1388fa12-75f4-4d45-bfe1-5bd2260d0d75_A.pdf",
+        "uploadDocumentImg_type": "application/pdf",
+        "documentType": "Application/Petition*"
+      }
+    ],
+    "relSection": [],
+    "relavantActRegulation": null,
+    "comment": null,
+    "checkLists": null,
+    "sewaSetuUserId": null,
+    "rtpsTransId": null,
+    "id": 314,
+    "documentTypeStoreCitizen": [
+      {
+        "id": 41,
+        "uploadDocument": "A.pdf",
+        "uploadDocumentImgPath": "file:////home/opc/uploads/compressed_1388fa12-75f4-4d45-bfe1-5bd2260d0d75_A.pdf",
+        "uploadDocumentImg_type": "application/pdf",
+        "documentType": "Application/Petition*"
+      }
+    ]
+  },
+  "timestamp": "2025-10-09T16:34:19.5480865",
+  "path": "/v1/ApprovedCase/getApplication"
+}

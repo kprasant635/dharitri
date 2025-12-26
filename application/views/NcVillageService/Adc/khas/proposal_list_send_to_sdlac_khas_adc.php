@@ -1,0 +1,335 @@
+<style>
+    .reza-card {
+        background: #fff;
+        border-radius: 2px;
+        display: inline-block;
+        margin: 1rem;
+        position: relative;
+        width: 100%;
+    }
+    .reza-card {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    }
+    .reza-title{
+        font-weight: bold;
+        font-size: 18px;
+        padding: 20px;
+        color: #37474F;
+    }
+    .reza-body{
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-bottom: 40px;
+    }
+    .badge{
+        padding: 10px;
+        font-size: 15px;
+    }
+
+    .rezaButt {
+        color: #FFF;
+        background-color: #03a9f4;
+    }
+    .rezaButt:hover {
+        color: #0c0c0c;
+    }
+    .rezaButt{
+        display: inline-block;
+        position: relative;
+        cursor: pointer;
+        height: 35px;
+        min-width: 150px;
+        line-height: 35px;
+        padding: 0 1.5rem;
+        font-size: 15px;
+        font-weight: 600;
+        font-family: "Roboto", sans-serif;
+        letter-spacing: 0.8px;
+        text-align: center;
+        text-decoration: none;
+        text-transform: uppercase;
+        vertical-align: middle;
+        white-space: nowrap;
+        outline: none;
+        border: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        border-radius: 2px;
+        transition: all 0.3s ease-out;
+        /*box-shadow: 0 2px 5px 0 rgb(0 0 0 / 23%);*/
+    }
+    .rezaText {
+        font-size: 16px;
+    }
+    .btn-info{
+
+    }
+
+
+</style>
+<div class="row" style='padding: 40px 50px 40px 20px'>
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 pull-left" style="padding-bottom: 5px; padding-top: 10px">
+            Process / <?php echo $this->lang->line('ncSidebar') ?> /
+            <a href="<?= base_url()?>index.php/NcKhasLandAdc/NcKhasLandLandingPageAdc">
+                <?php echo $this->lang->line('ncKhasLink') ?>
+            </a> /
+            <?php echo $this->lang->line('NcSDLACMemberReport') ?>
+
+            <a href="<?= base_url()?>index.php/NcKhasLandAdc/NcKhasLandLandingPageAdc">
+                <button type="button" class="btn btn-sm btn-danger pull-right">
+                    <i class="fa fa-backward"></i>&nbsp;Back to Menu
+                </button>
+            </a>
+
+            <?php if($this->session->flashdata('success')) { ?>
+                <br>
+                <div class="success-msg">
+                    <div class="alert alert-success" style="box-shadow:  0 2px 5px 0 rgba(0,0,0,.16),0 2px 10px 0 rgba(0,0,0,.12);">
+                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <b><i class="fa fa-check"></i> <?php echo $this->session->flashdata('success') ?></b>
+                    </div>
+                </div>
+
+            <?php } ?>
+
+            <?php if($this->session->flashdata('error')) { ?>
+                <br>
+                <br>
+                <div class="alert alert-danger alert-dismissable" style="box-shadow:  0 2px 5px 0 rgba(0,0,0,.16),0 2px 10px 0 rgba(0,0,0,.12);">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <b><?php echo $this->session->flashdata('error') ?></b>
+                    <br>
+                    <b><?php echo $this->session->flashdata('error_code') ?></b>
+                </div>
+            <?php } ?>
+        </div>
+
+
+        <div class="reza-card">
+            <div class="reza-title">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-lg-12">
+                        <span><?php echo $this->lang->line('ncKhasLandTitle') ?></span>
+                        <hr>
+                    </div>
+                    <div class="col-md-6 col-sm-12 col-lg-12 col-xs-12">
+                        <span><?php echo $this->lang->line('proposalList') ?></span>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="reza-body">
+
+                <?php if ($pendingCaseCount == 0) : ?>
+                    <div class="rezaText"><?php echo $this->lang->line('zeroCase') ?></div>
+                <?php else : ?>
+                    <table class="datatable table table-stripped" id='datatable' width="100%">
+                        <thead>
+                        <tr>
+                            <th width='5%'>SL No.</th>
+                            <th width='25%'> Proposal No <input type="text" id="by_proposal_no" name="by_proposal_no" data-column-index="1" class="form-control" placeholder="Search by Proposal No"></th>
+                            <th width='20%' class="center">Hearing Date <input type="text" id="by_hearing_date" name="by_hearing_date" class="form-control" placeholder="Search by Hearing Date" data-column-index="3"></th>
+                            <th width='20%' class="center">Created By <input type="text" id="by_case_no" name="by_case_no" data-column-index="2" class="form-control" placeholder="Search by Case No"></th>
+                            <th width="30%" class="center">Action<button type="button" class="search_button btn btn-sm btn-primary form-control"><i class="fa fa-search" aria-hidden="true"></i>&nbsp;&nbsp;Search</button></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+
+                    </table>
+                <?php endif; ?>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+
+<!--// NEW JS BY MASUD REZA-->
+<input type="hidden" id="getBaseURL" value="<?php echo base_url(); ?>index.php">
+
+<link rel="stylesheet" href="<?php echo base_url(); ?>application/css/sweetalert2.min.css">
+<script src="<?php echo base_url(); ?>application/views/js/sweetalert2/sweetalert2.all.min.js"></script>
+
+<script>
+
+    var BASE_URL = $("#getBaseURL").val();
+    function showSuccessMessage(text) {
+        swal.fire({
+            title: "Success !",
+            text: text,
+            icon: 'success',
+            position: 'top',
+            showConfirmButton: true,
+            timer: 5000,
+        });
+
+    }
+
+    function showErrorMessage(text) {
+        swal.fire({
+            title: "Error!",
+            text: text,
+            icon: 'error',
+            position: 'top',
+            showConfirmButton: false,
+            timer: 5000,
+            showCancelButton: true
+        });
+    }
+
+
+
+    // ****************************************************************
+    // proposal id search by case no
+    $(document).on('click','#searchProId',function ()
+    {
+        $('#searchProIdModal').modal({backdrop: 'static', keyboard: false});
+        $('#searchProIdModal').modal('show');
+    });
+
+    $(document).on('click','#searchProIdModalNo',function ()
+    {
+        $('#searchProIdModal').modal('hide');
+    });
+
+    $(document).on('click','#searchProIdModalYes',function ()
+    {
+        const applicant = {
+            caseNo: $("#caseId").val(),
+            applicationNo: $("#applicationId").val(),
+        };
+
+
+        $.ajax({
+            url: BASE_URL + "/SettlementCommonDc/searchProposalIdByAppCaseNo",
+            type: "post",
+            dataType: "json",
+            contentType: "application/json",
+            success: function (data) {
+                if (data.responseType == 1)
+                {
+                    showErrorMessage("There is some problem, Please try again");
+                }
+                else if (data.responseType == 2)
+                {
+
+                    $('#searchProIdModal').modal({backdrop: 'static', keyboard: false});
+
+                    var table = '';
+                    var sl    = 1;
+                    $.each(data.proposalIds, function (i, val) {
+
+                        table +=
+                            '<tr>'+
+                            '<td style="font-size: 18px; font-weight: bold">' + sl +'. &nbsp;' + '</td>' +
+                            '<td style="font-size: 18px; font-weight: bold">' + 'PROPOSAL ID - ' + val.proposal_id + '</td>' +
+                            '</tr>';
+
+                        sl = sl + 1;
+                    });
+                    $('#caseTable').html(table);
+                }
+                else if (data.responseType == 3)
+                {
+                    $('#searchProIdModal').modal('hide');
+                    showErrorMessage("Data not found !");
+                }
+                else
+                {
+                    showErrorMessage("SOMETHING WENT WRONG");
+                }
+            },
+            data: JSON.stringify(applicant)
+
+        });
+    });
+
+</script>
+
+<script type="text/javascript">
+
+    $('#datatable').DataTable();
+
+    load_data();
+
+    function load_data(){
+        var base_url     = "<?php echo base_url();?>";
+        var service_code = <?= NC_KHAS_LAND_ID ?>;
+
+        var case_no       = $('#by_case_no').val();
+        var hearing_date  = $('#by_hearing_date').val();
+        var proposal_no   = $('#by_proposal_no').val();
+
+        $('#datatable').DataTable().destroy();
+
+        var table = $('#datatable').DataTable({
+
+            'pageLength' : 10,
+            "processing" : true,
+            "searching"  : false,
+            "serverSide" : true,
+            "ordering"   : false,
+            "lengthMenu" : [[5, 10, 20, 50, 100], [5, 10, 20, 50, 100]],
+            'language'   : {
+                "processing": '<i class="fa fa-spinner fa-spin" style="font-size:24px;color:rgb(75, 183, 245);"></i>'
+            },
+            'ajax'   : {
+                url  : base_url+'index.php/NcKhasLandAdc/thirdProceedingSdlacReportAdc',
+                type : 'POST',
+                data : {
+                    service      : service_code,
+                    case_no      : case_no,
+                    hearing_date : hearing_date,
+                    proposal_no  : proposal_no,
+                },
+                deferLoading     : 57,
+            },
+
+            order           : [[2, 'asc']],
+            columnDefs      : [{
+                targets     : "_all",
+                orderable   : false,
+                "className" : "dt-center", "targets":[ 0, 1, 2, 3, 4],
+            }]
+        });
+    }
+
+    $('.search_button').click(function(){
+        load_data();
+    });
+
+    function openTab(id){
+
+        var base_url     = "<?php echo base_url();?>";
+        var service_code = <?= NC_KHAS_LAND_ID ?>;
+
+        $.ajax({
+            url  : base_url+'index.php/NcKhasLandAdc/getCasesAgainstProposalNo',
+            dataType: "JSON",
+            data: {id : id, service_code : service_code},
+            type: "POST",
+            success: function(data) {
+                console.log(data.response[0]['case_no']);
+                var cases=[];
+                $.each(data.response, function (i, val) {
+                    cases += '<br>' + val['case_no']
+                });
+                $('#list_of_cases_'+id).html(cases);
+            }
+        });
+    }
+
+</script>

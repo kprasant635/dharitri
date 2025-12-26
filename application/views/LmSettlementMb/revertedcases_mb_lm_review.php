@@ -1,0 +1,152 @@
+<div class="col-lg-12 ">
+            <div class="well well-sm mis_report">
+                <h4 style="text-align: center;">
+                    Reverted case(s)
+                </h4>
+            </div>
+        </div>
+        <div class="col-lg-12 ">
+            <div class="panel panel-info panel-form">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Reverted <?php echo $this->lang->line('pending_cases');  ?>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <table class='table table-striped' id='cases' width="100%">
+                        <thead>
+                            <th><label class="control-label"><?php echo $this->lang->line('case_no'); ?></label></th>
+                            <th class="center"><label class="control-label"><?php echo $this->lang->line('location'); ?></label></th>
+                            <th class="center"><label class="control-label"><?php echo $this->lang->line('submission_date'); ?></label></th>
+                            <th class="center"><label class="control-label"><?php echo $this->lang->line('action'); ?></label></th>
+                        </thead>
+                        <?php foreach ($cases as $case) : ?>
+                            <tr>
+                                <td><a href="#"><?php echo $case->case_no; ?></a><br>
+                                    <span class='small font-italic red'><?php if ($case->applid) {
+                                                                            echo "Basundhara:" . $case->applid;
+                                                                        } ?> </span>
+                                </td>
+                                <td class="center">
+
+                                    <?php
+                                    echo "Mouza : " . $mouza_pargona_code = $this->utilityclass->getMouzaName($case->dist_code, $case->subdiv_code, $case->cir_code, $case->mouza_pargona_code);
+                                    echo "<br>Lot : " . $lot_no = $this->utilityclass->getLotName($case->dist_code, $case->subdiv_code, $case->cir_code, $case->mouza_pargona_code, $case->lot_no);
+                                    echo "<br>Village : " . $vill_townprt_code = $this->utilityclass->getVillageName($case->dist_code, $case->subdiv_code, $case->cir_code, $case->mouza_pargona_code, $case->lot_no, $case->vill_townprt_code);
+                                    ?>
+                                </td>
+                                <td class="center">
+                                    <i class='fa fa-calendar'></i> Submited On <?php echo date('d-m-Y', strtotime($case->date_update)); ?>
+
+                                </td>
+                                <td>
+                                    <?php
+                                        if($service_controller == 'SettlementAp')
+                                        {
+                                            ?>
+
+                                                <!-- <a type="button" href="<?php echo base_url() . "index.php/".$service_controller."/secondProceeding?case=" . $case->case_no; ?>" class='lmreportpart btn-sm btn btn-primary' id='myModal'><i class="fa fa-envelope-open" aria-hidden="true"></i> <?php echo $this->lang->line('submit_report'); ?></a> -->
+                                                <a type="button" href="<?php echo base_url() . "index.php/".$service_controller."/".$service_method."/1?app=" . $this->utilityclass->getApplidFromCaseNo($case->case_no); ?>" class='lmreportpart btn-sm btn btn-primary' id='myModal'><i class="fa fa-envelope-open" aria-hidden="true"></i> <?php echo $this->lang->line('submit_report'); ?></a>
+
+                                            <?php
+                                        }
+                                        else
+                                        {
+                                            ?>
+                                                <a type="button" href="<?php echo base_url() . "index.php/".$service_controller."/".$service_method."/1?app=" . $this->utilityclass->encryptJwtCase($this->utilityclass->getApplidFromCaseNo($case->case_no)); ?>" class='lmreportpart btn-sm btn btn-primary' id='myModal'><i class="fa fa-envelope-open" aria-hidden="true"></i> <?php echo $this->lang->line('submit_report'); ?></a>
+
+                                            <?php
+
+                                        }
+                                    
+                                    ?>
+                                    
+                                    <div style="height:5px;">&nbsp;</div>
+                                    <button class="btn btn-sm btn-success" onclick="queryToAppl('<?=$case->case_no?>')"><i class='fa fa-hand-paper-o'></i>Query to Applicant(s)</button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
+                    <center>
+                        <a href="<?php echo base_url(); ?>index.php/home/index" class="btn btn-danger">
+                            <i class="fa fa-arrow-left"></i>&nbsp;<?php echo $this->lang->line('back_to_main_menu'); ?>
+                        </a>
+                    </center>
+                </div>
+            </div>
+        </div>
+
+        <div id="modalQueryToAppl" class="modal" tabindex="-1">
+          <div class="modal-dialog" style="width: 100%">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h6 class="modal-title">Case No: <span class="text-danger" id="fetch_case_no"></span></h6>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+              </div>
+              <form id='queryRequest' action="<?php echo base_url() ?>index.php/QueryToApplController/queryToApplicantForMb2" method="post">
+                <div class="modal-body">
+                  <?php if($this->session->flashdata('query_mdl_message')) { ?>
+                    <div class="alert alert-warning alert-dismissible show" role="alert">
+                      <strong class="text-danger">
+                        <?= $this->session->flashdata('query_mdl_message'); ?>
+                      </strong>
+                    </div>
+                  <?php } ?>
+                  <label>Type Your Query</label>
+                  <textarea name='query_to_appl' class="form-control" rows="5" placeholder="Please enter your query"></textarea>
+                  <input type="hidden" name='appl_no' value="<?=$case->applid?>">
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" id='querySend' class="btn query btn-primary">Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <script>
+            $(function() {
+                $('.panel').on('click', '.lmreportmut', function(e) {
+                    e.preventDefault();
+                    console.log($(this));
+                    $.ajax({
+                        url: $(this).attr('href'),
+                        success: function(data) {
+                            $('#myModal .modal-content').html(data);
+                            $('#myModal').modal();
+                        }
+                    });
+                });
+                $('.panel').on('click', '.skreport', function(e) {
+                    e.preventDefault();
+                    $.ajax({
+                        url: $(this).attr('href'),
+                        success: function(data) {
+                            $('#myModal .modal-content').html(data);
+                            $('#myModal').modal();
+                        }
+                    });
+                });
+                $('#myModal').on('hidden.bs.modal', function() {
+                    $('body').css('padding-right', 0);
+                })
+            });
+
+            <?php
+                if($this->session->flashdata('query_mdl_message')){
+            ?>
+                $('#modalQueryToAppl').modal('show');
+            <?php
+                }
+            ?>
+
+            $('.close').click(function(){
+                $('#modalQueryToAppl').modal('hide');
+            });
+
+            function queryToAppl(case_no)
+            {
+                $('#modalQueryToAppl').modal('show');
+                $('#fetch_case_no').html(case_no);
+            }
+        </script>

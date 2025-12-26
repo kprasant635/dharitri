@@ -1,0 +1,729 @@
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+define('FILE_READ_MODE', 0644);
+define('FILE_WRITE_MODE', 0666);
+define('DIR_READ_MODE', 0755);
+define('DIR_WRITE_MODE', 0777);
+define('VERSION', '5.0.001');
+define('FOPEN_READ',							'rb');
+define('FOPEN_READ_WRITE',						'r+b');
+define('FOPEN_WRITE_CREATE_DESTRUCTIVE',		'wb'); // truncates existing file data, use with care
+define('FOPEN_READ_WRITE_CREATE_DESTRUCTIVE',	'w+b'); // truncates existing file data, use with care
+define('FOPEN_WRITE_CREATE',					'ab');
+define('FOPEN_READ_WRITE_CREATE',				'a+b');
+define('FOPEN_WRITE_CREATE_STRICT',				'xb');
+define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
+
+
+
+#======================================================
+define('OPEN',1);
+define('CLOSE',0);
+define('IS_PRODUCTION',CLOSE);//0 for 53 staging, 1 production for 34 and 35, 
+
+#======================================================
+/////////////LINKS//////////////////
+include(APPPATH."config/application_primary_link.php");
+///////////FILES RELEATED API////////////////////
+include(APPPATH."config/files_folder_constants.php");
+///////////////////////////////////////////////////////////////////////////////////////
+//END_UPLOADED_PATH
+define('TEA_ESTATE_CLASS_CODE','0116');
+define('GOVT_LAND','0211');
+define('CONVERSION_CODE','01');
+define('define_date','2017-09-16');
+define('CHANGE_DATE','2017-09-16');
+define('year_no',(date('m') < '07') ? date('Y') : date('Y', strtotime('+1 year')));
+define('RTPS_FLAG', OPEN);
+define('CO_BULK_SELECT_LIMIT','50');
+define('RTPS_CERT_ON_OFF',OPEN);
+define('OFC_MUTATION', '1'); //if 1=new version, else= older version
+define('OFC_MUT_TYPE', '03');
+define('FIELD_MUT_TYPE', '01');
+define('OFC_PROCEED_ID_1', '1');
+define('OFC_PROCEED_ID_2', '2');
+define('FILE_TYPE', 'jpeg|jpg|png|pdf');
+define('MAX_SIZE', '1024');
+define('DEATH_CERTIFICATE', 'DEATH_CERTIFICATE');
+define('NOC', 'NOC');
+define('NOK_CONSENT', 'NOK_CONSENT');
+define('JAMABANDI', 'JAMABANDI');
+////17-03-22/////
+define('SINGLE_DAG','Single');
+define('BS_REJECT_CASE_TAG','REJ/');
+define('KARIMGANJ_DIST_CODE', '21');
+define('PARTITION_DAG_CHANGE_VALIDATION','D');
+define('ALLOT_CERT', 'Allotment_Certificate'); 
+define('All_application', 'ALL');
+define('Pending_with_ADC', 'PENDING');
+define('ADC_has_Approved', 'APPROVED');
+define('ADC_has_Rejected', 'REJECTED');
+define('PAGE_LIMIT', '50');
+define('affidavit', 'affidavit');
+define('AUTOMUTATION_NOTICE_PERIOD','+30 day');
+define('AUTOMUTATION_DEED_PERIOD','+7 day');
+
+///////////////
+define('SERVICE_OFFICE_MUTATION','1');
+define('SERVICE_FIELD_MUTATION','2');
+define('SERVICE_OFFICE_PARTITION','3');
+define('SERVICE_FIELD_PARTITION','4');
+define('SERVICE_ALLOTMENT','5');
+define('SERVICE_NAME_CORRECT','6');
+define('SERVICE_AREA_CORRECTION','7');
+define('SERVICE_NAME_CANCEL','8');
+define('SERVICE_CONVERSION','9');
+define('SERVICE_MOBILE_UPDATE','10');
+define('SERVICE_RECLASSIFICATION','11');
+/////////////////////////
+define('NC_VILLAGE', '01');
+define('REVENUE_VILLAGE', '02');
+define('NC_VILLAGE_TEXT', 'NC Village');
+define('REVENUE_VILLAGE_TEXT', 'Revenue Village');
+define('MUNICIPALITY_BOARD', '1');
+define('MUNICIPALITY_BOARD_TEXT', 'Municipality Board');
+define('TOWN_COMMITTEE', '2');
+define('TOWN_COMMITTEE_TEXT', 'Town Committee');
+define('MUNICIPALITY_CORPORATION', '3');
+define('MUNICIPALITY_CORPORATION_TEXT', 'Municipal Corporation');
+define('MUNICIPALITY', '4');
+define('MUNICIPALITY_TEXT', 'Municipality');
+define('NA', '9');
+define('NA_TEXT', 'Not Applicable (N/A)');
+//land bank constant
+define('LB_NATURE_OF_RESERVATION', json_encode([
+    ['CODE' => 1, 'NAME' => 'VGR'],
+    ['CODE' => 2, 'NAME' => 'PGR'],
+    ['CODE' => 3, 'NAME' => 'ROAD-SIDE-RESERVE'],
+    ['CODE' => 4, 'NAME' => 'RIVER-SIDE-RESERVE'],
+    ['CODE' => 7, 'NAME' => 'GOVT-KHAS-LAND'],
+    ['CODE' => 8, 'NAME' => 'GOVT-CEILING-LAND'],
+    ['CODE' => 6, 'NAME' => 'NONE'],
+]));
+define('LAND_BANK_STATUS_PENDING', 'P');
+define('LAND_BANK_STATUS_REVERT_BACK', 'R');
+define('LAND_BANK_STATUS_APPROVED', 'A');
+define('LAND_BANK_STATUS_FORWARD', 'C');
+define('LB_ENC_TYPE_OF_LAND_USE', json_encode([
+    ['CODE' => 1, 'NAME' => 'HOMESTEAD'],
+    ['CODE' => 2, 'NAME' => 'AGRICULTURAL'],
+    ['CODE' => 3, 'NAME' => 'SMALL-TEA-GROWER'],
+    ['CODE' => 4, 'NAME' => 'SPECIAL-CULTIVATION-RUBBER'],
+    ['CODE' => 5, 'NAME' => 'SPECIAL-CULTIVATION-COFFEE'],
+    ['CODE' => 6, 'NAME' => 'BY DIGGING POND'],
+]));
+//Trace map constant
+define('TRACE_MAP', 'TRACE MAP');
+define('BASUNDHARA_CHECK', 'MB');
+define('BARAK_VALLEY', json_encode(['21']));
+//define('BARAK_VALLEY', array(21));
+define('PATTA_APPLICATION_TYPE', json_encode([
+    ['CODE' => 1, 'NAME' => 'PERIODIC KHIRAJ PATTA'],
+    ['CODE' => 2, 'NAME' => 'ANNUAL KHIRAJ PATTA'],
+]));
+define('DOUL_LAST_DATE', date('Y-m-d'));
+define('LAND_BANK_CO_PENDING_LIST_PAGINATION_LIMIT', 30);
+define('LAND_BANK_ENCROACHER_EXCEL_FORMAT_FILE_NAME', 'encroacher_details_format');
+define('LAND_BANK_ENCROACHER_EXCEL_FORMAT_FILE_LOCATION', 'application');
+define('NC', 'n');
+define('BTAD', 'b');
+define('NC_BTAD_OPTIONS', json_encode([
+    ['CODE' => 'n', 'NAME' => 'NC'],
+    ['CODE' => 'b', 'NAME' => 'BTAD'],
+    ['CODE' => 'e', 'NAME' => 'ERODED/No Existence'],
+    ['CODE' => 's', 'NAME' => 'SHIFTED'],
+    ['CODE' => 'd', 'NAME' => 'DUPLICATE'],
+    ['CODE' => 'c', 'NAME' => 'CHAR VILLAGE'],
+]));
+define('TYPE_OF_ENCROACHER', json_encode([
+    ['CODE' => 1, 'NAME' => 'OTHERS'],
+    ['CODE' => 2, 'NAME' => 'MNP'],
+    ['CODE' => 3, 'NAME' => 'EROSION AFFECTED'],
+    ['CODE' => 4, 'NAME' => 'REFUGEE'],
+    ['CODE' => 5, 'NAME' => 'ETHNIC VIOLENCE']
+]));
+///////////////////////////////////////////////////////////////////
+defined('SETTLEMENT_TENANT')                or define('SETTLEMENT_TENANT', 'STENT');
+defined('SETTLEMENT_TENANT_ID')             or define('SETTLEMENT_TENANT_ID', 13);
+defined('SETTLEMENT_AP_TRANSFER')           or define('SETTLEMENT_AP_TRANSFER', 'SAPNR');
+defined('SETTLEMENT_AP_TRANSFER_ID')        or define('SETTLEMENT_AP_TRANSFER_ID', 14);
+defined('SETTLEMENT_TRIBAL_COMMUNITY')      or define('SETTLEMENT_TRIBAL_COMMUNITY', 'STRIB');
+defined('SETTLEMENT_TRIBAL_COMMUNITY_ID')   or define('SETTLEMENT_TRIBAL_COMMUNITY_ID', 15);
+defined('SETTLEMENT_KHAS_LAND')             or define('SETTLEMENT_KHAS_LAND', 'SKHAS');
+defined('SETTLEMENT_KHAS_LAND_ID')          or define('SETTLEMENT_KHAS_LAND_ID', 16);
+defined('SETTLEMENT_PGR_VGR_LAND')          or define('SETTLEMENT_PGR_VGR_LAND', 'SVGR');
+defined('SETTLEMENT_PGR_VGR_LAND_ID')       or define('SETTLEMENT_PGR_VGR_LAND_ID', 17);
+defined('SETTLEMENT_SPECIAL_CULTIVATORS')    or define('SETTLEMENT_SPECIAL_CULTIVATORS', 'SCULT');
+defined('SETTLEMENT_SPECIAL_CULTIVATORS_ID') or define('SETTLEMENT_SPECIAL_CULTIVATORS_ID', 18);
+///Status Basundhara2.0
+define('CASTE', json_encode([
+    ['CODE' => 1, 'NAME' => 'ST', 'STATUS' => 1],
+    ['CODE' => 2, 'NAME' => 'SC', 'STATUS' => 1],
+    ['CODE' => 3, 'NAME' => 'Tea Garden', 'STATUS' => 1],
+    ['CODE' => 4, 'NAME' => 'Ex Tea Garden', 'STATUS' => 1],
+    ['CODE' => 5, 'NAME' => 'OBC', 'STATUS' => 1],
+    ['CODE' => 6, 'NAME' => 'GEN', 'STATUS' => 1],
+    ['CODE' => 7, 'NAME' => 'MOBC', 'STATUS' => 1],
+]));
+// new Masud Reza
+defined('MB_RE_REPORT') or define('MB_RE_REPORT', 'X');
+defined('MB_HEARING_DATE_CHANGED') or define('MB_HEARING_DATE_CHANGED', 'H');
+defined('PRO_CASE_STATUS_PENDING') or define('PRO_CASE_STATUS_PENDING', 1);
+defined('PRO_CASE_STATUS_REJECT') or define('PRO_CASE_STATUS_REJECT', 0);
+defined('PRO_CASE_STATUS_APPROVE') or define('PRO_CASE_STATUS_APPROVE', 2);
+define('KHAS_MAX_HOMESTEAD', 1);           // in bigha
+define('KHAS_MAX_AGRICULTURE', 7);         // in bigha
+define('CULTIVATION_MAX_APPLIED', 75);     // in bigha
+define('TRIBAL_MAX_HOMESTEAD', 1);         // in bigha
+define('TRIBAL_MAX_AGRICULTURE', 50);       // in bigha
+define('TRIBAL_MAX_BOTH', 50); 
+define('VGR_PGR_MAX_HOME', 1);             // in bigha
+define('MAX_APPLIED_ADDITIONAL_AREA', 8);          // in bigha
+define('MAX_APPLIED_URBAN_AREA_KATHA', 1);         // in KATHA
+define('MAX_APPLIED_URBAN_AREA_LESSA', 10);        // in LESSA
+define('MAX_APPLIED_URBAN_AREA_BARAK_KATHA', 6);   // in KATHA
+define('MAX_APPLIED_URBAN_AREA_BARAK_LESSA', 0);   // in LESSA
+define('HOMESTEAD', 1);
+define('AGRICULTURAL', 2);
+define('BOTH_LAND', 3);
+define('FISHERY', 4);
+define('FISHERY_MAX_AREA', 1);           // in bigha
+define('generateMinutes', 'Generate Minutes');
+defined('PRO_CASE_STATUS_REVERT_FOR_VERIFY') or define('PRO_CASE_STATUS_REVERT_FOR_VERIFY', 4);
+defined('PRO_CASE_APPROVED_STATUS') or define('PRO_CASE_APPROVED_STATUS', OPEN);
+defined('PRO_CASE_NOT_APPROVED_STATUS') or define('PRO_CASE_NOT_APPROVED_STATUS', CLOSE);
+defined('MB_REVERT') or define('MB_REVERT', 'R');
+defined('MB_FINAL') or define('MB_FINAL', 'F');
+defined('MB_APPLICANT_NOTICE') or define('MB_APPLICANT_NOTICE', 'A');
+defined('MB_NOTICE_SERVED') or define('MB_NOTICE_SERVED', 'S');
+defined('MB_PENDING') or define('MB_PENDING', 'W');
+defined('MB_PAYMENT_REQUEST') or define('MB_PAYMENT_REQUEST', 'M');
+defined('MB_DISMISS') or define('MB_DISMISS', 'D');
+defined('MB_PAYMENT_RECEIVED') or define('MB_PAYMENT_RECEIVED', 'P');
+defined('MB_UNDER_PROCESS_AFTER_PAYMENT') or define('MB_UNDER_PROCESS_AFTER_PAYMENT', 'U');
+defined('MB_PAYMENT_NOTICE') or define('MB_PAYMENT_NOTICE', 'N');
+//Actors
+defined('MB_LOT_MONDOL') or define('MB_LOT_MONDOL', 'LM');
+defined('MB_CIRCLE_OFFICER') or define('MB_CIRCLE_OFFICER', 'CO');
+defined('MB_DEPUTY_COMM') or define('MB_DEPUTY_COMM', 'DC');
+defined('MB_ADD_DEPUTY_COMM') or define('MB_ADD_DEPUTY_COMM', 'ADC');
+defined('MB_SUB_DIV_COMM') or define('MB_SUB_DIV_COMM', 'SDO');
+defined('MB_APPLICANT') or define('MB_APPLICANT', 'Applicant');
+defined('MB_MARK_AS_SDLAC') or define('MB_MARK_AS_SDLAC', 'T');
+defined('MB_SEND_TO_SDLAC') or define('MB_SEND_TO_SDLAC', 'L');
+defined('MB_SDLAC') or define('MB_SDLAC', 'SDLAC');
+defined('MB_DEPARTMENT') or define('MB_DEPARTMENT', 'DPT');
+defined('MB_ORDER_FOR_CHITHA_UPDATE') or define('MB_ORDER_FOR_CHITHA_UPDATE', 'C');
+defined('MB_FINAL_APPROVED_BY_DC') or define('MB_FINAL_APPROVED_BY_DC', 'O');
+defined('MB_APPROVED_BY_SDLAC') or define('MB_APPROVED_BY_SDLAC', 'J');
+define('MB2_LIVE', OPEN); //0 for hide 1 for show
+////////////////////// END REZA ///////////////////////////////////////////
+// new
+define('PAGINATION_LIMIT', 3);
+define('MB_UNDER_CONSIDERATION', 'Q');
+define('LAND_FALLS', json_encode([
+    ['CODE' => -1, 'NAME' => 'Please select Land Falls'],
+    ['CODE' => 1, 'NAME' => 'VGR'],
+    ['CODE' => 2, 'NAME' => 'PGR'],
+    ['CODE' => 3, 'NAME' => 'Wet Land'],
+    ['CODE' => 4, 'NAME' => 'CS Land'],
+    ['CODE' => 5, 'NAME' => 'Khas Govt Land'],
+    ['CODE' => 6, 'NAME' => 'NR Govt Land'],
+    ['CODE' => 7, 'NAME' => 'Green Belt Area'],
+    ['CODE' => 8, 'NAME' => 'Reserved for Govt Departments'],
+    ['CODE' => 9, 'NAME' => 'Ancient Monuments'],
+    ['CODE' => 10, 'NAME' => 'Reserved for other Purposes'],
+    ['CODE' => 11, 'NAME' => 'RF'],
+    ['CODE' => 12, 'NAME' => 'PRF'],
+    ['CODE' => 13, 'NAME' => 'Un-classed Forest land'],
+    ['CODE' => 14, 'NAME' => 'Under Wild Life Sanctuary'],
+    ['CODE' => 15, 'NAME' => 'Any Land Barred for Allotment'],
+    ['CODE' => 16, 'NAME' => 'Settlement by a Judicial Pronouncement or any Central or State Legislation'],
+
+]));
+defined('MB_NR') or define('MB_NR', 'G');
+define('PROTECTED_CLASS', json_encode([
+    ['CODE' => -1, 'NAME' => 'Select class...'],
+    ['CODE' => 1, 'NAME' => 'Plains Tribals'],
+    ['CODE' => 2, 'NAME' => 'Hills Tribals'],
+    ['CODE' => 3, 'NAME' => 'Tea Garden Tribals'],
+    ['CODE' => 4, 'NAME' => 'Santhals'],
+    ['CODE' => 5, 'NAME' => 'Nepali Cultivator graziers'],
+    ['CODE' => 6, 'NAME' => 'Scheduled Class'],
+    ['CODE' => 7, 'NAME' => 'Koch Rajbongshis'],
+    ['CODE' => 8, 'NAME' => 'Indigenous Nath (yogi)'],
+    ['CODE' => 9, 'NAME' => 'Tai Ahom'],
+    ['CODE' => 10, 'NAME' => 'Chutia'],
+    ['CODE' => 11, 'NAME' => 'Gorkha'],
+    ['CODE' => 12, 'NAME' => 'Moran'],
+    ['CODE' => 13, 'NAME' => 'Matak'],
+    ['CODE' => 14, 'NAME' => 'Does not falls under Protected Category'],
+]));
+define('VALIDATION_BYPASS', json_encode([
+    ['SERVICE_CODE' => SETTLEMENT_KHAS_LAND_ID, 'REJECTED_CODE' => ['106','84', '118', '119', '120', '121', '122', '123', '124', '125', '126', '127', '128', '129', '130', '131', '132', '133', '134', '135', '136', '137', '138', '139', '140', '141', '142', '143', '144', '145', '146', '147','336','342','232','236','237','229','230','231','233','234','235','238','345','354', '348', '358', '367','373']],
+    ['SERVICE_CODE' => SETTLEMENT_TRIBAL_COMMUNITY_ID, 'REJECTED_CODE' => ['83', '107', '148','149','150','151','152','153','154','155','156','157','158','159','160','161','162','163','164','165','166','167','168','169','170','171','172','173','174','175','341','255','258','259','260','261','251','252','253','254','256','257', '351', '357','366','372','376']],
+    ['SERVICE_CODE' => SETTLEMENT_SPECIAL_CULTIVATORS_ID, 'REJECTED_CODE' => ['95', '108', '176','177','178','179','180','181','182','183','184','185','186','187','188','189','190','191','192','193','194','195','196','197','198','199','200','201','202','203','204','338','344','266','262','263','264','265','267','268','353', '360','361','362','369','375']],
+    ['SERVICE_CODE' => SETTLEMENT_AP_TRANSFER_ID, 'REJECTED_CODE' => ['82', '109','110','205','206','207','208','209','210','211','212','213','214','215','216','217','218','219','220','221','222','223','224','225','226','227','228','335','340','244','247','248','249','250','240','239','241','242','243','245','246','346','350', '356','363','365', '371']],
+    ['SERVICE_CODE' => SETTLEMENT_PGR_VGR_LAND_ID, 'REJECTED_CODE' => ['94', '111','115','116','303','304','305','306','307','308','309','310','311','312','313','314','315','316','317','318','319','320','321','322','323','324','325','326','327','328','329','330','331','332','333','337','343','352', '359', '368','374']],
+    ['SERVICE_CODE' => SETTLEMENT_TENANT_ID, 'REJECTED_CODE' => ['269','270','271','272','273','274','275','276','277','278','279','280','281','282','283','284','285','286','287','288','289','290','291','292','293','294','295','296','297','298','299','300','301','302','334','339','347','349', '355','364', '370', '377']],
+]));
+define('LM_NOTE', json_encode([
+    ['CODE' => -1, 'NAME' => 'Please select remark category...'],
+    ['CODE' => 1, 'NAME' => 'Can be Recommended'],
+    ['CODE' => 2, 'NAME' => 'Can not be Recommended']
+]));
+define('YES', 'YES');
+define('NO', 'NO');
+defined('SETTLEMENT_TENANT_ASS') or define('SETTLEMENT_TENANT_ASS', 'Settlement Tenant');
+defined('SETTLEMENT_AP_TRANSFER_ASS') or define('SETTLEMENT_AP_TRANSFER_ASS', 'Settlement AP Transfer');
+defined('SETTLEMENT_TRIBAL_ASS') or define('SETTLEMENT_TRIBAL_ASS', 'Settlement Tribal');
+defined('SETTLEMENT_KHAS_ASS') or define('SETTLEMENT_KHAS_ASS', 'Settlement Khas Land');
+defined('SETTLEMENT_PGR_ASS') or define('SETTLEMENT_PGR_ASS', 'PGR VGR');
+defined('SETTLEMENT_SPECIAL_ASS') or define('SETTLEMENT_SPECIAL_ASS', 'Cultivation');
+define('TRACE_MAP_COPY', 'Trace Map Copy');
+define('GEO_TAG_PHOTO', 'Geo Tag Photo');
+define('FIELD_REPORT', 'Field Report');
+define('LR_REPORT', 'LR Report');
+define('CHITHA_COPY', 'Chitha Copy');
+define('BHUMI_CERT', 'CERT');
+define('BHUMI_ACK', 'ACK');
+//E-KHAJANA CONSTANTS
+define('JAMA_WASIL_STATUS_OFFLINE', 'offline');
+define('JAMA_WASIL_STATUS_ONLINE', 'online');
+define('JAMA_WASIL_ACTION_MOUZDAR_ENTRY', 'mouzadar_arrear_update');
+define('JAMA_WASIL_ACTION_MOUZDAR_ENTRY_UPDATE', 'mouzadar_arrear_new_update');
+define('JAMA_WASIL_ACTION_CO_ENTRY', 'co_arrear_update');
+define('JAMA_WASIL_ACTION_CO_ENTRY_UPDATE', 'co_arrear_new_update');
+define('JAMA_WASIL_ACTION_AST_ENTRY', 'ast_arrear_update');
+define('JAMA_WASIL_ACTION_AST_ENTRY_UPDATE', 'ast_arrear_new_update');
+define('EKHAJANA_STATUS_LM_FORWARD', 'LM-F');
+define('EKHAJANA_STATUS_CO_FORWARD', 'CO-F');
+define('EKHAJANA_STATUS_COMPLETED', 'F');
+define('EKHAJANA_STATUS_REJECTED', 'R');
+//menu active/deactive 
+define('EKHAJANA_LM_MENU_ACTIVE', OPEN);//1 FOR ACTIVE, O FOR DEACTIVE
+define('EKHAJANA_CO_MENU_ACTIVE', OPEN);//1 FOR ACTIVE, O FOR DEACTIVE
+define('EKHAJANA_AST_MENU_ACTIVE', OPEN);//1 FOR ACTIVE, O FOR DEACTIVE
+define('GEO_TAG_ACTIVE_STATUS', OPEN); //0 for hide 1 for show
+define('ENABLE_BUTTON_LM_SUBMIT', OPEN);
+define('ENABLE_BUTTON_CHANGE_ENCROACHER', OPEN);
+define('ENABLE_BUTTON_ADD_APPLICANT', OPEN);
+/////////////////////////////////////
+define('MARITAL_STATUS', json_encode([
+    ['CODE' => 1, 'NAME' => 'MARRIED'],
+    ['CODE' => 2, 'NAME' => 'UNMARRIED'],
+    ['CODE' => 3, 'NAME' => 'DIVORCED'],
+    ['CODE' => 4, 'NAME' => 'WIDOW'],
+    ['CODE' => 5, 'NAME' => 'WIDOWER'],
+]));
+define('EKSONA_TRANSFERRED', json_encode([
+    ['CODE' => 1, 'NAME' => 'Transferred'],
+    ['CODE' => 2, 'NAME' => 'Non Transferred']
+]));
+define('GRAMDAN_BHUDAN', json_encode([
+    ['CODE' => 1, 'NAME' => 'Eksona'],
+    ['CODE' => 2, 'NAME' => 'Gramdan Eksona'],
+    ['CODE' => 3, 'NAME' => 'Bhudan Eksona']
+]));
+define('ADD_APPLICANT_STATUS', CLOSE);
+define('DC_PROCESS_LIVE', CLOSE);
+define('ENABLE_BUTTON_LM_SUBMIT_AP', OPEN);
+define('ENABLE_BUTTON_LM_SUBMIT_KHAS', OPEN);
+define('ENABLE_BUTTON_LM_SUBMIT_VGR', OPEN);
+define('ENABLE_BUTTON_LM_SUBMIT_TENANT', OPEN);
+define('ENABLE_BUTTON_LM_SUBMIT_CULTI', OPEN);
+define('ENABLE_BUTTON_LM_SUBMIT_TRIBAL', OPEN);
+define('EKHAJANA_MOUZDAR_CODE', 'MOU');
+///////////////////////////////
+define('CITIZEN', 'CITIZEN');
+define('HISTORY',CLOSE); ////1 for not insert  0 for insert
+define('EKHAJANA_MOUZADAR_MENU_ACTIVE', OPEN);
+define('EKHAJANA_AST_MOU_REVERT', 'L');
+define('ENABLE_APPLICANT_BUTTON', CLOSE);
+define('ENABLE_AREA_BUTTON', OPEN);
+define('ENABLE_FAMILY_BUTTON', OPEN);
+define('ENABLE_BUTTON_CO_TO_DC_KHAS', OPEN); // Open=OPEN; Close=0
+define('KHAS_RURAL_MAX', '8B 0k 0L');
+define('JAMA_WASIL_ACTION_CO_ENTRY_REUPDATE', 'co_arrear_reupdate');
+define('FETCH_PAYMENT_STATUS_API_LINK', '');
+define('ENABLE_BUTTON_CO_TO_DC_AP', OPEN); // Open=1; Close=0
+define('TYPE_OF_PATTA', json_encode([
+    ['CODE' => 1, 'NAME' => 'Eksona'],
+    ['CODE' => 2, 'NAME' => 'Bhudan Eksona'],
+    ['CODE' => 3, 'NAME' => 'Gramdan Eksona'],
+]));
+define('TYPE_OF_TRANSFER', json_encode([
+    ['CODE' => 1, 'NAME' => 'BY AGREEMENT'],
+    ['CODE' => 2, 'NAME' => 'BY DEED'],
+    ['CODE' => 3, 'NAME' => 'INFORMAL'],
+    ['CODE' => 4, 'NAME' => 'NON TRANSFERED'],
+]));
+define('PAN',OPEN); //o for inactive 1 for active
+define('AADHAAR',OPEN); //o for inactive 1 for active
+define('EKHAJANA_AMDANI_REPORT_MENU_ACTIVE',CLOSE);
+define('ENABLE_BUTTON_SDO_ADC', OPEN); // Open=1; Close=0
+defined('SDLAC_STATUS_PENDING') or define('SDLAC_STATUS_PENDING', CLOSE);
+defined('SDLAC_STATUS_AGREE') or define('SDLAC_STATUS_AGREE', 1);
+defined('SDLAC_STATUS_DISAGREE') or define('SDLAC_STATUS_DISAGREE', 2);
+defined('SDLAC_MEMBER_REPORT_STATUS_PENDING') or define('SDLAC_MEMBER_REPORT_STATUS_PENDING', CLOSE);
+defined('SDLAC_MEMBER_REPORT_STATUS_AGREE') or define('SDLAC_MEMBER_REPORT_STATUS_AGREE', 1);
+defined('SDLAC_MEMBER_REPORT_STATUS_DISAGREE') or define('SDLAC_MEMBER_REPORT_STATUS_DISAGREE', 2);
+define('ENABLE_BUTTON_SEND_TO_SDLAC', OPEN); // Open=1; Close=0
+define('ENABLE_BUTTON_CO_TO_DC_TRIBAL', OPEN); // Open=1; Close=0
+defined('PRO_CASE_STATUS_REVERTED') or define('PRO_CASE_STATUS_REVERTED', 3);
+define('ENABLE_BUTTON_CO_TO_DC_CULTIVATORS', OPEN); // Open=OPEN; Close=0
+define('ENABLE_BUTTON_SEND_TO_SDLAC_TRIBAL_ADC',OPEN);
+define('ENABLE_BUTTON_SEND_TO_SDLAC_TRIBAL_SDO',OPEN);
+define('SDLAC_ATTEND_ONLINE', OPEN);
+define('SDLAC_ATTEND_OFFLINE', 2);
+define('NOMINEE_STATUS_ENABLE', OPEN);
+define('DC_ADC_SDO_PRO_BUTTON', OPEN); 
+define('PROPOSAL_SEND_TO_SDLAC', 'IN (0)');
+define('FIRST_PAGE_ONLY_DC', 0); 
+define('SEND_PROPOSAL_TO_SDLAC_MEM_BUTTON', OPEN); 
+define('APPLIED_SCHEME', json_encode([
+    ['CODE' => 1, 'NAME' => 'MNP', 'STATUS' => 1],
+    ['CODE' => 2, 'NAME' => 'ST / SC', 'STATUS' => 1],
+    ['CODE' => 3, 'NAME' => 'Refugee', 'STATUS' => 1],
+    ['CODE' => 4, 'NAME' => 'Ethinic Violence / Errossion Effected', 'STATUS' => 1],
+    ['CODE' => 5, 'NAME' => 'None of the above', 'STATUS' => 1],
+
+]));
+define('SELECTED_CASES_APPROVED_BY_DEPT_DC', OPEN); 
+define('ENABLE_DAG_ELIGIBLE_BUTTON', OPEN);
+defined('MB_SUPERVISOR_KANANGU') or define('MB_SUPERVISOR_KANANGU', 'SK');
+define('ENC_VARIFICATION_LIST', json_encode([
+    ['CODE' => -1, 'NAME' => 'Select class...', 'STATUS' => '1'],
+    ['CODE' => 1, 'NAME' => 'Name exists', 'STATUS' => '1'],
+    ['CODE' => 2, 'NAME' => 'Name exists but possession not found', 'STATUS' => '1'],
+    ['CODE' => 3, 'NAME' => 'Name does not exists', 'STATUS' => '1'],
+    ['CODE' => 4, 'NAME' => 'Name does not exist and also not in possession', 'STATUS' => '1'],
+]));
+define('EKHAJANA_STATUS_MOU_FORWARD', 'MOU_F');
+define('ENABLE_DAG_ELIGIBLE_BUTTON_LM_REVERT', OPEN); // Open=1; Close=0
+define('lm_state_cadre', 'Date of superannuation being within three years'); //0 for UAT 1 for Production
+define('lm_state_cadre_date', '2023-05-14'); //0 for UAT 1 for Production
+define('EKHAJANA_STATUS_COMBINE_FORWARD', 'COM_F');
+define('EKHAJANA_STATUS_LM_FORWARD_MOUZADARI_SYSTEM', 'MLM_F');
+defined('DC_FINAL_APPROVED') or define('DC_FINAL_APPROVED', CLOSE);
+defined('PAYMENT_REQUEST_AT_DC_DEPT') or define('PAYMENT_REQUEST_AT_DC_DEPT', CLOSE);  //Reza  Open=1; Close=0
+defined('REMARK_UNDER_PAYMENT_NOTICE') or define('REMARK_UNDER_PAYMENT_NOTICE', "Amount to be paid in mentioned time period.");
+define('CO_NOTE', json_encode([
+    ['CODE' => -1, 'NAME' => 'Please select remark category...'],
+    ['CODE' => 1, 'NAME' => 'Can be Recommended'],
+    ['CODE' => 2, 'NAME' => 'Can not be Recommended'],
+    ['CODE' => 3, 'NAME' => 'Revert to LM'],
+]));
+define('NOT_AVAILABLE', 0);
+define('AVAILABLE', 1);
+define('NO_ENCROACHER', '-1');
+define('NO_AVAILABLE_ASSAMESE', 'উপলব্ধ নহয়');
+define('ENABLE_DAG_CHANGE_BUTTON', OPEN); // Open=1; Close=0
+define('MAX_BIGHA', 30);
+define('MAX_KATHA_BARAK', 15);
+define('MIN_VALUE', 0);
+define('MAX_KATHA', 4);
+define('EKHAJANA_MOUZADAR_OBJECTION', 'M_OBJ');
+define('EKHAJANA_MOUZADAR_CO_ACTIVE', OPEN);
+define('MB2_DIGITAL_SIGN_LIVE', CLOSE);
+define('MB2_DIGITAL_SIGN_DRAFT_MODE', OPEN);  // production=1; draft=0
+define('MB2_DC_FINAL_PROCESS_LIVE', OPEN);  // UAT=1; LIVE=0
+
+// define('CHECK_IF_AP_TO_PP', 110);
+define('CHECK_IF_AP_TO_PP', 220);
+define('VLMCC_MEETING_LIVE', CLOSE); 
+define('PUT_UNDER_CONSIDERATION', json_encode([
+    ['CODE' => -1, 'NAME' => 'Please select......'],
+    ['CODE' => 1, 'NAME'  => 'Re verification'],
+    ['CODE' => 2, 'NAME'  => 'Document Pending'],
+]));
+define('ENABLE_CHECK_LAND', OPEN);
+define('AREA_RESERVE_VILLAGE_WISE', 15);  // in Bigha
+define('ENABLE_ADDITIONAL_PROPERTY_BUTTON', CLOSE);  // Open=1; Close=0
+define('ADDITIONAL_PROPERTY_BUTTON', '<button type="button" name="view_additional_property" class="m-1 col-2 btn btn-success btn-sm" id="view_additional_property" onclick="viewAdditionalPropertyModal()"><i class="fa fa-university">&nbsp;&nbsp;</i>View Additional Property</button>');
+define('FILE_UPLOAD_REQUIRE_IN_DHARITREE', OPEN); // 1: open, 0: close
+define('JAMA_WASIL_STATUS_PAID', 'PAID');
+define('JAMA_WASIL_STATUS_UNPAID', 'UNPAID');
+define('PAYMENT_NOTICE_BUTTON', OPEN); // 1: open, 0: close
+define('VGR_PGR_REJECT_ONLY', OPEN); // 1: open, 0: close
+define('VGR_RECOMEND_OPTION', OPEN); //1-> OPEN 0-> CLOSE
+define('DAG_FLAG_ENABLED', CLOSE);
+define('ENABLE_BUTTON_CO_SUBMIT_VGR', OPEN);
+define('LM_NOT_RECOMM_OPTION', OPEN); // 0 for not show, 1 for show
+define('REJECTED_REMARK_HEAD', json_encode([
+  ['CODE' => 1, 'NAME' => 'Land Not Settlable', 'STATUS' => 1],
+  ['CODE' => 2, 'NAME' => 'Possession Related issues', 'STATUS' => 1],
+  ['CODE' => 3, 'NAME' => 'Identity Mismatch Issues', 'STATUS' => 1],
+  ['CODE' => 4, 'NAME' => 'Applicant Ineligibility issues', 'STATUS' => 1],
+  ['CODE' => 5, 'NAME' => 'WRONG SERVICE APPLICATION', 'STATUS' => 1],
+  ['CODE' => 6, 'NAME' => 'Self declaration issues', 'STATUS' => 1],
+]));
+define('UPPER_ASSAM_DIST_CODE', json_encode(['11','12','14','15','16','17','18','25','37']));
+define('ENABLE_BUTTON_CO_SUBMIT_TENANT', OPEN);
+define('BASUNDHARA_PRODUCTION_API', API_LINK_MB2);
+define('EDIT_AREA_NOT_MORE_THEN_APPLIED_AREA',1);
+define('CHITHA_AREA_CHECK_WITH_MEETING_ID', 4);
+defined('CO_BULK_SELECT_LIMIT_NEW') or define('CO_BULK_SELECT_LIMIT_NEW',10);
+define('TENANT_GENERAL_NOTICE', OPEN); // 1: open, 0: close
+define('LOT_BIFURCATE',OPEN);
+define('SEND_TO_OTHER_LM_VGR', CLOSE);
+define('ENABLE_LAND_OWNER_BUTTON', CLOSE);
+define('PATTA_TYPE_CODE', json_encode(['0202','0230']));
+define('NGDRS_DIST', json_encode(['08','07']));
+define('CHITHA_DAG_FLAG_ENABLED', OPEN);
+define('ALLOWED_DHA_DB',['dha1','dha2','dha3','dha4','dha5','dha6','dha7','dha8','dha9','dha11','dha23']);
+// define('ALLOWED_DHA_DB',['dha10','dha12','dha13','dha14','dha15','dha16','dha17','dha18','dha19','dha20','dha21','dha22','dha25','dha39']);
+define('ENABLE_CHITHA_UPDATE', CLOSE);
+define('SEND_TO_OTHER_CO_VGR', CLOSE);  // Open=1; Close=0
+define('DC_ADC_SDO_PRO_BUTTON_VGR', OPEN); // 1: open 0: close
+define('MODIFICATION_REQUEST_ENABLE', OPEN);   // 1 YES 0 NO
+define('MODIFICATION_REQUEST_PENDING', CLOSE);
+define('MODIFICATION_REQUEST_APPROVED', OPEN);
+define('MODIFICATION_REQUEST_REJECTED', 2);
+define('MODIFICATION_REQUEST_SERVICE_CODE', [14,15,16,17,18]);
+define('LOT_BIFURCATE_PULL',OPEN);
+define('REVIVAL_REASONS', json_encode([
+    ['CODE' => 1, 'NAME' => 'Wrongful rejection'],
+    ['CODE' => 2, 'NAME'  => 'Change in policy'],
+    ['CODE' => 3, 'NAME'  => 'Dead applicant'],
+]));
+defined('PROG_MEET_GENERATE') or define('PROG_MEET_GENERATE', '1');
+defined('PROG_MEET_AREA') or define('PROG_MEET_AREA', '1');
+defined('PROG_MEET_APPROVE') or define('PROG_MEET_APPROVE', '1');
+define('SDLAC_MEM_MLA_NOMINEE_ALLOW', ['07_SDLC44','11_SDLC25','06_SDLC16','06_SDLC22','06_SDLC23']);
+define('SDLAC_MEM_NOMINEE_ALLOW', ['MP','SDLC']);
+define('TENANT_MAX_BOTH_ADDITIONAL_AREA', 50);  // in bigha
+define('CONSULTANT_CURRENT_SALARY', 25000);
+define('CPMS_ADC_ACTIVE', OPEN);
+define('ADC_SDO_REVERT_SEND_MINUTES_BUTTON_VGR', CLOSE); // 1: open 0: close
+define('PAYMENT_NOTICE_BULK_REQUEST_DIST', json_encode(['12','10','06','13','03','01','15','39','23','14','25','02','34','07','18','38','32','05','37','21','24','33','17','35','22','36','11','16','08']));
+define('DC_DIGITAL_SIGN_MINUTES_BUTTON_VGR', OPEN); // 1: open 0: close
+define('GET_BHUMIPUTRA_STATUS', CLOSE);
+define('PROCESS_REVERTED_VGR_PGR_CASE_ADC_SDO', OPEN); // 1: open 0: close
+define('CHECK_MULTIPLE_IP', OPEN); // 1: open 0: close
+define('RESTRICT_IP', json_encode(['10.177.0','10.177.15','10.177.48']));
+define('CHITHA_DAG_FAG_TRIBAL_CASE_ADC_SDO', CLOSE); // 1: open 0: close
+define('CHITHA_DAG_FAG_CULTIVATOR_CASE_ADC_SDO', CLOSE); // 1: open 0: close
+define('CHITHA_DAG_FAG_KHAS_CASE_ADC_SDO', CLOSE); // 1: open 0: close
+define('CHITHA_DAG_FAG_AP_CASE_ADC_SDO', CLOSE); // 1: open 0: close
+define('CHITHA_FLAG_UPDATE_CASES', []);
+define('CHITHA_DAG_FLAG_DIST_CODE', '00');
+define('HOLD_CASES_FORWARD_TO_DEPT_BY_DC', '2024-01-11 23:59:55');
+define('RESET_PASS_ENABLED',OPEN);
+define('HOLD_All_MB2_CASES_DATE', '2024-01-15 23:59:59');
+define('HOLD_All_MB2_CASES_STATUS', CLOSE);
+define('CIRCLE_BIRFURCATE_ADC',CLOSE);
+define('DHARLOGIN_PASSWORD_UPDATE_FIRST',CLOSE);
+define('REVIVE_CASE_BUTTON', OPEN);
+define('REVIVAL_REJECT_CODE', array('130','131','138','145','218','226','362','361','174','376','373','371','372','358','143'));
+define('OTP_MOBILE_UPDATE_ENABLE', OPEN);
+define('NRC_FILE_UPLOAD_ENABLED',CLOSE);
+define('ENABLE_MODIFY_MAIN_APPLICANT', OPEN);
+define('GENDER_NEW_APPL', json_encode([
+    ['CODE' => '1', 'NAME' => 'Male'],
+    ['CODE' => '2', 'NAME' => 'Female'],
+    ['CODE' => '3', 'NAME' => 'Other'],
+]));
+define('RELATION_NEW_APPL', json_encode([
+    ['CODE' => '1', 'NAME' => 'মাতৃ (Mother)'],
+    ['CODE' => '2', 'NAME' => 'পিতৃ (Father)'],
+    ['CODE' => '3', 'NAME' => 'পতি (Husband)'],
+    ['CODE' => '4', 'NAME' => 'পত্নী (Wife)'],
+    ['CODE' => '7', 'NAME' => 'অভিভাৱক (Guardian)'],
+]));
+define('MARITAL_STATUS_NEW_APPL', json_encode([
+    ['CODE' => '1', 'NAME' => 'Married'],
+    ['CODE' => '2', 'NAME' => 'Unmarried'],
+    ['CODE' => '4', 'NAME' => 'Widow'],
+    ['CODE' => '5', 'NAME' => 'Widower'],
+    ['CODE' => '3', 'NAME' => 'Divorced'],
+]));
+define('OCCUPATION_NEW_APPL', json_encode([
+    ['CODE' => 'SERVICE', 'NAME' => 'Govt Service'],
+    ['CODE' => 'PRIVSERV', 'NAME' => 'Pvt Service'],
+    ['CODE' => 'BUSINESS', 'NAME' => 'Business'],
+    ['CODE' => 'PENSIONER', 'NAME' => 'Pensioner'],
+    ['CODE' => 'AGRICULTURE', 'NAME' => 'Agriculture'],
+    ['CODE' => 'HOUSEWIFE', 'NAME' => 'House Wife'],
+    ['CODE' => 'UNEMPLOYED', 'NAME' => 'Unemployed'],
+]));
+define('MIN_APPLIED_AGE', 18);
+// ================= added for NRC doc upload ===================
+define('ENABLE_NRC_FILE_UPLOAD',OPEN);
+define('ENABLE_OTHER_FILE_UPLOAD',OPEN);
+define('NRC_HEREDITARY_DOCLIST', json_encode([
+    ['DOC_CODE' => '2a', 'DOC_NAME' => 'Land Document (Certified by CO)', 'STATUS' => 1],
+    ['DOC_CODE' => '3a', 'DOC_NAME' => 'University Certificate/admit/migration etc', 'STATUS' => 1],
+    ['DOC_CODE' => '3b', 'DOC_NAME' => 'SEBA Board Certificate/admit/migration etc', 'STATUS' => 1],
+    ['DOC_CODE' => '3c', 'DOC_NAME' => 'Madrassa Board Certificate/admit/migration etc', 'STATUS' => 1],
+    ['DOC_CODE' => '3d', 'DOC_NAME' => 'CBSE Board Certificate/admit/migration etc', 'STATUS' => 1],
+    ['DOC_CODE' => '3e', 'DOC_NAME' => 'AHSEC Board Certificate/admit/migration etc', 'STATUS' => 1],
+    ['DOC_CODE' => '4a', 'DOC_NAME' => 'BANK Account', 'STATUS' => 1],
+    ['DOC_CODE' => '4b', 'DOC_NAME' => 'Insurance Account', 'STATUS' => 1],
+    ['DOC_CODE' => '4c', 'DOC_NAME' => 'Post office Account', 'STATUS' => 1],
+    ['DOC_CODE' => '6a', 'DOC_NAME' => 'EPIC/Voter Id card/Numbered Electoral', 'STATUS' => 1],
+    ['DOC_CODE' => '8a', 'DOC_NAME' => 'Death Certificate', 'STATUS' => 1],
+    ['DOC_CODE' => '8b', 'DOC_NAME' => 'Caste Certificate', 'STATUS' => 1],
+    ['DOC_CODE' => '8c', 'DOC_NAME' => 'Driving license', 'STATUS' => 1],
+    ['DOC_CODE' => '8d', 'DOC_NAME' => 'PF Records', 'STATUS' => 1],
+    ['DOC_CODE' => '8e', 'DOC_NAME' => 'Employment Certificate -GOVT', 'STATUS' => 1],
+    ['DOC_CODE' => '8f', 'DOC_NAME' => 'Employment Certificate -Tea Gardens', 'STATUS' => 1],
+    ['DOC_CODE' => '8h', 'DOC_NAME' => 'Passport', 'STATUS' => 1],
+    ['DOC_CODE' => '8i', 'DOC_NAME' => 'Court Records/Process', 'STATUS' => 1],
+    ['DOC_CODE' => '8j', 'DOC_NAME' => 'PAN Card', 'STATUS' => 1],
+    ['DOC_CODE' => '8k', 'DOC_NAME' => 'AADHAAR Card', 'STATUS' => 1],
+]));
+define('DAGDEL','DAG-DEL');
+define('DAGDEL_ID',29);
+define('DAG_DELETE_ENABLE',CLOSE);  // 1 open 0 close
+define('DAG_DELETE_REASON', json_encode([
+    ['CODE' => 1, 'NAME' => 'Wrong data entry'],
+]));
+define('EKHAJANA_CASE_UPDATE', json_encode([
+        array(
+            'application_no'=>'RTPS/EKHT/2023/1',
+            'ld_application_no'=>"RTPS/EKHT/2023/1/1",
+            'query'=>'1',
+        ),      
+]));
+define('ENABLED_BLOCKCHAIN',CLOSE);
+define('ENABLED_BLOCKCHAIN_PROD',CLOSE);
+define('ENABLED_BLOCKCHAIN_FOR_DIST',json_encode(['08']));
+define('MEETING_PROPOSAL_SDLAC_NOTICE_HOLD', OPEN);
+define('MEETING_PROPOSAL_SDLAC_NOTICE_DATE', '2024-01-10 23:59:59');
+define('MEETING_PROPOSAL_SDLAC_NOTICE_DATE_INPUT', '2024-01-11 00:00:00');
+define('MEETING_PROPOSAL_SDLAC_NOTICE_DATE_SHOW', '10th January 2024');
+define('ALLOW_DAG_DELETION_DIST_TO_DAG',
+    array(
+        '24_01_03_02_01_10002_1955',
+        '24_01_03_02_09_20001_1426',
+        '24_01_03_01_01_20002_262',
+        '24_01_03_03_01_10003_7805',
+        '24_01_03_03_01_10003_7806',
+        '24_01_03_03_01_10003_7807',
+        '24_01_03_03_01_10003_7814',
+        '24_01_03_03_01_10003_7815',
+        '24_01_03_03_01_10003_7817',        
+        '24_01_03_03_05_10003_1966',
+        '24_01_03_03_04_20003_1966'
+    )
+);
+define('VERIFICATION_MODULE_METHODS', array('paymentNoticeCofirmationCases','confirmPaymentCo', 'getAllDags','getVillage','getLot','getMouza','getCircle','getSubdiv','getFinalVerificationData','getGuardianRelation','addFamilyDetails','delFamilyDetailsExisted','delFamilyDetails','chithaProcessingDetails','coApproveLmReport','getRevenueDetails','chithaUpdateDetails','checkIfBifurcateAreaExceed','getLotsFromMouza','pagination','noticeGeneratedCases','finalVerificationPagination','viewApplicationDetailsOnly','printPaymentNotice','manualPaymentDetailsSubmitHandle','getLotsFromMouzaCo','downloadDocument','adcDash','pendingCasesStatus','pendingCaseDetailsDashboardADC','SettlementApFirstLandDc', 'getAllOrderChithaUpdateForDcAppTenant', 'printNotice', 'confirmPaymentApplicantDc', 'confirmPaymentApplicant', 'partialPaymentConfirmationList','updateInstallPaymentView','updateChallenManualPayment','paginationPartialPaymentList','chithaBulkList','bulkChithaUpdate','paginationBulkChitaUpdate','updateLandClass','updatePattaType','choosePattaType'));
+define('VACANCY_OF_LR_STAFF_STATUS',CLOSE);
+define('MINUTES_VIEW_BY_DC_STATUS',OPEN);
+define('MANUAL_CHALLAN_MENU_ACTIVE','0');//0 for deactive
+define('NC_LIVE', CLOSE);
+defined('NC_KHAS_LAND')   or define('NC_KHAS_LAND', 'NCKHAS');
+defined('NC_KHAS_LAND_ID')   or define('NC_KHAS_LAND_ID', 25);
+defined('NC_CULTIVATOR')   or define('NC_CULTIVATOR', 'NCSCULT');
+defined('NC_CULTIVATOR_ID')   or define('NC_CULTIVATOR_ID', 30);
+defined('NC_TRIBAL')   or define('NC_TRIBAL', 'NCTRIB');
+defined('NC_TRIBAL_ID')   or define('NC_TRIBAL_ID', 27);
+define('LM_VERIFICATION_REPORT_BULK_APPROVE_CO', CLOSE);
+define('PARTIAL_PAYMENT_CONFIRMATION',CLOSE);
+define('EKHAJANA_DC_DEMAND_SATISFY_MENU_ACTIVE', CLOSE);
+define('CHITHA_REMARK_ENG',CLOSE);
+
+define('ENABLED_ADVANCED_AUTHORIZATION', OPEN);
+define('MANUAL_MAX_PAYMENT_DATE', '2024-02-15 23:59:59');
+define('MANUAL_MAX_PAYMENT_DATE_SHOW', '15th February 2024');
+define('DIGITAL_PATTA_OPEN' ,OPEN);
+define('DIGITAL_PATTA', OPEN);
+define('MOBILENO_UPDATE_IN_SUPERIOR_LOGIN',OPEN);
+define('ENABLED_BULK_JAMA_UPDATE', CLOSE);
+define('NEED_PLACEHOLDER_FOR_NOT_EXISTING_FILE', 1);
+define('EXCLUDE_PATTA_NO_BY_DIST', json_encode([
+    ['LOCATION' => '07_01_05_06_05_10007', 'PATTA_NO' => ['21', '22', '23', '24']],
+]));
+define('ENABLE_SNA_MODULE',CLOSE);
+define('PREMIUM_RECALCULATE_AND_REGENERATE_NOTICE',CLOSE);
+define('MUT_TYPE_OFFMUT', 'OFC_MUT');
+define('ENABLE_RJCT_COMPOSITE', CLOSE);
+define('SERVICE_AUTO_MUTATION',CLOSE);
+include(APPPATH."config/chitha_const_mb2service.php");
+if(ENABLED_BLOCKCHAIN ==OPEN)
+{
+    include(APPPATH."config/blockchainconstants.php");
+}
+if(ENABLED_ADVANCED_AUTHORIZATION==OPEN){
+    include(APPPATH."config/authorizationConstants.php");
+}
+if(DIGITAL_PATTA ==OPEN){
+    include(APPPATH."config/digital_patta_constants.php");
+}
+define('PREMIUM_NOTICE_30_PERCENT', OPEN);
+
+
+
+/// new NC case
+define('NC_LIVE', CLOSE);
+define('API_LINK_NC','http://141.148.207.152/rtpsmb2demo/NcApi/');
+defined('NC_KHAS_LAND')   or define('NC_KHAS_LAND', 'NCKHAS');
+defined('NC_KHAS_LAND_ID')   or define('NC_KHAS_LAND_ID', 25);
+defined('NC_CULTIVATOR')   or define('NC_CULTIVATOR', 'NCSCULT');
+defined('NC_CULTIVATOR_ID')   or define('NC_CULTIVATOR_ID', 30);
+defined('NC_TRIBAL')   or define('NC_TRIBAL', 'NCTRIB');
+defined('NC_TRIBAL_ID')   or define('NC_TRIBAL_ID', 27);
+define('NC_SDO_ADC_LIVE', CLOSE);
+define('NC_DC_LIVE', CLOSE);
+define('NC_SDO_ADC_PROCESS_LIVE', CLOSE);
+define('NC_CASE_PROCESS_STATUS_FOR_DC_ADC_SDO', CLOSE);
+define('NC_MODIFICATION_REQUEST_SERVICE_CODE', [25,30,27]);
+
+//Reza // 1 YES // 0 NO
+define('ADD_SDLAC_MEM_STATUS_NC', CLOSE);
+define('ENABLE_BUTTON_SEND_TO_SDLAC_NC', CLOSE);
+define('MEETING_PROPOSAL_SDLAC_NOTICE_HOLD_NC', CLOSE);
+define('MEETING_PROPOSAL_SDLAC_NOTICE_DATE_NC', '2024-01-10 23:59:59');
+define('MEETING_PROPOSAL_SDLAC_NOTICE_DATE_INPUT_NC', '2024-01-11 00:00:00');
+define('MEETING_PROPOSAL_SDLAC_NOTICE_DATE_SHOW_NC', '10th January 2024');
+define('SDLAC_MEM_MLA_NOMINEE_ALLOW_NC', ['07_SDLC00']);
+define('SDLAC_MEM_NOMINEE_ALLOW_NC', ['NC_MP','NC_SDLC']);
+define('SELECTED_CASES_APPROVED_BY_DEPT_DC_NC', CLOSE);
+define('SEND_PROPOSAL_TO_SDLAC_MEM_BUTTON_NC', CLOSE);
+define('HOLD_CASES_FORWARD_TO_DEPT_BY_DC_NC', '2024-05-15 23:59:59');
+define('MB2_DIGITAL_SIGN_LIVE_NC', CLOSE);           // Yes=1; No=0  1 digital sign with token
+define('MB2_DIGITAL_SIGN_DRAFT_MODE_NC', CLOSE);     // production=1; draft=0
+define('NC_ENABLE_APPLICANT_BUTTON', CLOSE);         // open=1; closed=0  add/Edit applicant
+define('NC_ENABLE_BUTTON_CHANGE_ENCROACHER', CLOSE); // open=1; closed=0  update encroacher details
+define('NC_ENABLE_AREA_BUTTON', CLOSE);              // open=1; closed=0  area edit
+define('NC_ENABLE_FAMILY_BUTTON', CLOSE);            // open=1; closed=0  add family member
+define('NC_ENABLE_DAG_ELIGIBLE_BUTTON', CLOSE);      // Open=1; Closed=0  dag delete
+define('NC_ENABLE_DAG_CHANGE_BUTTON', CLOSE);        // Open=1; Closed=0  add new dag
+
+define('NC_KHAS_MAX_HOMESTEAD', 1);              // in bigha
+define('NC_KHAS_MAX_AGRICULTURE', 50);           // in bigha
+define('NC_KHAS_MAX_BOTH', 50);                  // in bigha
+define('PARTIAL_PAYMENT_CHITHA_UPDATE', CLOSE);
+
+
+define('NC_KHAS_RURAL_MAX', '8B 0k 0L');
+define('NC_ENABLE_MODIFY_MAIN_APPLICANT', CLOSE);
+define('NC_ENABLE_DAG_ELIGIBLE_BUTTON_LM_REVERT', CLOSE);
+define('NC_ENABLE_DAG_CHANGE_BUTTON_REVERT', CLOSE);
+
+
+
+// new for offline settlement
+define('OFFLINE_SETTLEMENT_LIVE', OPEN);
+define('OFFLINE_KHAS_LAND_ID', 35);
+define('OFFLINE_KHAS_LAND_NAME', 'OSKHAS');
+define('OFFLINE_SETTLEMENT_ACCESS', ['LM','AST']);
+define('OFFLINE_SETTLEMENT_REGISTER_ACCESS', ['AST']);
+define('OFFLINE_SETTLEMENT_FIRST_REPORT', ['LM']);
+define('OFFLINE_SETTLEMENT_EDIT_OPTION_ACCESS', ['LM']);
+define('OFFLINE_SERVICE_CODE_ALLOW', [OFFLINE_KHAS_LAND_ID]);
+
+define('OFFLINE_KHAS_MAX_HOMESTEAD', 1);    // in bigha
+define('OFFLINE_KHAS_MAX_AGRICULTURE', 7);  // in bigha
+define('OFFLINE_KHAS_MAX_BOTH', 8);         // in bigha
+
+define('OFFLINE_SETTLEMENT_ENABLE_FAMILY_BUTTON', OPEN);
+define('OFFLINE_SETTLEMENT_ENABLE_FAMILY_BUTTON_LM', CLOSE);
+define('OFFLINE_SETTLEMENT_ENABLE_DAG_CHANGE_BUTTON', CLOSE);
+define('OFFLINE_SETTLEMENT_ENABLE_DAG_ELIGIBLE_BUTTON', CLOSE);
+define('OFFLINE_SETTLEMENT_ENABLE_AREA_BUTTON', CLOSE);
+
+
+
+
+?>

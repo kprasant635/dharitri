@@ -1,0 +1,639 @@
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+/*
+| -------------------------------------------------------------------
+| DATABASE CONNECTIVITY SETTINGS
+| -------------------------------------------------------------------
+| This file will contain the settings needed to access your database.
+|
+| For complete instructions please consult the 'Database Connection'
+| page of the User Guide.
+|
+| -------------------------------------------------------------------
+| EXPLANATION OF VARIABLES
+| -------------------------------------------------------------------
+|
+|	['hostname'] The hostname of your database server.
+|	['username'] The username used to connect to the database
+|	['password'] The password used to connect to the database
+|	['database'] The name of the database you want to connect to
+|	['dbdriver'] The database type. ie: mysql.  Currently supported:
+				 mysql, mysqli, postgre, odbc, mssql, sqlite, oci8
+|	['dbprefix'] You can add an optional prefix, which will be added
+|				 to the table name when using the  Active Record class
+|	['pconnect'] FALSE/FALSE - Whether to use a persistent connection
+|	['db_debug'] FALSE/FALSE - Whether database errors should be displayed.
+|	['cache_on'] FALSE/FALSE - Enables/disables query caching
+|	['cachedir'] The path to the folder where cache files should be stored
+|	['char_set'] The character set used in communicating with the database
+|	['dbcollat'] The character collation used in communicating with the database
+|				 NOTE: For MySQL and MySQLi databases, this setting is only used
+| 				 as a backup if your server is running PHP < 5.2.3 or MySQL < 5.0.7
+|				 (and in table creation queries made with DB Forge).
+| 				 There is an incompatibility in PHP with mysql_real_escape_string() which
+| 				 can make your site vulnerable to SQL injection if you are using a
+| 				 multi-byte character set and are running versions lower than these.
+| 				 Sites using Latin-1 or UTF-8 database character set and collation are unaffected.
+|	['swap_pre'] A default table prefix that should be swapped with the dbprefix
+|	['autoinit'] Whether or not to automatically initialize the database.
+|	['stricton'] FALSE/FALSE - forces 'Strict Mode' connections
+|							- good for ensuring strict SQL while developing
+|
+| The $active_group variable lets you choose which connection group to
+| make active.  By default there is only one group (the 'default' group).
+|
+| The $active_record variables lets you determine whether or not to load
+| the active record class
+*/
+if(
+    basename($_SERVER['REQUEST_URI'])=='apiforJamabandi' 
+    || basename($_SERVER['REQUEST_URI'])=='getJamaWasil' 
+    || basename($_SERVER['REQUEST_URI'])=='getMinutes' 
+    || basename($_SERVER['REQUEST_URI'])=='getRemoteFile' 
+    || basename($_SERVER['REQUEST_URI'])=='createsdlcAccount'
+    || basename($_SERVER['REQUEST_URI'])=='generateChithaRegistration'
+    || basename($_SERVER['REQUEST_URI'])=='autoRegister'
+    || basename($_SERVER['REQUEST_URI'])=='getSronoteAPI' 
+    || basename($_SERVER['REQUEST_URI'])=='checkPaymentRevival'
+    || basename($_SERVER['REQUEST_URI'])=='traceMapAttachment'
+    || basename($_SERVER['REQUEST_URI'])=='updateUserPassword'
+    || basename($_SERVER['REQUEST_URI'])=='updateLocationFromChangeVillage' 
+    || basename($_SERVER['REQUEST_URI'])=='getResponseAfterEkyc'
+    || basename($_SERVER['REQUEST_URI'])=='deedviewNgdrsApi'
+    || basename($_SERVER['REQUEST_URI'])=='insertNcVillageData'
+    || basename($_SERVER['REQUEST_URI'])=='sroreplyApi'
+    || basename($_SERVER['REQUEST_URI'])=='RCCMS-CHITHA'
+    || basename($_SERVER['REQUEST_URI'])=='RCCMS-ROR'
+)
+{
+ $active_group = 'db2';
+}
+else if (isset($_POST['token'])){
+	$_SESSION['KEY_API_SSO']=$_POST['token'];
+    $jwt = new JWT();
+    $key = 'abcd123haryanasinglesigonapplicationDFFEFSDAFE';
+    $decode = $jwt->decode($_POST['token'],$key,'HS256');
+    $_SESSION['credentials'] = (array)$decode;
+    $active_group = $decode->dn;
+    $active_group = $_SESSION['credentials']['dn'];
+}
+else if (isset($_SESSION['credentials']))
+{
+    $active_group = $_SESSION['credentials']['dn'];   
+}
+else
+{
+    echo 'ERROR NO CONNECTION'; 
+    die();
+}
+$active_record = TRUE;
+
+$db['db2']['hostname'] = '172.16.2.218';
+$db['db2']['username'] = 'postgres';
+$db['db2']['password'] = 'postgres';
+$db['db2']['database'] = 'district_demo';
+$db['db2']['dbdriver'] = 'postgre';
+$db['db2']['dbprefix'] = '';
+$db['db2']['pconnect'] = FALSE;
+$db['db2']['db_debug'] = FALSE;
+$db['db2']['cache_on'] = FALSE;
+$db['db2']['cachedir'] = '';
+$db['db2']['char_set'] = 'utf8';
+$db['db2']['dbcollat'] = 'utf8_general_ci';
+$db['db2']['swap_pre'] = '';
+$db['db2']['autoinit'] = TRUE;
+$db['db2']['stricton'] = FALSE;
+$db['db2']['port'] = 5432;
+
+
+$db['dha1']['hostname'] = 'localhost';
+$db['dha1']['username'] = 'postgres';
+$db['dha1']['password'] = 'postgres';
+$db['dha1']['database'] = 'barpeta';
+$db['dha1']['dbdriver'] = 'postgre';
+$db['dha1']['dbprefix'] = '';
+$db['dha1']['pconnect'] = FALSE;
+$db['dha1']['db_debug'] = FALSE;
+$db['dha1']['cache_on'] = FALSE;
+$db['dha1']['cachedir'] = '';
+$db['dha1']['char_set'] = 'utf8';
+$db['dha1']['dbcollat'] = 'utf8_general_ci';
+$db['dha1']['swap_pre'] = '';
+$db['dha1']['autoinit'] = TRUE;
+$db['dha1']['stricton'] = FALSE;
+$db['dha1']['port'] = 5432;
+
+$db['dha2']['hostname'] = 'localhost';
+$db['dha2']['username'] = 'postgres';
+$db['dha2']['password'] = 'postgres';
+$db['dha2']['database'] = 'bongaigaon';
+$db['dha2']['dbdriver'] = 'postgre';
+$db['dha2']['dbprefix'] = '';
+$db['dha2']['pconnect'] = FALSE;
+$db['dha2']['db_debug'] = FALSE;
+$db['dha2']['cache_on'] = FALSE;
+$db['dha2']['cachedir'] = '';
+$db['dha2']['char_set'] = 'utf8';
+$db['dha2']['dbcollat'] = 'utf8_general_ci';
+$db['dha2']['swap_pre'] = '';
+$db['dha2']['autoinit'] = TRUE;
+$db['dha2']['stricton'] = FALSE;
+$db['dha2']['port'] = 5432;
+
+$db['dha3']['hostname'] = 'localhost';
+$db['dha3']['username'] = 'postgres';
+$db['dha3']['password'] = 'postgres';
+$db['dha3']['database'] = 'dhubri';
+$db['dha3']['dbdriver'] = 'postgre';
+$db['dha3']['dbprefix'] = '';
+$db['dha3']['pconnect'] = FALSE;
+$db['dha3']['db_debug'] = FALSE;
+$db['dha3']['cache_on'] = FALSE;
+$db['dha3']['cachedir'] = '';
+$db['dha3']['char_set'] = 'utf8';
+$db['dha3']['dbcollat'] = 'utf8_general_ci';
+$db['dha3']['swap_pre'] = '';
+$db['dha3']['autoinit'] = TRUE;
+$db['dha3']['stricton'] = FALSE;
+$db['dha3']['port'] = 5432;
+
+$db['dha4']['hostname'] = '172.16.2.218';
+$db['dha4']['username'] = 'postgres';
+$db['dha4']['password'] = 'postgres';
+$db['dha4']['database'] = 'dibrugarh';
+$db['dha4']['dbdriver'] = 'postgre';
+$db['dha4']['dbprefix'] = '';
+$db['dha4']['pconnect'] = FALSE;
+$db['dha4']['db_debug'] = FALSE;
+$db['dha4']['cache_on'] = FALSE;
+$db['dha4']['cachedir'] = '';
+$db['dha4']['char_set'] = 'utf8';
+$db['dha4']['dbcollat'] = 'utf8_general_ci';
+$db['dha4']['swap_pre'] = '';
+$db['dha4']['autoinit'] = TRUE;
+$db['dha4']['stricton'] = FALSE;
+$db['dha4']['port'] = 5432;
+
+$db['dha5']['hostname'] = 'localhost';
+$db['dha5']['username'] = 'postgres';
+$db['dha5']['password'] = 'postgres';
+$db['dha5']['database'] = 'jorhat';
+$db['dha5']['dbdriver'] = 'postgre';
+$db['dha5']['dbprefix'] = '';
+$db['dha5']['pconnect'] = FALSE;
+$db['dha5']['db_debug'] = FALSE;
+$db['dha5']['cache_on'] = FALSE;
+$db['dha5']['cachedir'] = '';
+$db['dha5']['char_set'] = 'utf8';
+$db['dha5']['dbcollat'] = 'utf8_general_ci';
+$db['dha5']['swap_pre'] = '';
+$db['dha5']['autoinit'] = TRUE;
+$db['dha5']['stricton'] = FALSE;
+$db['dha5']['port'] = 5432;
+
+$db['dha6']['hostname'] = 'localhost';
+$db['dha6']['username'] = 'postgres';
+$db['dha6']['password'] = 'postgres';
+$db['dha6']['database'] = 'golaghat';
+$db['dha6']['dbdriver'] = 'postgre';
+$db['dha6']['dbprefix'] = '';
+$db['dha6']['pconnect'] = FALSE;
+$db['dha6']['db_debug'] = FALSE;
+$db['dha6']['cache_on'] = FALSE;
+$db['dha6']['cachedir'] = '';
+$db['dha6']['char_set'] = 'utf8';
+$db['dha6']['dbcollat'] = 'utf8_general_ci';
+$db['dha6']['swap_pre'] = '';
+$db['dha6']['autoinit'] = TRUE;
+$db['dha6']['stricton'] = FALSE;
+$db['dha6']['port'] = 5432;
+
+$db['dha7']['hostname'] = '172.16.2.218';
+$db['dha7']['username'] = 'postgres';
+$db['dha7']['password'] = 'postgres';
+//$db['dha7']['database'] = 'kamrup';
+$db['dha7']['database'] = 'kamrup_demo';
+$db['dha7']['dbdriver'] = 'postgre';
+$db['dha7']['dbprefix'] = '';
+$db['dha7']['pconnect'] = FALSE;
+$db['dha7']['db_debug'] = FALSE;
+$db['dha7']['cache_on'] = FALSE;
+$db['dha7']['cachedir'] = '';
+$db['dha7']['char_set'] = 'utf8';
+$db['dha7']['dbcollat'] = 'utf8_general_ci';
+$db['dha7']['swap_pre'] = '';
+$db['dha7']['autoinit'] = TRUE;
+$db['dha7']['stricton'] = FALSE;
+$db['dha7']['port'] = 5432;
+
+$db['dha8']['hostname'] = '172.16.2.218';
+$db['dha8']['username'] = 'postgres';
+$db['dha8']['password'] = 'postgres';
+$db['dha8']['database'] = 'goalpara_demo';
+$db['dha8']['dbdriver'] = 'postgre';
+$db['dha8']['dbprefix'] = '';
+$db['dha8']['pconnect'] = FALSE;
+$db['dha8']['db_debug'] = FALSE;
+$db['dha8']['cache_on'] = FALSE;
+$db['dha8']['cachedir'] = '';
+$db['dha8']['char_set'] = 'utf8';
+$db['dha8']['dbcollat'] = 'utf8_general_ci';
+$db['dha8']['swap_pre'] = '';
+$db['dha8']['autoinit'] = TRUE;
+$db['dha8']['stricton'] = FALSE;
+$db['dha8']['port'] = 5432;
+
+$db['dha9']['hostname'] = 'localhost';
+$db['dha9']['username'] = 'postgres';
+$db['dha9']['password'] = 'postgres';
+$db['dha9']['database'] = 'tinsukia';
+$db['dha9']['dbdriver'] = 'postgre';
+$db['dha9']['dbprefix'] = '';
+$db['dha9']['pconnect'] = FALSE;
+$db['dha9']['db_debug'] = FALSE;
+$db['dha9']['cache_on'] = FALSE;
+$db['dha9']['cachedir'] = '';
+$db['dha9']['char_set'] = 'utf8';
+$db['dha9']['dbcollat'] = 'utf8_general_ci';
+$db['dha9']['swap_pre'] = '';
+$db['dha9']['autoinit'] = TRUE;
+$db['dha9']['stricton'] = FALSE;
+$db['dha9']['port'] = 5432;
+
+$db['dha10']['hostname'] = 'localhost';
+$db['dha10']['username'] = 'postgres';
+$db['dha10']['password'] = 'postgres';
+$db['dha10']['database'] = 'kamrupM';
+$db['dha10']['dbdriver'] = 'postgre';
+$db['dha10']['dbprefix'] = '';
+$db['dha10']['pconnect'] = FALSE;
+$db['dha10']['db_debug'] = FALSE;
+$db['dha10']['cache_on'] = FALSE;
+$db['dha10']['cachedir'] = '';
+$db['dha10']['char_set'] = 'utf8';
+$db['dha10']['dbcollat'] = 'utf8_general_ci';
+$db['dha10']['swap_pre'] = '';
+$db['dha10']['autoinit'] = TRUE;
+$db['dha10']['stricton'] = FALSE;
+$db['dha10']['port'] = 5432;
+
+$db['dha11']['hostname'] = 'localhost';
+$db['dha11']['username'] = 'postgres';
+$db['dha11']['password'] = 'postgres';
+$db['dha11']['database'] = 'nalbari';
+$db['dha11']['dbdriver'] = 'postgre';
+$db['dha11']['dbprefix'] = '';
+$db['dha11']['pconnect'] = FALSE;
+$db['dha11']['db_debug'] = FALSE;
+$db['dha11']['cache_on'] = FALSE;
+$db['dha11']['cachedir'] = '';
+$db['dha11']['char_set'] = 'utf8';
+$db['dha11']['dbcollat'] = 'utf8_general_ci';
+$db['dha11']['swap_pre'] = '';
+$db['dha11']['autoinit'] = TRUE;
+$db['dha11']['stricton'] = FALSE;
+$db['dha11']['port'] = 5432;
+
+$db['dha12']['hostname'] = 'localhost';
+$db['dha12']['username'] = 'postgres';
+$db['dha12']['password'] = 'postgres';
+$db['dha12']['database'] = 'sonitpur';
+$db['dha12']['dbdriver'] = 'postgre';
+$db['dha12']['dbprefix'] = '';
+$db['dha12']['pconnect'] = FALSE;
+$db['dha12']['db_debug'] = FALSE;
+$db['dha12']['cache_on'] = FALSE;
+$db['dha12']['cachedir'] = '';
+$db['dha12']['char_set'] = 'utf8';
+$db['dha12']['dbcollat'] = 'utf8_general_ci';
+$db['dha12']['swap_pre'] = '';
+$db['dha12']['autoinit'] = TRUE;
+$db['dha12']['stricton'] = FALSE;
+$db['dha12']['port'] = 5432;
+
+$db['dha13']['hostname'] = 'localhost';
+$db['dha13']['username'] = 'postgres';
+$db['dha13']['password'] = 'postgres';
+$db['dha13']['database'] = 'lakhimpur';
+$db['dha13']['dbdriver'] = 'postgre';
+$db['dha13']['dbprefix'] = '';
+$db['dha13']['pconnect'] = FALSE;
+$db['dha13']['db_debug'] = FALSE;
+$db['dha13']['cache_on'] = FALSE;
+$db['dha13']['cachedir'] = '';
+$db['dha13']['char_set'] = 'utf8';
+$db['dha13']['dbcollat'] = 'utf8_general_ci';
+$db['dha13']['swap_pre'] = '';
+$db['dha13']['autoinit'] = TRUE;
+$db['dha13']['stricton'] = FALSE;
+$db['dha13']['port'] = 5432;
+
+$db['dha14']['hostname'] = 'localhost';
+$db['dha14']['username'] = 'postgres';
+$db['dha14']['password'] = 'postgres';
+$db['dha14']['database'] = 'sibsagar';
+$db['dha14']['dbdriver'] = 'postgre';
+$db['dha14']['dbprefix'] = '';
+$db['dha14']['pconnect'] = FALSE;
+$db['dha14']['db_debug'] = FALSE;
+$db['dha14']['cache_on'] = FALSE;
+$db['dha14']['cachedir'] = '';
+$db['dha14']['char_set'] = 'utf8';
+$db['dha14']['dbcollat'] = 'utf8_general_ci';
+$db['dha14']['swap_pre'] = '';
+$db['dha14']['autoinit'] = TRUE;
+$db['dha14']['stricton'] = FALSE;
+$db['dha14']['port'] = 5432;
+
+$db['dha15']['hostname'] = 'localhost';
+$db['dha15']['username'] = 'postgres';
+$db['dha15']['password'] = 'postgres';
+$db['dha15']['database'] = 'morigaon';
+$db['dha15']['dbdriver'] = 'postgre';
+$db['dha15']['dbprefix'] = '';
+$db['dha15']['pconnect'] = FALSE;
+$db['dha15']['db_debug'] = FALSE;
+$db['dha15']['cache_on'] = FALSE;
+$db['dha15']['cachedir'] = '';
+$db['dha15']['char_set'] = 'utf8';
+$db['dha15']['dbcollat'] = 'utf8_general_ci';
+$db['dha15']['swap_pre'] = '';
+$db['dha15']['autoinit'] = TRUE;
+$db['dha15']['stricton'] = FALSE;
+$db['dha15']['port'] = 5432;
+
+$db['dha16']['hostname'] = 'localhost';
+$db['dha16']['username'] = 'postgres';
+$db['dha16']['password'] = 'postgres';
+$db['dha16']['database'] = 'nagaon';
+$db['dha16']['dbdriver'] = 'postgre';
+$db['dha16']['dbprefix'] = '';
+$db['dha16']['pconnect'] = FALSE;
+$db['dha16']['db_debug'] = FALSE;
+$db['dha16']['cache_on'] = FALSE;
+$db['dha16']['cachedir'] = '';
+$db['dha16']['char_set'] = 'utf8';
+$db['dha16']['dbcollat'] = 'utf8_general_ci';
+$db['dha16']['swap_pre'] = '';
+$db['dha16']['autoinit'] = TRUE;
+$db['dha16']['stricton'] = FALSE;
+$db['dha16']['port'] = 5432;
+
+$db['dha17']['hostname'] = 'localhost';
+$db['dha17']['username'] = 'postgres';
+$db['dha17']['password'] = 'postgres';
+$db['dha17']['database'] = 'majuli';
+$db['dha17']['dbdriver'] = 'postgre';
+$db['dha17']['dbprefix'] = '';
+$db['dha17']['pconnect'] = FALSE;
+$db['dha17']['db_debug'] = FALSE;
+$db['dha17']['cache_on'] = FALSE;
+$db['dha17']['cachedir'] = '';
+$db['dha17']['char_set'] = 'utf8';
+$db['dha17']['dbcollat'] = 'utf8_general_ci';
+$db['dha17']['swap_pre'] = '';
+$db['dha17']['autoinit'] = TRUE;
+$db['dha17']['stricton'] = FALSE;
+$db['dha17']['port'] = 5432;
+
+$db['dha18']['hostname'] = 'localhost';
+$db['dha18']['username'] = 'postgres';
+$db['dha18']['password'] = 'postgres';
+$db['dha18']['database'] = 'karimganj';
+$db['dha18']['dbdriver'] = 'postgre';
+$db['dha18']['dbprefix'] = '';
+$db['dha18']['pconnect'] = FALSE;
+$db['dha18']['db_debug'] = FALSE;
+$db['dha18']['cache_on'] = FALSE;
+$db['dha18']['cachedir'] = '';
+$db['dha18']['char_set'] = 'utf8';
+$db['dha18']['dbcollat'] = 'utf8_general_ci';
+$db['dha18']['swap_pre'] = '';
+$db['dha18']['autoinit'] = TRUE;
+$db['dha18']['stricton'] = FALSE;
+$db['dha18']['port'] = 5432;
+
+$db['dha19']['hostname'] = '172.16.2.218';
+$db['dha19']['username'] = 'postgres';
+$db['dha19']['password'] = 'postgres';
+$db['dha19']['database'] = 'darrang_demo';
+$db['dha19']['dbdriver'] = 'postgre';
+$db['dha19']['dbprefix'] = '';
+$db['dha19']['pconnect'] = FALSE;
+$db['dha19']['db_debug'] = FALSE;
+$db['dha19']['cache_on'] = FALSE;
+$db['dha19']['cachedir'] = '';
+$db['dha19']['char_set'] = 'utf8';
+$db['dha19']['dbcollat'] = 'utf8_general_ci';
+$db['dha19']['swap_pre'] = '';
+$db['dha19']['autoinit'] = TRUE;
+$db['dha19']['stricton'] = FALSE;
+$db['dha19']['port'] = 5432;
+
+$db['dha20']['hostname'] = 'localhost';
+$db['dha20']['username'] = 'postgres';
+$db['dha20']['password'] = 'postgres';
+$db['dha20']['database'] = 'biswanath';
+$db['dha20']['dbdriver'] = 'postgre';
+$db['dha20']['dbprefix'] = '';
+$db['dha20']['pconnect'] = FALSE;
+$db['dha20']['db_debug'] = FALSE;
+$db['dha20']['cache_on'] = FALSE;
+$db['dha20']['cachedir'] = '';
+$db['dha20']['char_set'] = 'utf8';
+$db['dha20']['dbcollat'] = 'utf8_general_ci';
+$db['dha20']['swap_pre'] = '';
+$db['dha20']['autoinit'] = TRUE;
+$db['dha20']['stricton'] = FALSE;
+$db['dha20']['port'] = 5432;
+
+$db['dha21']['hostname'] = 'localhost';
+$db['dha21']['username'] = 'postgres';
+$db['dha21']['password'] = 'postgres';
+$db['dha21']['database'] = 'hojai';
+$db['dha21']['dbdriver'] = 'postgre';
+$db['dha21']['dbprefix'] = '';
+$db['dha21']['pconnect'] = FALSE;
+$db['dha21']['db_debug'] = FALSE;
+$db['dha21']['cache_on'] = FALSE;
+$db['dha21']['cachedir'] = '';
+$db['dha21']['char_set'] = 'utf8';
+$db['dha21']['dbcollat'] = 'utf8_general_ci';
+$db['dha21']['swap_pre'] = '';
+$db['dha21']['autoinit'] = TRUE;
+$db['dha21']['stricton'] = FALSE;
+$db['dha21']['port'] = 5432;
+
+$db['dha22']['hostname'] = 'localhost';
+$db['dha22']['username'] = 'postgres';
+$db['dha22']['password'] = 'postgres';
+$db['dha22']['database'] = 'charaideo';
+$db['dha22']['dbdriver'] = 'postgre';
+$db['dha22']['dbprefix'] = '';
+$db['dha22']['pconnect'] = FALSE;
+$db['dha22']['db_debug'] = FALSE;
+$db['dha22']['cache_on'] = FALSE;
+$db['dha22']['cachedir'] = '';
+$db['dha22']['char_set'] = 'utf8';
+$db['dha22']['dbcollat'] = 'utf8_general_ci';
+$db['dha22']['swap_pre'] = '';
+$db['dha22']['autoinit'] = TRUE;
+$db['dha22']['stricton'] = FALSE;
+$db['dha22']['port'] = 5432;
+
+$db['dha23']['hostname'] = 'localhost';
+$db['dha23']['username'] = 'postgres';
+$db['dha23']['password'] = 'postgres';
+$db['dha23']['database'] = 'dhemaji';
+$db['dha23']['dbdriver'] = 'postgre';
+$db['dha23']['dbprefix'] = '';
+$db['dha23']['pconnect'] = FALSE;
+$db['dha23']['db_debug'] = FALSE;
+$db['dha23']['cache_on'] = FALSE;
+$db['dha23']['cachedir'] = '';
+$db['dha23']['char_set'] = 'utf8';
+$db['dha23']['dbcollat'] = 'utf8_general_ci';
+$db['dha23']['swap_pre'] = '';
+$db['dha23']['autoinit'] = TRUE;
+$db['dha23']['stricton'] = FALSE;
+$db['dha23']['port'] = 5432;
+
+$db['dha24']['hostname'] = 'localhost';
+$db['dha24']['username'] = 'postgres';
+$db['dha24']['password'] = 'postgres';
+$db['dha24']['database'] = 'chirang';
+$db['dha24']['dbdriver'] = 'postgre';
+$db['dha24']['dbprefix'] = '';
+$db['dha24']['pconnect'] = FALSE;
+$db['dha24']['db_debug'] = FALSE;
+$db['dha24']['cache_on'] = FALSE;
+$db['dha24']['cachedir'] = '';
+$db['dha24']['char_set'] = 'utf8';
+$db['dha24']['dbcollat'] = 'utf8_general_ci';
+$db['dha24']['swap_pre'] = '';
+$db['dha24']['autoinit'] = TRUE;
+$db['dha24']['stricton'] = FALSE;
+$db['dha24']['port'] = 5432;
+
+$db['dha25']['hostname'] = 'localhost';
+$db['dha25']['username'] = 'postgres';
+$db['dha25']['password'] = 'postgres';
+$db['dha25']['database'] = 'ssalmara';
+$db['dha25']['dbdriver'] = 'postgre';
+$db['dha25']['dbprefix'] = '';
+$db['dha25']['pconnect'] = FALSE;
+$db['dha25']['db_debug'] = FALSE;
+$db['dha25']['cache_on'] = FALSE;
+$db['dha25']['cachedir'] = '';
+$db['dha25']['char_set'] = 'utf8';
+$db['dha25']['dbcollat'] = 'utf8_general_ci';
+$db['dha25']['swap_pre'] = '';
+$db['dha25']['autoinit'] = TRUE;
+$db['dha25']['stricton'] = FALSE;
+$db['dha25']['port'] = 5432;
+
+$db['dha26']['hostname'] = '172.16.2.218';
+$db['dha26']['username'] = 'postgres';
+$db['dha26']['password'] = 'postgres';
+$db['dha26']['database'] = 'nocmaster_demo';
+$db['dha26']['dbdriver'] = 'postgre';
+$db['dha26']['dbprefix'] = '';
+$db['dha26']['pconnect'] = FALSE;
+$db['dha26']['db_debug'] = FALSE;
+$db['dha26']['cache_on'] = FALSE;
+$db['dha26']['cachedir'] = '';
+$db['dha26']['char_set'] = 'utf8';
+$db['dha26']['dbcollat'] = 'utf8_general_ci';
+$db['dha26']['swap_pre'] = '';
+$db['dha26']['autoinit'] = TRUE;
+$db['dha26']['stricton'] = FALSE;
+$db['dha26']['port'] = 5432;
+
+$db['dash']['hostname'] = '172.16.2.218';
+$db['dash']['username'] = 'postgres';
+$db['dash']['password'] = 'postgres';
+$db['dash']['database'] = 'dashboard_demo';
+$db['dash']['dbdriver'] = 'postgre';
+$db['dash']['dbprefix'] = '';
+$db['dash']['pconnect'] = FALSE;
+$db['dash']['db_debug'] = FALSE;
+$db['dash']['cache_on'] = FALSE;
+$db['dash']['cachedir'] = '';
+$db['dash']['char_set'] = 'utf8';
+$db['dash']['dbcollat'] = 'utf8_general_ci';
+$db['dash']['swap_pre'] = '';
+$db['dash']['autoinit'] = TRUE;
+$db['dash']['stricton'] = FALSE;
+$db['dash']['port'] = 5432;
+
+$db['dha39']['hostname'] = 'localhost';
+$db['dha39']['username'] = 'postgres';
+$db['dha39']['password'] = 'postgres';
+$db['dha39']['database'] = 'bajali';
+$db['dha39']['dbdriver'] = 'postgre';
+$db['dha39']['dbprefix'] = '';
+$db['dha39']['pconnect'] = FALSE;
+$db['dha39']['db_debug'] = FALSE;
+$db['dha39']['cache_on'] = FALSE;
+$db['dha39']['cachedir'] = '';
+$db['dha39']['char_set'] = 'utf8';
+$db['dha39']['dbcollat'] = 'utf8_general_ci';
+$db['dha39']['swap_pre'] = '';
+$db['dha39']['autoinit'] = TRUE;
+$db['dha39']['stricton'] = FALSE;
+$db['dha39']['port'] = 5432;
+
+$db['dha41']['hostname'] = '172.16.2.218';
+$db['dha41']['username'] = 'postgres';
+$db['dha41']['password'] = 'postgres';
+$db['dha41']['database'] = 'hailakandi_demo';
+$db['dha41']['dbdriver'] = 'postgre';
+$db['dha41']['dbprefix'] = '';
+$db['dha41']['pconnect'] = FALSE;
+$db['dha41']['db_debug'] = FALSE;
+$db['dha41']['cache_on'] = FALSE;
+$db['dha41']['cachedir'] = '';
+$db['dha41']['char_set'] = 'utf8';
+$db['dha41']['dbcollat'] = 'utf8_general_ci';
+$db['dha41']['swap_pre'] = '';
+$db['dha41']['autoinit'] = TRUE;
+$db['dha41']['stricton'] = FALSE;
+
+
+
+$db['auth']['hostname'] = '172.16.2.218';
+$db['auth']['username'] = 'postgres';
+$db['auth']['password'] = 'postgres';
+$db['auth']['database'] = 'central_auth_demo';
+$db['auth']['dbdriver'] = 'postgre';
+$db['auth']['dbprefix'] = '';
+$db['auth']['pconnect'] = FALSE;
+$db['auth']['db_debug'] = FALSE;
+$db['auth']['cache_on'] = FALSE;
+$db['auth']['cachedir'] = '';
+$db['auth']['char_set'] = 'utf8';
+$db['auth']['dbcollat'] = 'utf8_general_ci';
+$db['auth']['swap_pre'] = '';
+$db['auth']['autoinit'] = TRUE;
+$db['auth']['stricton'] = FALSE;
+$db['auth']['port'] = 5432;
+
+
+$db['ticket_sys']['hostname'] = '172.16.2.218';
+$db['ticket_sys']['username'] = 'postgres';
+$db['ticket_sys']['password'] = 'postgres';
+$db['ticket_sys']['database'] = 'ticket_system';
+$db['ticket_sys']['dbdriver'] = 'postgre';
+$db['ticket_sys']['dbprefix'] = '';
+$db['ticket_sys']['pconnect'] = FALSE;
+$db['ticket_sys']['db_debug'] = TRUE;
+$db['ticket_sys']['cache_on'] = FALSE;
+$db['ticket_sys']['cachedir'] = '';
+$db['ticket_sys']['char_set'] = 'utf8';
+$db['ticket_sys']['dbcollat'] = 'utf8_general_ci';
+$db['ticket_sys']['swap_pre'] = '';
+$db['ticket_sys']['autoinit'] = TRUE;
+$db['ticket_sys']['stricton'] = FALSE;
+$db['ticket_sys']['port']     = 5432;
+/* End of file database.php */
+
+/* Location: ./application/config/database.php */

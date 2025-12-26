@@ -1,0 +1,159 @@
+<div class="container-fluid form-top">
+    <div id="printdiv">
+   
+    <div class="col-lg-12" >
+        <P class="pull-left uni_text">Assam Schedule XXXVII, Form No.23 A</p>
+    </div>
+    <div class="col-lg-12">
+        <h2 class="text-center uni_text ">PERIODIC KHIRAJ LEASE AND TOWN LANDS</h2>
+        <p class="text-center uni_text "> চহৰৰ মাটিৰ মিয়াদী খেৰাজ পাট্টা </p>
+    </div>
+    <div class="col-lg-12">
+        <p class="uni_text">
+            কিয়নো ,<br>
+            
+            (যাক ইয়াৰ তলত পাট্টাদাৰ বোলা হৈছে) ইয়াৰ লগত দিয়া তপচিলত উল্লেখ কৰা চহৰৰ মালিকে পাট্টাৰ কাৰণে প্রৰ্থনা কৰিছে এতেকে ইয়াৰ তলত লিখা 
+            নিয়মাবিলাকৰ অধীন কৰি এই পাট্টাদাৰক তেওঁৰ উওৰাধিকাৰী , প্রতিনিধি আৰু স্থলাভিষিত্ত বিলাকক ইয়াৰ দ্বাৰা অসমৰ ভূমি আৰু ৰাজহ  বিধিৰ
+            ব্যবস্থা আৰু সময়ে সময়ে কৰা তাৰ নিয়মৰ বশৱৰ্ওী সেই মাটিৰ ওপৰত চিৰস্থায়ী উওৰাধিকাৰীত্বৰ আৰু হস্তান্তৰ কৰিব পৰা ভোগ দখলৰ স্বত্ব দিয়া 
+            যায় আৰু সেই মাটিৰ স্বত্ব লিখা নিয়ম বিলাক অধীন কৰি <?php echo $certDtls->no_of_years; ?> বছৰৰ কাৰণে অৰ্থাৎ <?php echo date('d/m/Y', strtotime($certDtls->to_date)); ?> তাৰিখলৈকে <?php echo $certDtls->appln_name; ?> পাট্টাদাৰক তেওঁৰ উওৰাধিকাৰী
+            প্রতিনিধি আৰু স্থলাভিষিত্ত  বিলাকক পাট্টা দিয়া যায় | সেই মাটিৰ নিৰুপিত ৰাজহ তলত লিখা কিস্তিত বা গৱৰ্ণমেন্টে সময়মতে আন যি যি  কিস্তিৰ সময় 
+            ধাৰ্য্য কৰে সেই কিস্তিমতে বছৰে বছৰে শোধাৱ লাগিৱ |
+            
+        </p>
+        <table class="table table_black">
+            <tr>
+                <td></td><td>কিস্তিৰ তাৰিখ </td><td>দিবলগীয়া ৰাজহ </td>
+            </tr>
+            <tr>
+                <td>প্রথম কিস্তি : </td><td><?php echo date('d/m/Y', strtotime($certDtls->first_installment_date)); ?></td><td><?php echo number_format($certDtls->first_installment,2); ?></td>
+            </tr>
+            <tr>
+                <td>দ্বিতীয়  কিস্তি : </td><td><?php echo date('d/m/Y', strtotime($certDtls->second_installment_date)); ?></td><td><?php echo number_format($certDtls->second_installment,2) ; ?></td>
+            </tr>
+        </table>
+        <p class="uni_text">
+            2 | পট্টাৰ নিয়মবোৰ এই :-<//P>
+        <ul style="list-style: none">
+            <li class="uni_text">
+                (১) ওপৰৰ লিখামতে বা প্রাদেশিক গৱৰ্ণমেন্টে সময়মতে ধাৰ্য্য কৰা কিস্তিমতে পাট্টাদাৰে তেওঁৰ উওৰাধিকাৰী প্রতিনিধি আৰু স্থলাভিষিত্ত বিলাকে ওপৰত উল্লেখ কৰা ৰাজহ পুৰাকৈ শুধাৱ লাগিব ; আৰু সেই মাটি সম্বন্ধে যিকোনো টেক্স , চেচ বা স্থানীয় কৰ যিটো সময়ত গৰাকীয়ে বা দখলকাৰে শোধাৱ লগাত পৰে তেনেকৈ নিয়মিত ৰুপে শোধাৱ লাগিৱ |
+            </li>
+            <li class="uni_text">
+               (২) বন্দোবস্ত চলি থাকোতে যদি কেতিয়াবা খেতি সম্পৰ্কীয় বস্তি আৰু খেতিৰ বাবে ৰখা গৰাবাদ মাটিও বুজিব লাগিৱ , 
+                বা  “ ব্যবহাৰত নলগোবা ” মাটি খেতিৰ সম্পৰ্ক নথকা বস্তিলৈ বা বেপাৰৰ ঠাইলৈ পৰিবৰ্তন কৰা হয় বা কোনো কোনো 
+                খেতিৰ সম্পৰ্ক নথকা বস্তিলৈ বা বেপাৰৰ ঠাইলৈ পৰিৱৰ্তন কৰা হয় তেণ্তে খেতিৰ সম্পৰ্ক নথকা বস্তিলৈ বা বেপাৰৰ ঠাইৰ বাবে 
+                প্রাদেশিক গৱৰ্ণমেন্টে আসাম লেন্দ ৰেভিনিউ ৰেগুলেচন অনুসৰি ব্যবস্থা কৰা নিৰিখমতে সেই মাটিৰ ৰাজহ বঢ়াব পাৰিৱ আৰু 
+                পাট্টাদাৰে তেওঁৰ উওৰাধিকাৰী প্রতিনিধি আৰু স্থলাভিষিত্ত বিলাকে  সেই বঢ়োবা ৰাজহ নিয়মিত  সময়ত শোধাৱ |<br>
+                খেতিৰ সম্পৰ্ক নথকা বস্তি বুলিলে খেতি সম্পৰ্কীয় বাদে আন বাৱে বসৱাস কৰিবৰ নিমিত্তে দখল কৰা মাটিক বুজায় |
+            </li>
+            <li class="uni_text">
+               (৩) এই পট্টাৰ মিয়াদ উকিল গলে পাট্টাদাৰক তেওঁৰ উওৰাধিকাৰী , প্রতিনিধি আৰু স্থলাভিষিত্ত বিলাকক সেই মাটিৰ নতুন পট্টা লবলৈ সুবিধা দিয়া যাব , তেওঁ বা তেওঁবিলাকে সেই সুবিধা লব নুখুজিলে পাট্টাদাৰে তেওঁৰ উওৰাধিকাৰী প্রতিনিধি আৰু স্থলাভিষিত্ত বিলাকৰ স্বত্ব আৰু তেওঁৰ উওৰাধিকাৰী,  প্রতিনিধি আৰু স্থলাভিষিত্ত বিলাকৰ হাতেদি বা তেওঁবিলাকৰ অধীনে সেই মাটিতে কাৰোৱাৰ প্রজা বা বন্ধকসূত্রে ভোগ কৰিব পৰা স্বত্ব থাকিলেও সেই  স্বত্ব সম্পূৰ্ণ ৰুপে ৰহিত আৰু শেষ হ’ৱ |
+            </li>
+            <li class="uni_text">
+               (৪)আলি মেৰামত কৰিবৰ নিমিওে প্রাদেশিক গৱৰ্ণমেন্টে বা গৱৰ্ণমেন্টেৰ কাৰ্য্যকাৰকসকলে কোনো লোকচানি নিদিয়াকৈ সকলো প্রাদেশীয় বা লোকেল বোৰ্ড আলিৰ কাষৰ বা ওখ আলিৰ পৰা নামনিৰ পৰা ৩৫ ফুটৰ ভিতৰত খেতি সম্পৰ্কীয় মাটিৰ পৰা কটাই আনিব পাৰিব  আৰু সেই মাটি বা তাৰ কোনো অংশ , তাত থকা শস্য , লাগনী গছ বা ঘৰৰ মূল্যত বাজে আন কোনো লোকচানি নিদিয়াকৈ লব পাৰিৱ |<br>
+                কিণ্তু এই পট্টাৰ কোনো নিয়মে পাট্টাদাৰে ইতিপূৰ্ব্বে পোবা কোনো স্বত্বৰ বা আগৰ পট্টা অনুসৰি প্রাদেশিক গৱৰ্ণমেন্টে ৰখা কোনো স্বত্বৰ অন্যথা কৰিব নোবাৰিৱ | 
+
+            </li>
+            <li class="uni_text">
+               (৫) সেই মাটিত বা তাৰ তলত থকা শিলৰ খনি খনিজ বস্তু  বা মাটিৰ তলত পোত গৈ থকা সকলো বহুমলীয়া বস্তু ৰ ওপৰত প্রাদেশিক গৱৰ্ণমেন্টেস্বত্ব ৰখা গ’ল | সেই বিলাক বিচাৰিবলৈ বা খানি উলিয়াবলৈ যাওতে মাটিৰ ওপৰভাগত কোনো লোকচান হ’লে সেই নিমিত্তে তৎকালীন ডেপুটি কমিচনাৰ চাহাবে হিচাবকৰি ক্ষতিপূৰণৰ টকা ধাৰ্য্য কৰে , সেই টকা পাট্টাদাৰক তেওঁৰ উওৰাধিকাৰী , প্রতিনিধি আৰু স্থলাভিষিত্ত বিলাকক দি সেই শিলৰ খনি ইত্যাদি বিচাৰিবলৈ বা খনি উলিয়াবলৈ প্রাদেশিক গৱৰ্ণমেন্টেৰ সকলো সময়তে সম্পূৰ্ণ ক্ষমতা থাকিব |
+            </li>
+            <li class="uni_text">
+                (৬)    উক্ত মাটিৰ সীমাই বা তাৰ ওপৰেদি বৈ যোবা নৈ আৰু জান বিলাকত য’ত বছৰৰ কোনো সময়ত নাও চলাব পাৰি বা কাঠ উটাই নিব পাৰি , সেই বিলাকত  চলাচল কৰিবৰ নিমিত্তে সৰ্ব সাধাৰণৰ স্বত্ত থাকিব আৰু সেই বিলাকক নৈ বা জানৰ দুয়োকাষে ২০ ফুট বহল একদোষৰ মাটি সৰ্বসাধাৰণে নাও টানিবৰ বা বান্ধিবৰ নিমিত্তে , বস্তু – বাহানি তোলা পাৰা কৰিবৰ নিমিত্তে আৰু পানী চলাচল কৰোঁতে , কাঠ উঠাই আনোঁতে আৰু মাছ মাৰোতে যি বিলাক কাম কৰিবৰ আবশ্যক হয় সেইবিলাকৰ নিমিত্তে সকলো সময়তে ব্যবহাৰ কৰিব পাৰিৱ | 
+                <br>
+                কিণ্তু যি মাটিত এনে বিলাক স্বত্ব ইতিপূৰ্ব্বে ৰখা নহৈছিল সেই মাটিত এই নিয়ম নাখাটিব |
+            </li>
+            <li class="uni_text">
+                (৭)পাট্টাদাৰে তেওঁৰ উওৰাধিকাৰী , প্রতিনিধি আৰু স্থলাভিষিত্ত বিলাকে , এই পাট্টাৰ তলত দখল কৰা মাটিৰ পাছত কেতিয়াবা জোখোতে পাট্টাত লিখা মাটিতকৈ বঢ়া বা কম পালে তেতিয়াৰ পৰা , সেই পৰিমাণ এতিয়া ধাৰ্য্য কৰা ৰাজহ ও বেচি বা কম নিৰুপিত কৰিব পৰা যাব | 
+            </li>
+        </ul>    
+        <div class="col-lg-12">
+            <div class="col-lg-3">
+                <span class="uni_text"> তাৰিখ : <?php echo date('d/m/Y'); ?></span>
+            </div>
+            <div class="col-lg-3 col-lg-offset-6">
+              <span class="uni_text">  পাট্টাদাৰাৰ চহী <br>
+                  জিলাৰ ডেপুটি কমিচনাৰ বা ক্ষমতা পোবা আন কোনো হাকিমৰ চহী  </span>
+            </div>
+        </div>
+        <p class="text-center uni_text">তপচিল</p>
+        <hr>
+        <p class="uni_text pull-left">চহৰ :<?php echo $location['vill_townprt_code']; ?> </p>
+        <p class="uni_text pull-right"> পাট্টা নং  :<?php echo $certDtls->patta_no; ?></p>
+        <table class="table table_black small" border="1">
+            <tr>
+                <td>মাটিৰ বিৱৰণ </td>
+                <td>মাটিৰ পৰিমাণ </td>
+                <td>নিৰুপিত ৰাজহ </td>
+                <td>মন্তব্য </td>
+            </tr>
+            <tr>
+                <td>দাগ নং <?php echo $dagDtls[0]->dag_no; ?></td>
+                <td><?php echo $dagDtls[0]->a_dag_area_b."B&nbsp;&nbsp;&nbsp;".$dagDtls[0]->a_dag_area_k."K&nbsp;&nbsp;&nbsp;".$dagDtls[0]->a_dag_area_lc."L" ?></td>
+                <td>0</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>মুঠ ৰাজহ </td>
+                <td>&nbsp;</td>
+                <td>0</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>স্থানীয় কৰ </td>
+                <td>&nbsp;</td>
+                <td>0</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>সৰ্ববমুঠ</td>
+                <td>&nbsp;</td>
+                <td>0</td>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+        <div class="row">
+            <p class="pull-left uni_text">DLR & SURVEY (XXXVII)F No.23-A</p>
+            <div class="col-lg-3 col-lg-offset-9">
+              <span class="uni_text">  পাট্টাদাৰাৰ চহী <br>
+                  জিলাৰ ডেপুটি কমিচনাৰ বা ক্ষমতা পোবা আন কোনো হাকিমৰ চহী  </span>
+            </div>
+        </div>
+        
+    </div>
+    </div>
+    <hr>
+                        <?php 
+                        $data = explode(",",$qrcode)[1];
+                        echo '<img src="data:image/png;base64,' . $data . '" />';
+                        ?> 
+    <div class="row dontshow">
+        <div class="col-lg-12 col-lg-offset-4">
+                <form action="<?php echo base_url(); ?>index.php/CitizenController/CaseDelivered" method="POST">
+               <div class="btn btn-primary uni_text" id="openBtn"><i class="fa fa-arrow-circle-down"></i> Keep Pending</div>
+                <div class="btn btn-sm btn-danger uni_text printlink" onclick="myFunction()" ><i class="fa fa-print"></i> &nbsp;Print Report</div>
+                <button class="btn btn-info" disabled type="submit" id='close'>Certificate is Delivered</button>
+                <input type="hidden" value="<?php echo $certDtls->cert_no; ?>" name="case_no" >
+                </form>
+        </div>
+    </div>
+</div>
+<style>
+p, .uni_text {
+	font-size:1em !important;
+}
+.table_black tr td{
+	font-size:1em !important;
+	color: #000;
+    border: 1px solid #000 !important;
+}
+</style>
+<script>
+function myFunction() {
+				//document.getElementById("print").disabled = false;
+				//document.getElementById("close").disabled = false;
+				$(".dontshow").hide();
+                    window.print();
+					$(".dontshow").show();
+					document.getElementById("close").disabled = false;
+            }
+</script>
+  
